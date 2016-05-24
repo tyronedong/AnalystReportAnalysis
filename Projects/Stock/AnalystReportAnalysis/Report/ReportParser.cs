@@ -10,16 +10,25 @@ namespace Report
 {
     class ReportParser
     {
-        protected PDDocument report;
+        protected string pdfText;
+        protected string[] lines;
+        protected string[] noTableLines;
+        protected string[] noTableAndOtherLines;
+        protected string[] mergedParas;
+
+        protected PDDocument pdfReport;
+        protected AnalystReport anaReport;
 
         public ReportParser()
         {
-            report = null;
+            pdfReport = null;
+            anaReport = null;
         }
 
         public ReportParser(PDDocument doc)
         {
-            report = doc;
+            pdfReport = doc;
+            anaReport = new AnalystReport();
         }
 
         public virtual string extractStockjobber()
@@ -27,29 +36,16 @@ namespace Report
             return "";
         }
 
-        public virtual string extractStockCode()
+        public virtual bool extractStockBasicInfo()
         {
-            return "";
+            //extract stock name and stock code
+            return false;
         }
 
-        public virtual string extractStockName()
+        public virtual bool extractStockOtherInfo()
         {
-            return "";
-        }
-
-        public virtual string extractStockPrice()
-        {
-            return "";
-        }
-
-        public virtual string extractStockRating()
-        {
-            return "";
-        }
-
-        public virtual string extractRatingChanges()
-        {
-            return "";
+            //extract stock price, stock rating and stock rating change
+            return false;
         }
 
         public virtual string extractAnalysts()
@@ -59,12 +55,13 @@ namespace Report
 
         public virtual string extractDate()
         {
+            //just get date from database
             return "";
         }
 
-        public virtual string extractContent()
+        public virtual bool extractContent()
         {
-            return "";
+            return false;
         }
 
         public string loadPDFText()
@@ -72,13 +69,19 @@ namespace Report
             try
             {
                 PDFTextStripper pdfStripper = new PDFTextStripper();
-                string text = pdfStripper.getText(report).Replace("\r\n", "\n");
+                string text = pdfStripper.getText(pdfReport).Replace("\r\n", "\n");
                 return text;
             }
             catch (Exception e) { return null; }  
         }
 
         public virtual string[] removeTable(string[] lines)
+        {
+            string[] str = null;
+            return str;
+        }
+
+        public virtual string[] removeOther(string[] lines)
         {
             string[] str = null;
             return str;
