@@ -13,6 +13,7 @@ namespace Report
         protected string pdfText;
         protected string[] lines;
         protected string[] noTableLines;
+        protected string[] noOtherLines;
         protected string[] noTableAndOtherLines;
         protected string[] mergedParas;
 
@@ -89,8 +90,20 @@ namespace Report
 
         public virtual string[] mergeToParagraph(string[] lines)
         {
-            string[] str = null;
-            return str;
+            string curPara = "";
+            List<string> paragraphs = new List<string>();
+            foreach (var line in lines)
+            {
+                if (line.EndsWith(" "))
+                {
+                    curPara += line;
+                    paragraphs.Add(curPara);
+                    curPara = "";
+                    continue;
+                }
+                curPara += line;
+            }
+            return paragraphs.ToArray();
         }
         //public virtual string getContent()
         //{

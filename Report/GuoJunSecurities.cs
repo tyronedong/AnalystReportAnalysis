@@ -95,12 +95,18 @@ namespace Report
 
         public override bool extractContent()
         {
-            string s = "";
+            string content = "";
+            Regex paraHead_1 = new Regex("^(\\[Table_Summary\\])*( )* [\u4e00-\u9fa5a-zA-z\\d]");//匹配"[Table_Summary]  投资建议："或者" 业绩略低于市场预期" 
             foreach (var para in mergedParas)
             {
-
+                if (paraHead_1.IsMatch(para))
+                {
+                    content += para.Replace("[Table_Summary]", "") + '\n';
+                    //content += paraHead_1.Match(para).Value + '\n';
+                }
             }
-            return base.extractContent();
+            anaReport.Content = content;
+            return true;
         }
 
         public override string[] removeTable(string[] lines)
