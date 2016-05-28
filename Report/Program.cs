@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
 using Spire.Pdf;
 using org.apache.pdfbox;
 using org.apache.pdfbox.cos;
@@ -18,6 +21,8 @@ namespace Report
 {
     class Program
     {
+        private static string idFileName = ConfigurationManager.AppSettings["IdFileName"];
+
         static void Main(string[] args)
         {
             SqlServerHandler slh = new SqlServerHandler();
@@ -123,6 +128,30 @@ namespace Report
 
             System.Console.WriteLine("Hello");
             System.Console.WriteLine("hello");
+        }
+
+        static bool Execute()
+        {
+            CurIdHandler curIH = new CurIdHandler(idFileName);
+            SqlServerHandler sqlSH = new SqlServerHandler();      
+            SqlDataAdapter sqlDA;
+            SqlCommand cmd = new SqlCommand();
+            DataTable curReportsTable;
+            while (true)
+            {
+                string curId = curIH.GetCurIdFromFile();
+
+                curReportsTable = sqlSH.GetTableByCMD(cmd);
+
+                foreach (DataRow curRow in curReportsTable.Rows)
+                {
+                    //get values in row 
+                    //find in directory
+                    //handle the data
+                }
+                //set curid to id file
+            }
+            return false;
         }
     }
 }

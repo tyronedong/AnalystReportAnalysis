@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalystReport.cs" />
+    <Compile Include="CurIdHandler.cs" />
     <Compile Include="FileHandler.cs" />
     <Compile Include="GuoJunSecurities.cs" />
     <Compile Include="Program.cs" />
