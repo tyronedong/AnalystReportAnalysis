@@ -20,7 +20,7 @@ namespace Report
         public CurIdHandler(string FileName)
         {
             curidPath = string.Format(rootPathPattern, FileName);
-            SetCurIdToFile(firstId);
+            //SetCurIdToFile(firstId);
         }
 
         public string GetCurIdFromFile()
@@ -39,16 +39,16 @@ namespace Report
                 }
                 catch (Exception e)
                 {
-                    Trace.TraceError("something is wrong when get current id and need attention " + e.Message);
-                    Console.WriteLine("something is wrong when get current id and need attention " + e.Message);
-                    return "null";
+                    Trace.TraceError("CurIdHandler.GetCurIdFromFile(): " + e.Message);
+                    //Console.WriteLine("something is wrong when get current id and need attention " + e.Message);
+                    return null;
                 }
             }
             else
             {
                 //SetCurIdToFile(firstId);
                 Trace.TraceError("file doesn't exist when get current id ");
-                Console.WriteLine("file doesn't exist when get current id ");
+                //Console.WriteLine("file doesn't exist when get current id ");
                 return null;
             }
         }//getcuridfromfile
@@ -68,8 +68,8 @@ namespace Report
             }
             catch (Exception e)
             {
-                Trace.TraceError("something is wrong when set current id and need attention " + e.Message);
-                Console.WriteLine("something is wrong when set current id and need attention " + e.Message);
+                Trace.TraceError("CurIdHandler.SetCurIdToFile(string id): " + e.Message);
+                //Console.WriteLine("something is wrong when set current id and need attention " + e.Message);
                 return false;
             }
         }//setcuridtofile

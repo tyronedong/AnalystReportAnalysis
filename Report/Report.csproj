@@ -80,7 +80,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportParser.cs" />
     <Compile Include="SqlServerHandler.cs" />
-    <Compile Include="Temp.cs" />
     <Compile Include="ZhaoShangSecurities.cs" />
     <Compile Include="ZhongJinSecurities.cs" />
     <Compile Include="ZhongXinSecurities.cs" />
