@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Collections;
+using System.Diagnostics;
 
 namespace Report
 {
@@ -14,13 +15,21 @@ namespace Report
     {
 
         private SqlConnection sqlCnn;
-        private SqlDataReader sqlReader;
+
         private SqlDataAdapter sqlAdapter;
-        //private Hashtable 
+        private SqlCommand sqlReportCmd;
+        private DataTable dataTable;
+        private SqlParameter param_num_once_select = new SqlParameter("@num_once_select", SqlDbType.Int);
+        private SqlParameter param_id_min = new SqlParameter("@id_min", SqlDbType.Char);
+
         private Dictionary<string, PersonalInfo> personTable;
 
         private static string sqlConnectionString = ConfigurationManager.AppSettings["SqlConnectionString"];
-        private static string storedProcName = ConfigurationManager.AppSettings["StoredProcName"];
+        private static string storedProcName_Person = ConfigurationManager.AppSettings["StoredProcName_Person"];
+        private static string storedProcName_Report = ConfigurationManager.AppSettings["StoredProcName_Report"];
+        private static string numOnceSelect = ConfigurationManager.AppSettings["num_once_select"];
+
+        //private static 
 
         public SqlServerHandler()
         {
@@ -35,10 +44,20 @@ namespace Report
             try
             {
                 sqlCnn = new SqlConnection(sqlConnectionString);
+
+                sqlReportCmd = new SqlCommand(storedProcName_Report, sqlCnn);
+                sqlReportCmd.CommandType = CommandType.StoredProcedure;
+                sqlReportCmd.Parameters.Add(param_num_once_select);
+                sqlReportCmd.Parameters.Add(param_id_min);
+                sqlReportCmd.CommandTimeout = 60;
+                sqlAdapter = new SqlDataAdapter(sqlReportCmd);
+                dataTable = new DataTable();
+
                 sqlCnn.Open();
             }
             catch (Exception e)
             {
+                Trace.TraceError("SqlServerHandler.Init(): " + e.Message);
                 return false;
             }
             return true;
@@ -47,7 +66,7 @@ namespace Report
         public bool LoadPersonTable()
         {
             //select all persons in person_d_fact table and store it into personTable
-            SqlCommand sqlCmd = new SqlCommand(storedProcName, sqlCnn);
+            SqlCommand sqlCmd = new SqlCommand(storedProcName_Person, sqlCnn);
             SqlDataAdapter sqlAdapter = new SqlDataAdapter(sqlCmd);
             DataTable dataTable = new DataTable();
             sqlAdapter.Fill(dataTable);
@@ -66,13 +85,42 @@ namespace Report
             return true ;
         }
 
-        public DataTable GetTableByCMD(SqlCommand sqlCmd)
+        public bool ModifyCMDById(string curId)
         {
-            SqlDataAdapter sqlAdapter = new SqlDataAdapter(sqlCmd);
-            DataTable dataTable = new DataTable();
-            sqlAdapter.Fill(dataTable);
+            try
+            {
+                param_num_once_select.Value = Int32.Parse(numOnceSelect);
+                param_id_min.Value = curId;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("SqlServerHandler.ModifyCMDById(string curId): " + e.Message);
+                return false;
+            }
+            return true;
+        }
 
+        public DataTable GetTableById(string curId)
+        {
+            dataTable.Clear();
 
+            if (ModifyCMDById(curId))
+            {
+                try
+                {
+                    sqlAdapter.Fill(dataTable);
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError("SqlServerHandler.GetTableById(string curId): " + e.Message);
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+            
             return dataTable;
         }
     }

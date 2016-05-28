@@ -134,24 +134,58 @@ namespace Report
         {
             CurIdHandler curIH = new CurIdHandler(idFileName);
             SqlServerHandler sqlSH = new SqlServerHandler();      
-            SqlDataAdapter sqlDA;
-            SqlCommand cmd = new SqlCommand();
-            DataTable curReportsTable;
+
+            bool isError = false;
             while (true)
             {
+                //get current id in the log file
                 string curId = curIH.GetCurIdFromFile();
+                if (curId == null)
+                {
+                    isError = true;
+                    break;
+                }
 
-                curReportsTable = sqlSH.GetTableByCMD(cmd);
+                //get data by id
+                DataTable curReportsTable = sqlSH.GetTableById(curId);
+                if (curReportsTable == null)
+                {
+                    isError = true;
+                    break;
+                }
+
+                //judge if data has all been handled
+                if (curReportsTable.Rows.Count == 0)
+                {
+                    isError = false;
+                    break;
+                }
 
                 foreach (DataRow curRow in curReportsTable.Rows)
                 {
                     //get values in row 
+                    var time = curRow[0].ToString();
+                    var id = curRow[1].ToString();
+                    var securitiesName = curRow[2].ToString();
+                    var reportName = curRow[3].ToString();
+                    var language = curRow[4].ToString();
+                    var person1 = curRow[5].ToString();
+                    var person2 = curRow[6].ToString();
+                    var person3 = curRow[7].ToString();
                     //find in directory
                     //handle the data
                 }
                 //set curid to id file
             }
-            return false;
+
+            if (isError)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }
