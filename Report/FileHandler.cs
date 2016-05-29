@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Diagnostics;
 using org.apache.pdfbox.pdmodel;
 
 namespace Report
@@ -12,15 +13,23 @@ namespace Report
     {
         public static string GetFilePathByName(string rootPath, string fileName)
         {
-            string searchPattern = fileName + "*";
-            string[] foundPaths = Directory.GetFiles(rootPath, searchPattern, SearchOption.AllDirectories);
-            if (foundPaths.Length == 0)
+            try
             {
-                return null;
+                string searchPattern = fileName + "*";
+                string[] foundPaths = Directory.GetFiles(rootPath, searchPattern, SearchOption.AllDirectories);
+                if (foundPaths.Length == 0)
+                {
+                    return null;
+                }
+                else
+                {
+                    return foundPaths[0];
+                }
             }
-            else
+            catch (Exception e)
             {
-                return foundPaths[0];
+                Trace.TraceError("FileHandler.GetFilePathByName(string rootPath, string fileName): " + e.Message);
+                return null;
             }
         }
     }

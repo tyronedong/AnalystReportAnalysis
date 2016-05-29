@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using org.apache.pdfbox.pdmodel;
 using org.apache.pdfbox.util;
 
@@ -12,12 +13,27 @@ namespace Report
     //国泰君安
     class GuoJunSecurities : ReportParser
     {
-        public GuoJunSecurities(PDDocument pdreport)
-            : base(pdreport)
+        public GuoJunSecurities(string pdReportPath)
+            : base(pdReportPath)
         {
-            pdfText = loadPDFText();
-            lines = pdfText.Split('\n');
-            mergedParas = mergeToParagraph(lines);
+            if (this.isValid)
+            {
+                try
+                {
+                    pdfText = loadPDFText();
+                    lines = pdfText.Split('\n');
+                    mergedParas = mergeToParagraph(lines);
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError("GuoJunSecurities.GuoJunSecurities(string pdReportPath): " + e.Message);
+                }
+            }
+        }
+
+        public override AnalystReport executeExtract()
+        {
+            return base.executeExtract();
         }
 
         public override bool extractStockBasicInfo()

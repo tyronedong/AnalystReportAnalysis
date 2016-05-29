@@ -11,13 +11,16 @@ namespace Report
     class ZhongJinSecurities : ReportParser
     {
         //中金公司
-        public ZhongJinSecurities(PDDocument pdreport)
-            : base(pdreport)
+        public ZhongJinSecurities(string pdReportPath)
+            : base(pdReportPath)
         {
-            pdfText = loadPDFText();
-            lines = pdfText.Split('\n');
-            noOtherLines = removeOther(lines);
-            mergedParas = mergeToParagraph(noOtherLines);
+            if (this.isValid)
+            {
+                pdfText = loadPDFText();
+                lines = pdfText.Split('\n');
+                noOtherLines = removeOther(lines);
+                mergedParas = mergeToParagraph(noOtherLines);
+            }
         }
 
         public override bool extractStockBasicInfo()

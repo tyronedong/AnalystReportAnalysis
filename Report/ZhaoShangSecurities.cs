@@ -12,14 +12,17 @@ namespace Report
     //招商证券
     class ZhaoShangSecurities : ReportParser
     {
-        public ZhaoShangSecurities(PDDocument pdreport)
-            : base(pdreport)
+        public ZhaoShangSecurities(string pdReportPath)
+            : base(pdReportPath)
         {
-            pdfText = loadPDFText();
-            lines = pdfText.Split('\n');
-            noTableLines = removeTable(lines);
-            noTableAndOtherLines = removeOther(noTableLines);
-            mergedParas = mergeToParagraph(noTableAndOtherLines);
+            if (this.isValid)
+            {
+                pdfText = loadPDFText();
+                lines = pdfText.Split('\n');
+                noTableLines = removeTable(lines);
+                noTableAndOtherLines = removeOther(noTableLines);
+                mergedParas = mergeToParagraph(noTableAndOtherLines);
+            }
         }
         
             //base(pdreport);
