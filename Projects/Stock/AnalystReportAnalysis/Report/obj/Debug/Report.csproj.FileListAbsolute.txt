@@ -2,7 +2,6 @@ D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Report.exe.config
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Report.exe
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Report.pdb
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Spire.Pdf.dll
-D:\workingwc\Stock\AnalystReportAnalysis\Report\obj\Debug\Report.csprojResolveAssemblyReference.cache
 D:\workingwc\Stock\AnalystReportAnalysis\Report\obj\Debug\Report.exe
 D:\workingwc\Stock\AnalystReportAnalysis\Report\obj\Debug\Report.pdb
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Spire.License.dll

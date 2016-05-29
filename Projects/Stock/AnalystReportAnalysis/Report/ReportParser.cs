@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using org.apache.pdfbox.pdmodel;
 using org.apache.pdfbox.util;
 
@@ -10,6 +11,8 @@ namespace Report
 {
     class ReportParser
     {
+        public bool isValid = false;
+
         protected string pdfText;
         protected string[] lines;
         protected string[] noTableLines;
@@ -26,15 +29,38 @@ namespace Report
             anaReport = null;
         }
 
-        public ReportParser(PDDocument doc)
+        //public ReportParser(PDDocument doc)
+        //{
+        //    pdfReport = doc;
+        //    anaReport = new AnalystReport();
+        //}
+
+        public ReportParser(string pdfPath)
         {
-            pdfReport = doc;
             anaReport = new AnalystReport();
+            try
+            {
+                pdfReport = PDDocument.load(pdfPath);
+                isValid = true;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("ReportParser.ReportParser(string pdfPath): " + e.Message);
+                isValid = false;
+            }
+        }
+
+        public virtual AnalystReport executeExtract()
+        {
+            extractStockBasicInfo();
+            extractStockOtherInfo();
+            extractContent();
+            return anaReport;
         }
 
         public virtual string extractStockjobber()
         {
-            return "";
+            return null;
         }
 
         public virtual bool extractStockBasicInfo()
@@ -51,7 +77,7 @@ namespace Report
 
         public virtual string extractAnalysts()
         {
-            return "";
+            return null;
         }
 
         public virtual string extractDate()

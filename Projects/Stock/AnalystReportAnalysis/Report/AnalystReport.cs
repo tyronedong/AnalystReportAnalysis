@@ -33,6 +33,14 @@ namespace Report
 
     class Analyst
     {
+        public Analyst(string Name, string CertificateNumber, string PhoneNumber, string Email)
+        {
+            this.Name = Name;
+            this.CertificateNumber = CertificateNumber;
+            this.PhoneNumber = PhoneNumber;
+            this.Email = Email;
+        }
+
         public string Name { get; set; }
         public string CertificateNumber { get; set; }
         public string PhoneNumber { get; set; }
