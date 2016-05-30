@@ -27,10 +27,10 @@ namespace Report
 
         static void Main(string[] args)
         {
-            //Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
-            //Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
+            Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
+            Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            //Execute();
+            Execute();
 
             //SqlServerHandler slh = new SqlServerHandler();
             //slh.Init();
@@ -156,6 +156,7 @@ namespace Report
             bool isError = false;
             string reportRelativeRootPath = @"{0}\{1}-{2}-{3}";
             List<AnalystReport> reports = new List<AnalystReport>();
+            //int c = 0, t = 0;
             while (true)
             {
                 //get current id in the log file
@@ -195,6 +196,12 @@ namespace Report
                     var person1 = curRow[5].ToString();
                     var person2 = curRow[6].ToString();
                     var person3 = curRow[7].ToString();
+                    //update nextCurId
+                    nextCurId = id;
+                    if (time.Year != 2013)
+                    {
+                        continue;
+                    }
                     //judge if current document is handlable
                     if (language.Equals("EN"))
                     {
@@ -206,40 +213,48 @@ namespace Report
                     string filePath = FileHandler.GetFilePathByName(curRootPath, id);
                     if (filePath == null)
                     {
-                        isError = true;
-                        break;
+                        //isError = true;
+                        //break;
+                        continue;
                     }
 
                     //get pdf file parser by securities
-                    ReportParser report = null;
+                    ReportParser reportParser = null;
                     if (securitiesName.Equals("国泰君安"))
                     {
-                        report = new GuoJunSecurities(filePath);
+                        //reportParser = new GuoJunSecurities(filePath);
                     }
                     else if (securitiesName.Equals("中金公司"))
                     {
-                        report = new ZhongJinSecurities(filePath);
+                        //reportParser = new ZhongJinSecurities(filePath);
                     }
                     else if (securitiesName.Equals("招商证券"))
                     {
-                        report = new ZhaoShangSecurities(filePath);
+                        reportParser = new ZhaoShangSecurities(filePath);
                     }
                     
                     //handle the data
-                    if (report == null)
+                    if (reportParser == null)
                     {
-
+                        continue;
                     }
-                    else if (!report.isValid)
+                    else if (!reportParser.isValid)
                     {
                         isError = true;
                         break;
                     }
-                    AnalystReport curAnReport = report.executeExtract();
-                    curAnReport.Analysts = sqlSH.GetAnalysts(person1, person2, person3);
+
+                    AnalystReport curAnReport = reportParser.executeExtract();
+                    SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
+                    
+                    //if (curAnReport.Analysts.Count == 0)
+                    //{
+                    //    c++;
+                    //}
                     reports.Add(curAnReport);
                     //update nextCurId
                     nextCurId = id;
+                    reportParser.CloseAll();
                 }//for
                 //insert reports list to mongoDB
                 
@@ -257,5 +272,18 @@ namespace Report
                 return true;
             }
         }
+
+        /*
+         * set PDFileName, StockJobber, stock date and analysts through the information retriveled from sql server database
+         */
+        static void SetExistedInfo(ref AnalystReport anaReport, ref SqlServerHandler sqlSH, string pdFileName, string reportTitle, string jobber, DateTime time, string person1, string person2, string person3)
+        {
+            anaReport.ReportTitle = reportTitle;
+            anaReport.PDFileName = pdFileName;
+            anaReport.Stockjobber = jobber;
+            anaReport.Date = time;
+            anaReport.Analysts = sqlSH.GetAnalysts(person1, person2, person3);
+        }
+
     }
 }
