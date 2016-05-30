@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -19,6 +20,8 @@ namespace Report
         protected string[] noOtherLines;
         protected string[] noTableAndOtherLines;
         protected string[] mergedParas;
+        protected string[] advancedMergedParas;
+        protected string[] finalParas;
 
         protected PDDocument pdfReport;
         protected AnalystReport anaReport;
@@ -28,12 +31,6 @@ namespace Report
             pdfReport = null;
             anaReport = null;
         }
-
-        //public ReportParser(PDDocument doc)
-        //{
-        //    pdfReport = doc;
-        //    anaReport = new AnalystReport();
-        //}
 
         public ReportParser(string pdfPath)
         {
@@ -52,15 +49,23 @@ namespace Report
 
         public virtual AnalystReport executeExtract()
         {
-            extractStockBasicInfo();
-            extractStockOtherInfo();
+            extractStockInfo();
             extractContent();
             return anaReport;
         }
 
-        public virtual string extractStockjobber()
+        public virtual bool extractStockInfo()
         {
-            return null;
+            bool f1 = extractStockBasicInfo();
+            bool f2 = extractStockOtherInfo();
+            if (f1 && f2)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public virtual bool extractStockBasicInfo()
@@ -73,9 +78,26 @@ namespace Report
         {
             //extract stock price, stock rating and stock rating change
             return false;
+        }         
+
+        public virtual bool extractContent()
+        {
+            //problem: haven't remove something like "分析员，SAC 执业证书编号" and "公司简介"
+            string content = "";
+            Regex isContent = new Regex("[\u4e00-\u9fa5a][，。；]");
+            foreach (var para in finalParas)
+            {
+                string normaledPara = para.Trim();
+                if (isContent.IsMatch(para))
+                {
+                    content += normaledPara + '\n';
+                }
+            }
+            anaReport.Content = content;
+            return true;
         }
 
-        public virtual string extractAnalysts()
+        public virtual string extractStockjobber()
         {
             return null;
         }
@@ -83,12 +105,12 @@ namespace Report
         public virtual string extractDate()
         {
             //just get date from database
-            return "";
+            return null;
         }
 
-        public virtual bool extractContent()
+        public virtual string extractAnalysts()
         {
-            return false;
+            return null;
         }
 
         public string loadPDFText()
@@ -114,6 +136,11 @@ namespace Report
             return str;
         }
 
+        public virtual string[] removeOtherInParas(string[] paras)
+        {
+            return null;
+        }
+
         public virtual string[] mergeToParagraph(string[] lines)
         {
             string curPara = "";
@@ -131,9 +158,23 @@ namespace Report
             }
             return paragraphs.ToArray();
         }
-        //public virtual string getContent()
-        //{
-        //    return "";
-        //}
+
+        public void CloseAll()
+        {
+            pdfReport.close();
+        }
+
     }
 }
+
+
+//public ReportParser(PDDocument doc)
+//{
+//    pdfReport = doc;
+//    anaReport = new AnalystReport();
+//}
+
+//public virtual string getContent()
+//{
+//    return "";
+//}

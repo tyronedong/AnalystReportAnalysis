@@ -8,9 +8,13 @@ namespace Report
 {
     class AnalystReport
     {
+        public string ReportTitle { get; set; }
+
         public string StockCode { get; set; }
         public string StockName { get; set; }
 
+        //public double StockCurPrice { get; set; }
+        //public double StockTarPrice { get; set; }
         public double StockPrice { get; set; }
         public string StockRating { get; set; }
         public string RatingChanges { get; set; }
@@ -18,6 +22,7 @@ namespace Report
         public List<Analyst> Analysts { get; set; }
         public string Stockjobber { get; set; }
         public DateTime Date { get; set; }
+        public string PDFileName { get; set; }
 
         public string Content { get; set; }
 
@@ -25,6 +30,8 @@ namespace Report
 
         public AnalystReport()
         {
+            //StockCurPrice = 0.0;
+            //StockTarPrice = 0.0;
             StockPrice = 0.0;
             Analysts = new List<Analyst>();
             dic = new List<string>();

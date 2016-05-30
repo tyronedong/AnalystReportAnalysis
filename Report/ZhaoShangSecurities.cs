@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using org.apache.pdfbox.pdmodel;
 using org.apache.pdfbox.util;
@@ -19,56 +20,120 @@ namespace Report
             {
                 pdfText = loadPDFText();
                 lines = pdfText.Split('\n');
-                noTableLines = removeTable(lines);
-                noTableAndOtherLines = removeOther(noTableLines);
-                mergedParas = mergeToParagraph(noTableAndOtherLines);
+                noOtherLines = removeOther(lines);
+                mergedParas = mergeToParagraph(noOtherLines);
+                advancedMergedParas = removeOtherInParas(mergedParas);
+                finalParas = advancedMergedParas;
+                //noTableLines = removeTable(lines);
+                //noTableAndOtherLines = removeOther(noTableLines);
+                //mergedParas = mergeToParagraph(noTableAndOtherLines);
             }
         }
-        
-            //base(pdreport);
-        
-        //public override
+
+        public override bool extractStockInfo()
+        {
+            Regex stockNCRRP = new Regex(@"(强烈推荐|审慎推荐|推荐|中性|回避)-[a-zA-Z]+（[\u4e00-\u9fa5]+） *[\u4e00-\u9fa5a-zA-Z]+ *[(（]?\d+\.[a-zA-Z]+[)）]?");//匹配强烈推荐-A（维持） 鄂武商Ａ 000501.SZ 
+            Regex stockNameAndCode = new Regex(@"[\u4e00-\u9fa5a-zA-Z]+ *[(（]\d+.?[a-zA-Z]*[)）]");//匹配“云南白药  (000538.CH)”或 “云南白药  000538.CH”
+            Regex stockName = new Regex("[\u4e00-\u9fa5a-zA-Z]+");
+            Regex stockCode = new Regex(@"\d+");
+            Regex stockRRP = new Regex("(强烈推荐|审慎推荐|推荐|中性|回避).+（[\u4e00-\u9fa5]+）");
+            Regex stockRating = new Regex("强烈推荐|审慎推荐|推荐|中性|回避");
+            Regex stockRatingChange = new Regex(@"（[\u4e00-\u9fa5]+）");
+            Regex stockPrice = new Regex(@"\d+(\.\d+)?");
+            bool isNameCodeDone = false, isRandRCDone = false, isPriceDone = false;
+            foreach (var line in lines)
+            {
+                if (isNameCodeDone && isRandRCDone && isPriceDone)
+                {
+                    break;
+                }
+                if (!isNameCodeDone && stockNCRRP.IsMatch(line))
+                {
+                    string snc = stockNameAndCode.Match(line).Value;
+                    string sn = stockName.Match(snc).Value;
+                    string sc = stockCode.Match(snc).Value;
+
+                    anaReport.StockName = sn;
+                    anaReport.StockCode = sc;
+
+                    isNameCodeDone = true;
+
+                    string srrc = stockRRP.Match(line).Value;
+                    anaReport.StockRating = stockRating.Match(srrc).Value;
+                    anaReport.RatingChanges = stockRatingChange.Match(srrc).Value.Replace("（", "").Replace("）", "");
+
+                    isRandRCDone = true;
+                    //if (stockRating.IsMatch(line) && stockRatingChange.IsMatch(line))
+                    //{
+                    //    anaReport.StockRating = stockRating.Match(line).Value;
+                    //    anaReport.RatingChanges = stockRatingChange.Match(line).Value.Replace("（", "").Replace("）", "");
+
+                    //    isRandRCDone = true;
+                    //}
+                }
+                if (!isPriceDone && line.Trim().StartsWith("当前股价："))
+                {
+                    if (stockPrice.IsMatch(line))
+                    {
+                        try
+                        {
+                            anaReport.StockPrice = float.Parse(stockPrice.Match(line).Value);
+                            //anaReport.StockPrice.ToString();
+                            isPriceDone = true;
+                        }
+                        catch (Exception e)
+                        {
+                            Trace.TraceError("GuoJunSecurities.extractStockOtherInfo(): " + e.Message);
+                        }
+                    }
+                }
+
+            }
+            if (isNameCodeDone && isRandRCDone && isPriceDone)
+            {
+                return true;
+            }
+            return false;
+        }
 
         public override bool extractContent()
-        {      
+        {
             string content = "";
-            //string pdftext = loadPDFText();
-            //string[] lines = pdftext.Split('\n');
-            //string[] noTableLines = removeTable(lines);
-            //string[] noTableAndOtherLines = removeOther(noTableLines);
-            //string[] mergedParas = mergeToParagraph(noTableAndOtherLines);
-
-            //string s = "", ss = "";3
-            //foreach (var line in noTableLines)
-            //{
-            //    s += line + '\n'; 
-            //    Console.WriteLine(line);
-            //}
-            //foreach (var para in mergedParas)
-            //{
-            //    ss += para + '\n';
-            //    Console.WriteLine(para);
-            //}
-
-            Regex paraHead = new Regex("^\\D ");
-            Regex chinese = new Regex("[\u4e00-\u9fa5]");
-            int index = 0; bool isFirst = true;
-            foreach (var para in mergedParas)
+            Regex isContent = new Regex("[\u4e00-\u9fa5a][，。；]");
+            foreach (var para in finalParas)
             {
-                if (paraHead.IsMatch(para) && chinese.IsMatch(para))
+                string normaledPara = para.Replace(" ", "").Trim();
+                if (isContent.IsMatch(para))
                 {
-                    if (isFirst)
-                    {
-                        content += mergedParas.ElementAt(index-1) + "\n";
-                        isFirst = false;
-                    }
-                    content += para + "\n";
+                    content += normaledPara + '\n';
                 }
-                index++;
             }
             anaReport.Content = content;
             return true;
         }
+        //public override bool extractContent()
+        //{      
+        //    string content = "";
+
+        //    Regex paraHead = new Regex("^\\D ");
+        //    Regex chinese = new Regex("[\u4e00-\u9fa5]");
+        //    int index = 0; bool isFirst = true;
+        //    foreach (var para in mergedParas)
+        //    {
+        //        if (paraHead.IsMatch(para) && chinese.IsMatch(para))
+        //        {
+        //            if (isFirst)
+        //            {
+        //                content += mergedParas.ElementAt(index-1) + "\n";
+        //                isFirst = false;
+        //            }
+        //            content += para.Replace(" ","").Trim() + "\n";
+        //        }
+        //        index++;
+        //    }
+        //    anaReport.Content = content;
+        //    return true;
+        //}
 
         public override string[] removeTable(string[] lines)
         {
@@ -100,42 +165,68 @@ namespace Report
         public override string[] removeOther(string[] lines)
         {
             //Regex spaces = new Regex(" ")
+            //Regex referencesReport = new Regex(@"^\d+、《.+\d");
             List<string> newLines = new List<string>();
             foreach (var line in lines)
             {
-                if (string.IsNullOrEmpty(line.Trim()))
+                string trimedLine = line.Trim();
+                if (string.IsNullOrEmpty(trimedLine))
                 {
                     continue;
                 }
-                if (line.Trim().Equals("公司研究"))
+                if (trimedLine.StartsWith("资料来源"))
                 {
                     continue;
                 }
-                if (line.StartsWith("敬请阅读末页的重要说明"))
+                if (trimedLine.Equals("分析师承诺"))
                 {
-                    continue;
+                    break;
+                }
+                if (trimedLine.Equals("投资评级定义"))
+                {
+                    break;
+                }
+                if (trimedLine.Equals("重要声明"))
+                {
+                    break;
                 }
                 newLines.Add(line);
             }
             return newLines.ToArray();
         }
 
-        public override string[] mergeToParagraph(string[] lines)
+        //public override string[] mergeToParagraph(string[] lines)
+        //{
+        //    string curPara = "";
+        //    List<string> paragraphs = new List<string>();
+        //    foreach (var line in lines)
+        //    {
+        //        if (line.EndsWith(" "))
+        //        {
+        //            curPara += line;
+        //            paragraphs.Add(curPara);
+        //            curPara = "";
+        //            continue;
+        //        }
+        //        curPara += line;
+        //    }
+        //    return paragraphs.ToArray();
+        //}
+
+        public override string[] removeOtherInParas(string[] paras)
         {
-            string curPara = "";
-            List<string> paragraphs = new List<string>();
-            foreach (var line in lines)
+            Regex referencesReport = new Regex(@"^\d+、《.+\d");
+            List<string> newLines = new List<string>();
+            foreach (var para in paras)
             {
-                if (line.EndsWith(" "))
+                string trimedLine = para.Trim();
+                if (referencesReport.IsMatch(trimedLine))
                 {
-                    curPara += line;
-                    paragraphs.Add(curPara);
-                    curPara = "";
                     continue;
                 }
-                curPara += line;
+                newLines.Add(para);
             }
-            return paragraphs.ToArray();
+            return newLines.ToArray();
         }
     }
 }

@@ -47,9 +47,10 @@ namespace Report
                 sqlReportCmd.Parameters.Add(param_id_min);
                 sqlReportCmd.CommandTimeout = 60;
                 sqlAdapter = new SqlDataAdapter(sqlReportCmd);
-                dataTable = new DataTable();
+                dataTable = new DataTable();       
 
                 sqlCnn.Open();
+                LoadPersonTable();
             }
             catch (Exception e)
             {
@@ -75,8 +76,7 @@ namespace Report
                 var s3 = curRow[3].ToString(); //TELEPHONE
                 var s4 = curRow[4].ToString(); //MOBILE
                 var s5 = curRow[5].ToString(); //EMAIL
-                if (string.IsNullOrEmpty(s3))
-                    personTable.Add(s0, new Analyst(s1, s2, string.IsNullOrEmpty(s3) ? s3 : s4, s5));
+                personTable.Add(s0, new Analyst(s1, s2, string.IsNullOrEmpty(s3) ? s3 : s4, s5));
             }
             return true ;
         }
@@ -125,15 +125,24 @@ namespace Report
             List<Analyst> analysts = new List<Analyst>();
             if (!string.IsNullOrEmpty(pid1))
             {
-                analysts.Add(personTable[pid1]);
+                if (personTable.ContainsKey(pid1))
+                {
+                    analysts.Add(personTable[pid1]);
+                }
             }
             if (!string.IsNullOrEmpty(pid2))
             {
-                analysts.Add(personTable[pid2]);
+                if (personTable.ContainsKey(pid2))
+                {
+                    analysts.Add(personTable[pid2]);
+                }
             }
             if (!string.IsNullOrEmpty(pid3))
             {
-                analysts.Add(personTable[pid3]);
+                if (personTable.ContainsKey(pid3))
+                {
+                    analysts.Add(personTable[pid3]);
+                }
             }
             return analysts;
         }

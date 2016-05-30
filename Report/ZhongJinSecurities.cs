@@ -20,12 +20,13 @@ namespace Report
                 lines = pdfText.Split('\n');
                 noOtherLines = removeOther(lines);
                 mergedParas = mergeToParagraph(noOtherLines);
+                finalParas = mergedParas;
             }
         }
 
         public override bool extractStockBasicInfo()
         {
-            Regex stockNameAndCode = new Regex("[\u4e00-\u9fa5]+ *[(（]\\d+.?[a-zA-Z]*[)）]");
+            Regex stockNameAndCode = new Regex("[\u4e00-\u9fa5]+ *[(（]\\d+.?[a-zA-Z]*[)）]");//匹配“云南白药  (000538.CH)”
             Regex stockName = new Regex("[\u4e00-\u9fa5]+");
             Regex stockCode = new Regex("\\d+");
             Regex stockNameLocater = new Regex("^\\d{4}年 *\\d{1,2}月 *\\d{1,2}日"); //用来定位stock name的前一行
