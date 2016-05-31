@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using org.pdfbox.pdmodel;
-using org.pdfbox.util;
+using org.apache.pdfbox.pdmodel;
+using org.apache.pdfbox.util;
 
 namespace Stock
 {
