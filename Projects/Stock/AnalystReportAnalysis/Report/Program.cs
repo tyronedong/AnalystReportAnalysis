@@ -129,6 +129,7 @@ namespace Report
                     {
                         stockData = new StockData(filePath);
                         stockParser = new DongBeiStock(stockData);
+                        stockParser.extrcactContent();
                     }
                     else if (securitiesName.Equals("东兴证券"))
                     {

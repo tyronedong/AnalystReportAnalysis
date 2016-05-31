@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Configuration;
@@ -48,7 +49,11 @@ namespace Stock
 
     class Parser
     {
+        //const string nlpirDllDir = ConfigurationManager.ConnectionStrings["NLPIRDLL_DIR"].ConnectionString.ToString();
+        //const string path = Path.Combine(nlpirDllDir, "NLPIR.dll");
         const string path = @"NLPIR.dll";//设定dll的路径
+        //string path = @"NLPIR.dll";//设定dll的路径
+        
         //对函数进行申明
         [DllImport(path, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi, EntryPoint = "NLPIR_Init")]
         public static extern bool NLPIR_Init(String sInitDirPath, int encoding, String sLicenseCode);
@@ -115,7 +120,7 @@ namespace Stock
             if (!isNLPIR_Init)
             {
                 string nlpirDllDir = ConfigurationManager.ConnectionStrings["NLPIRDLL_DIR"].ConnectionString.ToString();
-                
+
                 NLPIR_AddUserWord("邵明慧"); 
                 if (NLPIR_Init(nlpirDllDir, 0, ""))
                     isNLPIR_Init = true;
