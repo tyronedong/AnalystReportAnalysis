@@ -57,7 +57,6 @@ D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\bcmail-jdk15-1.44.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\bcprov-jdk15-1.44.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\commons-logging.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\fontbox-1.8.9.dll
-D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\ICSharpCode.SharpZipLib.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\icu4j-3.8.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\IKVM.AWT.WinForms.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\IKVM.OpenJDK.Beans.dll
@@ -82,9 +81,9 @@ D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\IKVM.OpenJDK.XML.Parse.
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\IKVM.OpenJDK.XML.Transform.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\IKVM.OpenJDK.XML.WebServices.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\IKVM.OpenJDK.XML.XPath.dll
-D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\IKVM.Reflection.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\IKVM.Runtime.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\IKVM.Runtime.JNI.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\pdfbox-1.8.9.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\junit.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\jempbox-1.8.9.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Stock\obj\Debug\Stock.csprojResolveAssemblyReference.cache

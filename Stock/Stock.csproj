@@ -50,29 +50,17 @@
     <StartupObject>Stock.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="bcmail-jdk15-1.44">
-      <HintPath>..\Report\package\PDFBox.NET-1.8.9\bin\bcmail-jdk15-1.44.dll</HintPath>
-    </Reference>
     <Reference Include="bcprov-jdk15-1.44">
       <HintPath>..\Report\package\PDFBox.NET-1.8.9\bin\bcprov-jdk15-1.44.dll</HintPath>
     </Reference>
-    <Reference Include="commons-logging">
-      <HintPath>..\Report\package\PDFBox.NET-1.8.9\bin\commons-logging.dll</HintPath>
-    </Reference>
     <Reference Include="fontbox-1.8.9">
       <HintPath>..\Report\package\PDFBox.NET-1.8.9\bin\fontbox-1.8.9.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\Report\package\PDFBox.NET-1.8.9\bin\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="icu4j-3.8">
-      <HintPath>..\Report\package\PDFBox.NET-1.8.9\bin\icu4j-3.8.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.AWT.WinForms, Version=8.0.5449.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Report\package\PDFBox.NET-1.8.9\bin\IKVM.AWT.WinForms.dll</HintPath>
     </Reference>
-    <Reference Include="IKVM.OpenJDK.Beans, Version=8.0.5449.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+    <Reference Include="IKVM.OpenJDK.Beans, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Report\package\PDFBox.NET-1.8.9\bin\IKVM.OpenJDK.Beans.dll</HintPath>
     </Reference>
@@ -159,9 +147,6 @@
     <Reference Include="IKVM.OpenJDK.XML.XPath, Version=8.0.5449.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Report\package\PDFBox.NET-1.8.9\bin\IKVM.OpenJDK.XML.XPath.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.Reflection">
-      <HintPath>..\Report\package\PDFBox.NET-1.8.9\bin\IKVM.Reflection.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.Runtime, Version=0.30.0.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58">
       <SpecificVersion>False</SpecificVersion>
