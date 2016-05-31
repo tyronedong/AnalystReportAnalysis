@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using org.pdfbox.pdmodel;
-using org.pdfbox.util;
+using org.apache.pdfbox.pdmodel;
+using org.apache.pdfbox.util;
 using System.IO;
 using System.Configuration;
 using System.Text.RegularExpressions;
@@ -162,7 +162,7 @@ namespace Stock
                 PDDocument doc = PDDocument.load(ReportPath);
                 PDFTextStripper pdfStripper = new PDFTextStripper();
                 string text = pdfStripper.getText(doc).Replace("\r\n", "\n");
-                PDFText2HTML p = new PDFText2HTML();
+                PDFText2HTML p = new PDFText2HTML("UTF-8");
                 string c = p.getText(doc);
                 string[] lines = text.Split(new char[] { '\n' });
 
@@ -223,7 +223,7 @@ namespace Stock
                 PDDocument doc = PDDocument.load(ReportPath);
                 PDFTextStripper pdfStripper = new PDFTextStripper();
                 string text = pdfStripper.getText(doc).Replace("\r\n", "\n");
-                PDFText2HTML p = new PDFText2HTML();
+                PDFText2HTML p = new PDFText2HTML("UTF-8");
                 string c = p.getText(doc);
                 return c;
             }

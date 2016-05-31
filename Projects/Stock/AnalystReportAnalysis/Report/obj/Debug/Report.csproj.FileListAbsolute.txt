@@ -32,3 +32,5 @@ D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Corba.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Jdbc.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Misc.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Report\obj\Debug\Report.csprojResolveAssemblyReference.cache
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Stock.exe
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Stock.pdb
