@@ -115,26 +115,47 @@ namespace Report
                     StockData stockData = null, stockParser = null; 
                     if (securitiesName.Equals("国泰君安"))
                     {
-                        //reportParser = new GuoJunSecurities(filePath);
+                        reportParser = new GuoJunSecurities(filePath);
                     }
                     else if (securitiesName.Equals("中金公司"))
                     {
-                        //reportParser = new ZhongJinSecurities(filePath);
+                        reportParser = new ZhongJinSecurities(filePath);
                     }
                     else if (securitiesName.Equals("招商证券"))
                     {
-                        //reportParser = new ZhaoShangSecurities(filePath);
+                        reportParser = new ZhaoShangSecurities(filePath);
                     }
                     else if (securitiesName.Equals("东北证券"))
                     {
                         stockData = new StockData(filePath);
+                        //stockData.setStockjobber("东北证券");
                         stockParser = new DongBeiStock(stockData);
-                        stockParser.extrcactContent();
+                        //stockParser.extrcactContent();
                     }
                     else if (securitiesName.Equals("东兴证券"))
                     {
                         stockData = new StockData(filePath);
                         stockParser = new DongXingStock(stockData);
+                    }
+                    else if (securitiesName.Equals("方正证券"))
+                    {
+                        stockData = new StockData(filePath);
+                        stockParser = new FangZhengStock(stockData);
+                    }
+                    else if (securitiesName.Equals("平安证券"))
+                    {
+                        stockData = new StockData(filePath);
+                        stockParser = new PingAnStock(stockData);
+                    }
+                    else if (securitiesName.Equals("兴业证券"))
+                    {
+                        stockData = new StockData(filePath);
+                        stockParser = new XingYeStock(stockData);
+                    }
+                    else if (securitiesName.Equals("长江证券"))
+                    {
+                        stockData = new StockData(filePath);
+                        stockParser = new ChangJiangStock(stockData);
                     }
                     
                     AnalystReport curAnReport = new AnalystReport();
@@ -145,6 +166,7 @@ namespace Report
                         {
                             curAnReport = reportParser.executeExtract();
                             SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
+                            reportParser.CloseAll();
                         }
                         else
                         {
@@ -155,6 +177,7 @@ namespace Report
                     else if (stockParser != null)
                     {
                         stockParser.extrcactContent();
+                        //stockParser.extractDetail(stockParser.loadPDFLines());
                         DataTransform(ref stockParser, ref curAnReport);
                         SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
                     }
@@ -167,7 +190,7 @@ namespace Report
                     reports.Add(curAnReport);
                     //update nextCurId
                     nextCurId = id;
-                    reportParser.CloseAll();
+                    
                 }//for
                 //insert reports list to mongoDB
                 

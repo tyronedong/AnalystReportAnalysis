@@ -29,8 +29,8 @@ namespace Stock
             //StockData stocdData = new StockData(filePath);
             //stocdData.getStockjobber();
 
-            string filePath2 = "F:/桌面文件备份/mission/分析师报告/分析师研报/分析师报告/000538/20150819-兴业证券-云南白药-000538-公司点评报告：业绩增长平稳，健康产品发展态势良好.pdf";
-            StockData stocdData2 = new StockData(filePath2);
+            //string filePath2 = "F:/桌面文件备份/mission/分析师报告/分析师研报/分析师报告/000538/20150819-兴业证券-云南白药-000538-公司点评报告：业绩增长平稳，健康产品发展态势良好.pdf";
+            //StockData stocdData2 = new StockData(filePath2);
 
             //string filePath3 = "E:/数据/分析师研报/按照证券公司分类/平安证券/20150917-平安证券-安科生物-300009-公司调研报告：内生增长动力强劲，进军精准医疗，围绕生物大健康布局.pdf";
             //StockData stocdData3 = new StockData(filePath3);
@@ -55,6 +55,9 @@ namespace Stock
             //string filePath9 = "E:/数据/分析师研报/按照证券公司分类/东北证券/20080505-东北证券-云南白药-000538-平稳增长，蓄势待发.pdf";
             //StockData stocdData9 = new StockData(filePath9);
             //stocdData9.setStockjobber("东北证券");
+            string filePath9 = @"F:\桌面文件备份\mission\分析师报告\分析师研报\分析师报告\000538\20080505-东北证券-云南白药-000538-平稳增长，蓄势待发.pdf";
+            StockData stocdData9 = new StockData(filePath9);
+            //stocdData9.setStockjobber("东北证券");
 
             //string filePath10 = "E:/数据/分析师研报/按照证券公司分类/招商证券/20060710-招商证券-东阿阿胶-000423-经营拐点确立，消费升级鸿篇巨制徐徐开启.pdf";
             //StockData stocdData10 = new StockData(filePath10);
@@ -71,18 +74,19 @@ namespace Stock
             //stocdData14.getStockjobber();
 
             //CommonStock zhaoshang = new CommonStock(stocdData); zhaoshang.extrcactContent(); zhaoshang.saveResult("D:\\1.txt");
-            XingYeStock xingye = new XingYeStock(stocdData2); xingye.extractContent(xingye.loadPDFLines());//xingye.extrcactContent(); xingye.saveResult("D:\\2.txt");
-            Console.WriteLine("");
+            //XingYeStock xingye = new XingYeStock(stocdData2); xingye.extrcactContent(); xingye.saveResult("D:\\2.txt");
+            
             //PingAnStock pingan = new PingAnStock(stocdData3); pingan.extrcactContent(); pingan.saveResult("D:\\3.txt");
             //ChangJiangStock changjiang = new ChangJiangStock(stocdData4); changjiang.extrcactContent(); changjiang.saveResult("D:\\4.txt");
             //AnXinStock anxin = new AnXinStock(stocdData5); anxin.extrcactContent(); anxin.saveResult("D:\\5.txt");
             //CommonStock zhongjin = new CommonStock(stocdData6); zhongjin.extrcactContent(); zhongjin.saveResult("D:\\6.txt");
             //CommonStock haitong = new CommonStock(stocdData7); haitong.extrcactContent(); haitong.saveResult("D:\\7.txt");
             //ShenYinStock shenyin = new ShenYinStock(stocdData8); shenyin.extrcactContent(); shenyin.saveResult("D:\\8.txt");
-            //DongBeiStock dongbei = new DongBeiStock(stocdData9); dongbei.extrcactContent(); dongbei.saveResult("D:\\9.txt");
+            DongBeiStock dongbei = new DongBeiStock(stocdData9); dongbei.extrcactContent(); dongbei.saveResult("D:\\report\\9_4.txt");
             //DongXingStock dongxing = new DongXingStock(stocdData12); dongxing.extrcactContent(); dongxing.saveResult("D:\\10.txt");
             //FangZhengStock fangzheng = new FangZhengStock(stocdData13); fangzheng.extrcactContent(); fangzheng.saveResult("D:\\11.txt");
             //CommonStock datong = new CommonStock(stocdData14); datong.extrcactContent(); datong.saveResult("D:\\12.txt");
+            Console.WriteLine("");
         }
     }
 }
