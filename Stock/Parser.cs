@@ -120,6 +120,7 @@ namespace Stock
             if (!isNLPIR_Init)
             {
                 string nlpirDllDir = ConfigurationManager.ConnectionStrings["NLPIRDLL_DIR"].ConnectionString.ToString();
+                //string nlpirDllDir = ConfigurationManager.AppSettings["NLPIRDLL_DIR"];
 
                 NLPIR_AddUserWord("邵明慧"); 
                 if (NLPIR_Init(nlpirDllDir, 0, ""))
