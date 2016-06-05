@@ -78,6 +78,7 @@ namespace Report
                 reports.Clear();
                 foreach (DataRow curRow in curReportsTable.Rows)
                 {
+                    bool flag = false;
                     //get values in row 
                     //var time = curRow[0].ToString();
                     var time = (DateTime)curRow[0];
@@ -125,38 +126,43 @@ namespace Report
                     {
                         reportParser = new ZhaoShangSecurities(filePath);
                     }
-                    else if (securitiesName.Equals("东北证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        //stockData.setStockjobber("东北证券");
-                        stockParser = new DongBeiStock(stockData);
-                        //stockParser.extrcactContent();
-                    }
-                    else if (securitiesName.Equals("东兴证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        stockParser = new DongXingStock(stockData);
-                    }
-                    else if (securitiesName.Equals("方正证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        stockParser = new FangZhengStock(stockData);
-                    }
-                    else if (securitiesName.Equals("平安证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        stockParser = new PingAnStock(stockData);
-                    }
-                    else if (securitiesName.Equals("兴业证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        stockParser = new XingYeStock(stockData);
-                    }
-                    else if (securitiesName.Equals("长江证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        stockParser = new ChangJiangStock(stockData);
-                    }
+                    //else if (securitiesName.Equals("东北证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    //stockData.setStockjobber("东北证券");
+                    //    stockParser = new DongBeiStock(stockData);
+                    //    //stockParser.extrcactContent();
+                    //}
+                    //else if (securitiesName.Equals("东兴证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    stockParser = new DongXingStock(stockData);
+                    //}
+                    //else if (securitiesName.Equals("方正证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    stockParser = new FangZhengStock(stockData);
+                    //}
+                    //else if (securitiesName.Equals("平安证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    stockParser = new PingAnStock(stockData);
+                    //}
+                    //else if (securitiesName.Equals("兴业证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    stockParser = new XingYeStock(stockData);
+                    //}
+                    //else if (securitiesName.Equals("长江证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    stockParser = new ChangJiangStock(stockData);
+                    //}
+                    //else
+                    //{
+                    //    flag = true;
+                    //    reportParser = new CommonSecurities(filePath);
+                    //}
                     
                     AnalystReport curAnReport = new AnalystReport();
                     //handle the data
@@ -188,6 +194,10 @@ namespace Report
                     }
 
                     reports.Add(curAnReport);
+                    //if (flag)
+                    //{
+                    //    System.Console.WriteLine("Hello");
+                    //}
                     //update nextCurId
                     nextCurId = id;
                     

@@ -20,7 +20,7 @@ namespace Report
             {
                 pdfText = loadPDFText();
                 lines = pdfText.Split('\n');
-                noOtherLines = removeOther(lines);
+                noOtherLines = removeOtherInLines(lines);
                 mergedParas = mergeToParagraph(noOtherLines);
                 advancedMergedParas = removeOtherInParas(mergedParas);
                 finalParas = advancedMergedParas;
@@ -142,7 +142,7 @@ namespace Report
         //    return true;
         //}
 
-        public override string[] removeTable(string[] lines)
+        public override string[] removeTableInLines(string[] lines)
         {
             Regex tableHead = new Regex("[表|图].{1,1}?\\d{1,2}|财务预测表");
             Regex tableTail = new Regex("资料来源");
@@ -169,7 +169,7 @@ namespace Report
             return newLines.ToArray();
         }
 
-        public override string[] removeOther(string[] lines)
+        public override string[] removeOtherInLines(string[] lines)
         {
             //Regex spaces = new Regex(" ")
             //Regex referencesReport = new Regex(@"^\d+、《.+\d");
@@ -177,10 +177,10 @@ namespace Report
             foreach (var line in lines)
             {
                 string trimedLine = line.Trim();
-                if (string.IsNullOrEmpty(trimedLine))
-                {
-                    continue;
-                }
+                //if (string.IsNullOrEmpty(trimedLine))
+                //{
+                //    continue;
+                //}
                 if (trimedLine.StartsWith("资料来源"))
                 {
                     continue;

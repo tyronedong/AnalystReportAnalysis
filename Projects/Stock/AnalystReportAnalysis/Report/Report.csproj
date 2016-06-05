@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalystReport.cs" />
+    <Compile Include="CommonSecurities.cs" />
     <Compile Include="Handler\CurIdHandler.cs" />
     <Compile Include="Handler\FileHandler.cs" />
     <Compile Include="Securities\GuoJunSecurities.cs" />
