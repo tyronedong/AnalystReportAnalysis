@@ -19,7 +19,7 @@ namespace Report
             {
                 pdfText = loadPDFText();
                 lines = pdfText.Split('\n');
-                noOtherLines = removeOther(lines);
+                noOtherLines = removeOtherInLines(lines);
                 mergedParas = mergeToParagraph(noOtherLines);
                 finalParas = mergedParas;
             }
@@ -167,17 +167,17 @@ namespace Report
             return true;
         }
 
-        public override string[] removeOther(string[] lines)
+        public override string[] removeOtherInLines(string[] lines)
         {
             //remove nonsence information including "法律声明" ,table head, table tail and other things
             List<string> newLines = new List<string>();
             foreach (var line in lines)
             {
                 string trimedLine = line.Trim();
-                if (string.IsNullOrEmpty(trimedLine))
-                {
-                    continue;
-                }
+                //if (string.IsNullOrEmpty(trimedLine))
+                //{
+                //    continue;
+                //}
                 if (trimedLine.Equals("公司研究"))
                 {
                     continue;
