@@ -198,6 +198,10 @@ namespace Stock
 
              string[] lines = text.Split(new char[] { '\n' });
 
+             ///********************/
+             //extractDetail(lines);
+             ///********************/
+
              int count = 0;
 
              string newStr = "";

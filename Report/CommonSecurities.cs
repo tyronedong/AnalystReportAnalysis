@@ -20,7 +20,8 @@ namespace Report
                     lines = pdfText.Split('\n');
                     noABCLines = removeAnyButContentInLines(lines);
                     mergedParas = mergeToParagraph(noABCLines);
-                    finalParas = mergedParas;
+                    noABCParas = removeAnyButContentInParas(mergedParas);
+                    finalParas = noABCParas;
                 }
                 catch (Exception e)
                 {
