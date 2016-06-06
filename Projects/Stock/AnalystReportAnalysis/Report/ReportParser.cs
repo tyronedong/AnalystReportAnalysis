@@ -73,7 +73,7 @@ namespace Report
 
         public virtual bool extractStockBasicInfo()
         {
-            Regex stockNameAndCode = new Regex(@"[\u4e00-\u9fa5]+ *[(（]?\d{6}(\.[a-zA-Z]+)?[)）]?\D");//匹配“泸州老窖（000568）”
+            Regex stockNameAndCode = new Regex(@"[\u4e00-\u9fa5]+ *[(（]? *\d{6}(\.[a-zA-Z]+)?[)）]?\D");//匹配“泸州老窖（000568）”六位数加一个非数字
             Regex stockName = new Regex("[\u4e00-\u9fa5]+");
             Regex stockCode = new Regex(@"\d+");
 
@@ -107,10 +107,6 @@ namespace Report
             bool hasRRCMatched = false;
             foreach (var line in lines)
             {
-                if (hasRRCMatched)
-                {
-                    break;
-                }
                 string trimedLine = line.Trim();
                 if (stockRRC.IsMatch(line))
                 {
@@ -119,6 +115,7 @@ namespace Report
                     anaReport.RatingChanges = srrc.Replace(anaReport.StockRating, "").Replace("(", "").Replace("（", "").Replace("）", "").Replace(")", "");
 
                     hasRRCMatched = true;
+                    break;
                 }
             }
             if (hasRRCMatched)
@@ -225,7 +222,7 @@ namespace Report
         public virtual string[] removeAnyButContentInLines(string[] lines)
         {
             Regex InvestRatingStatement = new Regex("(^投资评级(的)?说明)|(投资评级(的)?(说明)?[:：]?$)|(评级(标准|说明)[:：]?$)");
-            Regex Statements = new Regex("^(((证券)?分析师(申明|声明|承诺))|(重要(声|申)明)|(免责(条款|声明|申明))|(法律(声|申)明)|(披露(声|申)明)|(信息披露)|(要求披露))[:：]?$");
+            Regex Statements = new Regex("^(((证券)?分析师(申明|声明|承诺))|((重要|特别)(声|申)明)|(免责(条款|声明|申明))|(法律(声|申)明)|(披露(声|申)明)|(信息披露)|(要求披露))[:：]?$");
             Regex FirmIntro = new Regex("公司简介[:：]?$");
             Regex AnalystIntro = new Regex("^(分析师|研究员|作者)(简介|介绍)[\u4e00-\u9fa5a]*?[:：]?$");
             List<string> newLines = new List<string>();

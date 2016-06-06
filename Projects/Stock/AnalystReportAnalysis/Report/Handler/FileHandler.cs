@@ -7,7 +7,7 @@ using System.IO;
 using System.Diagnostics;
 using org.apache.pdfbox.pdmodel;
 
-namespace Report
+namespace Report.Handler
 {
     class FileHandler
     {

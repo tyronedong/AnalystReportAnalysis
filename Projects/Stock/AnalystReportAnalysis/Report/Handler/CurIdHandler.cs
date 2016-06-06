@@ -7,7 +7,7 @@ using System.Configuration;
 using System.IO;
 using System.Diagnostics;
 
-namespace Report
+namespace Report.Handler
 {
     class CurIdHandler
     {

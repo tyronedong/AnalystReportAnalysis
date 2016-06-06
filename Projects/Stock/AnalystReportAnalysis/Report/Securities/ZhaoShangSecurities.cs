@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using org.apache.pdfbox.pdmodel;
 using org.apache.pdfbox.util;
 
-namespace Report
+namespace Report.Securities
 {
     //招商证券
     class ZhaoShangSecurities : ReportParser

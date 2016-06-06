@@ -8,7 +8,7 @@ using System.Diagnostics;
 using org.apache.pdfbox.pdmodel;
 using org.apache.pdfbox.util;
 
-namespace Report
+namespace Report.Securities
 {
     //国泰君安
     class GuoJunSecurities : ReportParser

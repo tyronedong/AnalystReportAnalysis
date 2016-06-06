@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Configuration;
 using System.IO;
 
-namespace Report
+namespace Report.Handler
 {
     class TraceHandler : TraceListener
     {

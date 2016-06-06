@@ -9,7 +9,7 @@ using System.Data.SqlClient;
 using System.Collections;
 using System.Diagnostics;
 
-namespace Report
+namespace Report.Handler
 {
     class SqlServerHandler
     {
