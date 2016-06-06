@@ -74,16 +74,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalystReport.cs" />
-    <Compile Include="CommonSecurities.cs" />
+    <Compile Include="Securities\CommonSecurities.cs" />
     <Compile Include="Handler\CurIdHandler.cs" />
     <Compile Include="Handler\FileHandler.cs" />
+    <Compile Include="Securities\GuoJinSecurities.cs" />
     <Compile Include="Securities\GuoJunSecurities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportParser.cs" />
     <Compile Include="Handler\SqlServerHandler.cs" />
     <Compile Include="Handler\TraceHandler.cs" />
+    <Compile Include="Securities\GuoXinSecurities.cs" />
     <Compile Include="Securities\ZhaoShangSecurities.cs" />
+    <Compile Include="Securities\ZhongJianSecurities.cs" />
     <Compile Include="Securities\ZhongJinSecurities.cs" />
     <Compile Include="Securities\ZhongXinSecurities.cs" />
   </ItemGroup>

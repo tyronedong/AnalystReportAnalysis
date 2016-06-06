@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using org.apache.pdfbox.pdmodel;
 
-namespace Report
+namespace Report.Securities
 {
     class ZhongXinSecurities : ReportParser
     {

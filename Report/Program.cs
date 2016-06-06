@@ -19,6 +19,8 @@ using org.apache.pdfbox.pdfparser;
 using java.io;
 using java.util;
 using Stock;
+using Report.Handler;
+using Report.Securities;
 
 namespace Report
 {
@@ -119,6 +121,21 @@ namespace Report
                     {
                         reportParser = new GuoJunSecurities(filePath);
                     }
+                    else if (securitiesName.Equals("中信建投"))
+                    {
+                        flag = true;
+                        reportParser = new ZhongJianSecurities(filePath);
+                    }
+                    //else if (securitiesName.Equals("国信证券"))
+                    //{
+                    //    flag = true;
+                    //    reportParser = new GuoXinSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("国金证券"))
+                    //{
+                    //    flag = true;
+                    //    reportParser = new GuoJinSecurities(filePath);
+                    //}
                     //else if (securitiesName.Equals("中金公司"))
                     //{
                     //    reportParser = new ZhongJinSecurities(filePath);
@@ -159,11 +176,11 @@ namespace Report
                     //    stockData = new StockData(filePath);
                     //    stockParser = new ChangJiangStock(stockData);
                     //}
-                    else
-                    {
-                        flag = true;
-                        reportParser = new CommonSecurities(filePath);
-                    }
+                    //else
+                    //{
+                    //    flag = true;
+                    //    reportParser = new CommonSecurities(filePath);
+                    //}
                     
                     AnalystReport curAnReport = new AnalystReport();
                     //handle the data
@@ -195,7 +212,7 @@ namespace Report
                     }
 
                     reports.Add(curAnReport);
-                    if (!flag)
+                    if (flag)
                     {
                         System.Console.WriteLine("Hello");
                     }

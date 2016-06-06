@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using org.apache.pdfbox.pdmodel;
 
-namespace Report
+namespace Report.Securities
 {
     class ZhongJinSecurities : ReportParser
     {
