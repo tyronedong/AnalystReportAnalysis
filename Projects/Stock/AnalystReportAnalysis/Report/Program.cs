@@ -9,6 +9,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Spire.Pdf;
 using org.apache.pdfbox;
 using org.apache.pdfbox.cos;
@@ -118,14 +119,14 @@ namespace Report
                     {
                         reportParser = new GuoJunSecurities(filePath);
                     }
-                    else if (securitiesName.Equals("中金公司"))
-                    {
-                        reportParser = new ZhongJinSecurities(filePath);
-                    }
-                    else if (securitiesName.Equals("招商证券"))
-                    {
-                        reportParser = new ZhaoShangSecurities(filePath);
-                    }
+                    //else if (securitiesName.Equals("中金公司"))
+                    //{
+                    //    reportParser = new ZhongJinSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("招商证券"))
+                    //{
+                    //    reportParser = new ZhaoShangSecurities(filePath);
+                    //}
                     //else if (securitiesName.Equals("东北证券"))
                     //{
                     //    stockData = new StockData(filePath);
@@ -158,11 +159,11 @@ namespace Report
                     //    stockData = new StockData(filePath);
                     //    stockParser = new ChangJiangStock(stockData);
                     //}
-                    //else
-                    //{
-                    //    flag = true;
-                    //    reportParser = new CommonSecurities(filePath);
-                    //}
+                    else
+                    {
+                        flag = true;
+                        reportParser = new CommonSecurities(filePath);
+                    }
                     
                     AnalystReport curAnReport = new AnalystReport();
                     //handle the data
@@ -194,10 +195,10 @@ namespace Report
                     }
 
                     reports.Add(curAnReport);
-                    //if (flag)
-                    //{
-                    //    System.Console.WriteLine("Hello");
-                    //}
+                    if (!flag)
+                    {
+                        System.Console.WriteLine("Hello");
+                    }
                     //update nextCurId
                     nextCurId = id;
                     
@@ -248,13 +249,53 @@ namespace Report
         /// <returns></returns>
         static bool DataTransform(ref StockData stockData, ref AnalystReport anaReport)
         {
-            anaReport.Content = stockData.Content;
+            anaReport.Content = ContentTransform(stockData.Content);
+            //anaReport.Content = stockData.Content;
             anaReport.RatingChanges = stockData.RatingChanges;
             anaReport.StockCode = stockData.StockCode;
             anaReport.StockName = stockData.StockName;
             anaReport.StockPrice = stockData.StockPrice;
             anaReport.StockRating = stockData.StockRating;
             return true;
+        }
+
+        static string ContentTransform(string content)
+        {
+            string[] paras = content.Split('\n');
+
+            Regex InvestRatingStatement = new Regex("(^投资评级(的)?说明)|(投资评级(的)?(说明)?[:：]?$)|(评级(标准|说明)[:：]?$)");
+            Regex Statements = new Regex("^(((证券)?分析师(申明|声明|承诺))|(重要(声|申)明)|(免责(条款|声明|申明))|(法律(声|申)明)|(披露(声|申)明)|(信息披露)|(要求披露))[:：]?$");
+            Regex FirmIntro = new Regex("公司简介[:：]?$");
+            Regex AnalystIntro = new Regex("^(分析师|研究员|作者)(简介|介绍)[\u4e00-\u9fa5a]*?[:：]?$");
+            List<string> newParas = new List<string>();
+            foreach (var para in paras)
+            {
+                string trimedPara = para.Trim();
+                if (InvestRatingStatement.IsMatch(trimedPara))
+                {
+                    break;
+                }
+                if (Statements.IsMatch(trimedPara))
+                {
+                    break;
+                }
+                if (FirmIntro.IsMatch(trimedPara))
+                {
+                    break;
+                }
+                if (AnalystIntro.IsMatch(trimedPara))
+                {
+                    break;
+                }
+                newParas.Add(para);
+            }
+
+            string transformedContent = "";
+            foreach (var newPara in newParas)
+            {
+                transformedContent += newPara.Trim() + "\n";
+            }
+            return transformedContent;
         }
     }
 }

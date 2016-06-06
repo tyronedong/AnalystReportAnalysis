@@ -36,7 +36,7 @@ namespace Report
             Regex stockTest2 = new Regex(@" *[\u4e00-\u9fa5a-zA-ZＡ]+");
             //Regex stockNCRRP = new Regex(@"(强烈推荐|审慎推荐|推荐|中性|回避)-[a-zA-Z]+（[\u4e00-\u9fa5]+） *[\u4e00-\u9fa5a-zA-Z]+ *[\(（]?\d+\.[a-zA-Z]+[\)）]?");//匹配强烈推荐-A（维持） 鄂武商Ａ 000501.SZ 
             Regex stockNCRRP = new Regex(@"(强烈推荐|审慎推荐|推荐|中性|回避)-[a-zA-Z]+（[\u4e00-\u9fa5]+） *\D+ *[(（]?\d+\.[a-zA-Z]+[)）]?");//匹配强烈推荐-A（维持） 鄂武商Ａ 000501.SZ 
-            Regex stockNameAndCode = new Regex(@"）\D+ *[(（]?\d+\.[a-zA-Z]+[)）]?");//匹配“云南白药  (000538.CH)”或 “云南白药  000538.CH”
+            Regex stockNameAndCode = new Regex(@"\D+ *[(（]?\d+\.[a-zA-Z]+[)）]?");//匹配“云南白药  (000538.CH)”或 “云南白药  000538.CH”
             Regex stockName = new Regex(@"\D+");
             Regex stockCode = new Regex(@"\d+");
             Regex stockRRP = new Regex("(强烈推荐|审慎推荐|推荐|中性|回避).+（[\u4e00-\u9fa5]+）");
@@ -182,6 +182,10 @@ namespace Report
                 //    continue;
                 //}
                 if (trimedLine.StartsWith("资料来源"))
+                {
+                    continue;
+                }
+                if (trimedLine.StartsWith("数据来源："))
                 {
                     continue;
                 }

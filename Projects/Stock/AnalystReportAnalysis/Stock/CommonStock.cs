@@ -173,6 +173,10 @@ namespace Stock
                 string text = pdfStripper.getText(doc).Replace("\r\n", "\n");
                 string[] lines = text.Split(new char[] { '\n' });
 
+                ///********************/
+                //extractDetail(lines);
+                ///********************/
+
                 Content = getContent(lines);
 
                 int count = 0;

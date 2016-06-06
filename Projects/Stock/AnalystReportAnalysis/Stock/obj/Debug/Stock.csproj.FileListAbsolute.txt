@@ -87,3 +87,4 @@ D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\pdfbox-1.8.9.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\junit.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\jempbox-1.8.9.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Stock\bin\Debug\IKVM.GNU.Classpath.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Stock\obj\Debug\Stock.csprojResolveAssemblyReference.cache
