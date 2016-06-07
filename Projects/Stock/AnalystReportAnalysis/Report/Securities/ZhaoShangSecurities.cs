@@ -18,15 +18,23 @@ namespace Report.Securities
         {
             if (this.isValid)
             {
-                pdfText = loadPDFText();
-                lines = pdfText.Split('\n');
-                noOtherLines = removeOtherInLines(lines);
-                mergedParas = mergeToParagraph(noOtherLines);
-                advancedMergedParas = removeOtherInParas(mergedParas);
-                finalParas = advancedMergedParas;
-                //noTableLines = removeTable(lines);
-                //noTableAndOtherLines = removeOther(noTableLines);
-                //mergedParas = mergeToParagraph(noTableAndOtherLines);
+                try
+                {
+                    pdfText = loadPDFText();
+                    lines = pdfText.Split('\n');
+                    noOtherLines = removeOtherInLines(lines);
+                    mergedParas = mergeToParagraph(noOtherLines);
+                    advancedMergedParas = removeOtherInParas(mergedParas);
+                    finalParas = advancedMergedParas;
+                    //noTableLines = removeTable(lines);
+                    //noTableAndOtherLines = removeOther(noTableLines);
+                    //mergedParas = mergeToParagraph(noTableAndOtherLines);
+                }
+                catch (Exception e)
+                {
+                    this.isValid = false;
+                    Trace.TraceError("ZhaoShangSecurities.ZhaoShangSecurities(string pdReportPath): " + e.Message);
+                }
             }
         }
 

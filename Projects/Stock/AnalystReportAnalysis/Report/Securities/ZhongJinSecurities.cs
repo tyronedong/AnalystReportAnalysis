@@ -17,11 +17,19 @@ namespace Report.Securities
         {
             if (this.isValid)
             {
-                pdfText = loadPDFText();
-                lines = pdfText.Split('\n');
-                noOtherLines = removeOtherInLines(lines);
-                mergedParas = mergeToParagraph(noOtherLines);
-                finalParas = mergedParas;
+                try
+                {
+                    pdfText = loadPDFText();
+                    lines = pdfText.Split('\n');
+                    noOtherLines = removeOtherInLines(lines);
+                    mergedParas = mergeToParagraph(noOtherLines);
+                    finalParas = mergedParas;
+                }
+                catch (Exception e)
+                {
+                    this.isValid = false;
+                    Trace.TraceError("ZhongJinSecurities.ZhongJinSecurities(string pdReportPath): " + e.Message);
+                }
             }
         }
 

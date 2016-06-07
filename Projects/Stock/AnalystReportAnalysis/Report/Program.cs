@@ -121,66 +121,71 @@ namespace Report
                     {
                         reportParser = new GuoJunSecurities(filePath);
                     }
-                    else if (securitiesName.Equals("中信建投"))
+                    if (securitiesName.Equals("中信证券"))
                     {
                         flag = true;
+                        reportParser = new ZhongXinSecurities(filePath);
+                    }
+                    else if (securitiesName.Equals("中信建投"))
+                    {
+                        //flag = true;
                         reportParser = new ZhongJianSecurities(filePath);
                     }
-                    //else if (securitiesName.Equals("国信证券"))
-                    //{
-                    //    flag = true;
-                    //    reportParser = new GuoXinSecurities(filePath);
-                    //}
-                    //else if (securitiesName.Equals("国金证券"))
-                    //{
-                    //    flag = true;
-                    //    reportParser = new GuoJinSecurities(filePath);
-                    //}
-                    //else if (securitiesName.Equals("中金公司"))
-                    //{
-                    //    reportParser = new ZhongJinSecurities(filePath);
-                    //}
-                    //else if (securitiesName.Equals("招商证券"))
-                    //{
-                    //    reportParser = new ZhaoShangSecurities(filePath);
-                    //}
-                    //else if (securitiesName.Equals("东北证券"))
-                    //{
-                    //    stockData = new StockData(filePath);
-                    //    //stockData.setStockjobber("东北证券");
-                    //    stockParser = new DongBeiStock(stockData);
-                    //    //stockParser.extrcactContent();
-                    //}
-                    //else if (securitiesName.Equals("东兴证券"))
-                    //{
-                    //    stockData = new StockData(filePath);
-                    //    stockParser = new DongXingStock(stockData);
-                    //}
-                    //else if (securitiesName.Equals("方正证券"))
-                    //{
-                    //    stockData = new StockData(filePath);
-                    //    stockParser = new FangZhengStock(stockData);
-                    //}
-                    //else if (securitiesName.Equals("平安证券"))
-                    //{
-                    //    stockData = new StockData(filePath);
-                    //    stockParser = new PingAnStock(stockData);
-                    //}
-                    //else if (securitiesName.Equals("兴业证券"))
-                    //{
-                    //    stockData = new StockData(filePath);
-                    //    stockParser = new XingYeStock(stockData);
-                    //}
-                    //else if (securitiesName.Equals("长江证券"))
-                    //{
-                    //    stockData = new StockData(filePath);
-                    //    stockParser = new ChangJiangStock(stockData);
-                    //}
-                    //else
-                    //{
-                    //    flag = true;
-                    //    reportParser = new CommonSecurities(filePath);
-                    //}
+                    else if (securitiesName.Equals("国信证券"))
+                    {
+                        //flag = true;
+                        reportParser = new GuoXinSecurities(filePath);
+                    }
+                    else if (securitiesName.Equals("国金证券"))
+                    {
+                        //flag = true;
+                        reportParser = new GuoJinSecurities(filePath);
+                    }
+                    else if (securitiesName.Equals("中金公司"))
+                    {
+                        reportParser = new ZhongJinSecurities(filePath);
+                    }
+                    else if (securitiesName.Equals("招商证券"))
+                    {
+                        reportParser = new ZhaoShangSecurities(filePath);
+                    }
+                    else if (securitiesName.Equals("东北证券"))
+                    {
+                        stockData = new StockData(filePath);
+                        //stockData.setStockjobber("东北证券");
+                        stockParser = new DongBeiStock(stockData);
+                        //stockParser.extrcactContent();
+                    }
+                    else if (securitiesName.Equals("东兴证券"))
+                    {
+                        stockData = new StockData(filePath);
+                        stockParser = new DongXingStock(stockData);
+                    }
+                    else if (securitiesName.Equals("方正证券"))
+                    {
+                        stockData = new StockData(filePath);
+                        stockParser = new FangZhengStock(stockData);
+                    }
+                    else if (securitiesName.Equals("平安证券"))
+                    {
+                        stockData = new StockData(filePath);
+                        stockParser = new PingAnStock(stockData);
+                    }
+                    else if (securitiesName.Equals("兴业证券"))
+                    {
+                        stockData = new StockData(filePath);
+                        stockParser = new XingYeStock(stockData);
+                    }
+                    else if (securitiesName.Equals("长江证券"))
+                    {
+                        stockData = new StockData(filePath);
+                        stockParser = new ChangJiangStock(stockData);
+                    }
+                    else
+                    {
+                        //flag = true;
+                        reportParser = new CommonSecurities(filePath);
+                    }
                     
                     AnalystReport curAnReport = new AnalystReport();
                     //handle the data
