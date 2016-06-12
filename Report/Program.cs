@@ -24,7 +24,7 @@ using Report.Securities;
 
 namespace Report
 {
-    class Program
+    public class Program
     {
         private static string idFileName = ConfigurationManager.AppSettings["IdFileName"];
         private static string dataRootPath = ConfigurationManager.AppSettings["DataRootPath"];
@@ -121,71 +121,86 @@ namespace Report
                     {
                         reportParser = new GuoJunSecurities(filePath);
                     }
-                    if (securitiesName.Equals("中信证券"))
+                    //else if (securitiesName.Equals("申万宏源"))
+                    //{
+                    //    //flag = true;
+                    //    reportParser = new ShenHongSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("海通证券"))
+                    //{
+                    //    //flag = true;
+                    //    reportParser = new HaiTongSecurities(filePath);
+                    //}
+                    else if (securitiesName.Equals("安信证券"))
                     {
                         flag = true;
-                        reportParser = new ZhongXinSecurities(filePath);
+                        reportParser = new AnXinSecurities(filePath);
                     }
-                    else if (securitiesName.Equals("中信建投"))
-                    {
-                        //flag = true;
-                        reportParser = new ZhongJianSecurities(filePath);
-                    }
-                    else if (securitiesName.Equals("国信证券"))
-                    {
-                        //flag = true;
-                        reportParser = new GuoXinSecurities(filePath);
-                    }
-                    else if (securitiesName.Equals("国金证券"))
-                    {
-                        //flag = true;
-                        reportParser = new GuoJinSecurities(filePath);
-                    }
-                    else if (securitiesName.Equals("中金公司"))
-                    {
-                        reportParser = new ZhongJinSecurities(filePath);
-                    }
-                    else if (securitiesName.Equals("招商证券"))
-                    {
-                        reportParser = new ZhaoShangSecurities(filePath);
-                    }
-                    else if (securitiesName.Equals("东北证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        //stockData.setStockjobber("东北证券");
-                        stockParser = new DongBeiStock(stockData);
-                        //stockParser.extrcactContent();
-                    }
-                    else if (securitiesName.Equals("东兴证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        stockParser = new DongXingStock(stockData);
-                    }
-                    else if (securitiesName.Equals("方正证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        stockParser = new FangZhengStock(stockData);
-                    }
-                    else if (securitiesName.Equals("平安证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        stockParser = new PingAnStock(stockData);
-                    }
-                    else if (securitiesName.Equals("兴业证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        stockParser = new XingYeStock(stockData);
-                    }
-                    else if (securitiesName.Equals("长江证券"))
-                    {
-                        stockData = new StockData(filePath);
-                        stockParser = new ChangJiangStock(stockData);
-                    }
-                    else
-                    {
-                        //flag = true;
-                        reportParser = new CommonSecurities(filePath);
-                    }
+                    //if (securitiesName.Equals("中信证券"))
+                    //{
+                    //    //flag = true;
+                    //    reportParser = new ZhongXinSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("中信建投"))
+                    //{
+                    //    //flag = true;
+                    //    reportParser = new ZhongJianSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("国信证券"))
+                    //{
+                    //    //flag = true;
+                    //    reportParser = new GuoXinSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("国金证券"))
+                    //{
+                    //    //flag = true;
+                    //    reportParser = new GuoJinSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("中金公司"))
+                    //{
+                    //    reportParser = new ZhongJinSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("招商证券"))
+                    //{
+                    //    reportParser = new ZhaoShangSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("东北证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    //stockData.setStockjobber("东北证券");
+                    //    stockParser = new DongBeiStock(stockData);
+                    //    //stockParser.extrcactContent();
+                    //}
+                    //else if (securitiesName.Equals("东兴证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    stockParser = new DongXingStock(stockData);
+                    //}
+                    //else if (securitiesName.Equals("方正证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    stockParser = new FangZhengStock(stockData);
+                    //}
+                    //else if (securitiesName.Equals("平安证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    stockParser = new PingAnStock(stockData);
+                    //}
+                    //else if (securitiesName.Equals("兴业证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    stockParser = new XingYeStock(stockData);
+                    //}
+                    //else if (securitiesName.Equals("长江证券"))
+                    //{
+                    //    stockData = new StockData(filePath);
+                    //    stockParser = new ChangJiangStock(stockData);
+                    //}
+                    //else
+                    //{
+                    //    //flag = true;
+                    //    reportParser = new CommonSecurities(filePath);
+                    //}
                     
                     AnalystReport curAnReport = new AnalystReport();
                     //handle the data
@@ -254,7 +269,7 @@ namespace Report
         /// <param name="person1"></param>
         /// <param name="person2"></param>
         /// <param name="person3"></param>
-        static void SetExistedInfo(ref AnalystReport anaReport, ref SqlServerHandler sqlSH, string pdFileName, string reportTitle, string jobber, DateTime time, string person1, string person2, string person3)
+        public static void SetExistedInfo(ref AnalystReport anaReport, ref SqlServerHandler sqlSH, string pdFileName, string reportTitle, string jobber, DateTime time, string person1, string person2, string person3)
         {
             anaReport.ReportTitle = reportTitle;
             anaReport.PDFileName = pdFileName;
@@ -269,7 +284,7 @@ namespace Report
         /// <param name="stockData"></param>
         /// <param name="anaReport"></param>
         /// <returns></returns>
-        static bool DataTransform(ref StockData stockData, ref AnalystReport anaReport)
+        public static bool DataTransform(ref StockData stockData, ref AnalystReport anaReport)
         {
             anaReport.Content = ContentTransform(stockData.Content);
             //anaReport.Content = stockData.Content;
@@ -281,7 +296,7 @@ namespace Report
             return true;
         }
 
-        static string ContentTransform(string content)
+        public static string ContentTransform(string content)
         {
             string[] paras = content.Split('\n');
 

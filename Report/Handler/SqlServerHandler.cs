@@ -11,22 +11,27 @@ using System.Diagnostics;
 
 namespace Report.Handler
 {
-    class SqlServerHandler
+    public class SqlServerHandler
     {
+        public bool isValid = true;
 
         private SqlConnection sqlCnn;
 
         private SqlDataAdapter sqlAdapter;
-        private SqlCommand sqlReportCmd;
+        private SqlDataAdapter sqlAdapter2;
+        private SqlCommand sqlReportCmd;//for batch process
+        private SqlCommand sqlReportCmd2;//for select one process
         private DataTable dataTable;
-        private SqlParameter param_num_once_select = new SqlParameter("@num_once_select", SqlDbType.Int);
-        private SqlParameter param_id_min = new SqlParameter("@id_min", SqlDbType.Char);
+        private SqlParameter param_num_once_select_cmd = new SqlParameter("@num_once_select", SqlDbType.Int);
+        private SqlParameter param_id_min_cmd = new SqlParameter("@id_min", SqlDbType.Char);
+        private SqlParameter param_id_cmd2 = new SqlParameter("@GUID", SqlDbType.Char);
 
         private Dictionary<string, Analyst> personTable;
 
         private static string sqlConnectionString = ConfigurationManager.AppSettings["SqlConnectionString"];
         private static string storedProcName_Person = ConfigurationManager.AppSettings["StoredProcName_Person"];
         private static string storedProcName_Report = ConfigurationManager.AppSettings["StoredProcName_Report"];
+        private static string storedProcName_Report2 = ConfigurationManager.AppSettings["StoredProcName_Report2"];
         private static string numOnceSelect = ConfigurationManager.AppSettings["num_once_select"];
 
         public SqlServerHandler()
@@ -39,22 +44,31 @@ namespace Report.Handler
         {
             try
             {
+                //set connection
                 sqlCnn = new SqlConnection(sqlConnectionString);
 
+                //set cmd
                 sqlReportCmd = new SqlCommand(storedProcName_Report, sqlCnn);
                 sqlReportCmd.CommandType = CommandType.StoredProcedure;
-                sqlReportCmd.Parameters.Add(param_num_once_select);
-                sqlReportCmd.Parameters.Add(param_id_min);
+                sqlReportCmd.Parameters.Add(param_num_once_select_cmd);
+                sqlReportCmd.Parameters.Add(param_id_min_cmd);
                 sqlReportCmd.CommandTimeout = 60;
+                sqlReportCmd2 = new SqlCommand(storedProcName_Report2, sqlCnn);
+                sqlReportCmd2.CommandType = CommandType.StoredProcedure;
+                sqlReportCmd2.Parameters.Add(param_id_cmd2);
+                sqlReportCmd2.CommandTimeout = 60;
                 sqlAdapter = new SqlDataAdapter(sqlReportCmd);
+                sqlAdapter2 = new SqlDataAdapter(sqlReportCmd2);
                 dataTable = new DataTable();       
 
                 sqlCnn.Open();
                 LoadPersonTable();
+                isValid = true;
             }
             catch (Exception e)
             {
                 Trace.TraceError("SqlServerHandler.Init(): " + e.Message);
+                isValid = false;
                 return false;
             }
             return true;
@@ -85,8 +99,8 @@ namespace Report.Handler
         {
             try
             {
-                param_num_once_select.Value = Int32.Parse(numOnceSelect);
-                param_id_min.Value = curId;
+                param_num_once_select_cmd.Value = Int32.Parse(numOnceSelect);
+                param_id_min_cmd.Value = curId;
             }
             catch (Exception e)
             {
@@ -117,6 +131,44 @@ namespace Report.Handler
                 return null;
             }
             
+            return dataTable;
+        }
+
+        public bool ModifyCMD2ById(string curId)
+        {
+            try
+            {
+                param_id_cmd2.Value = curId;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("SqlServerHandler.ModifyCMD2ById(string curId): " + e.Message);
+                return false;
+            }
+            return true;
+        }
+
+        public DataTable GetRecordById(string curId)
+        {
+            dataTable.Clear();
+
+            if (ModifyCMD2ById(curId))
+            {
+                try
+                {
+                    sqlAdapter2.Fill(dataTable);
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError("SqlServerHandler.GetRecordById(string curId): " + e.Message);
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+
             return dataTable;
         }
 

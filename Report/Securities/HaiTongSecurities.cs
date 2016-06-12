@@ -8,10 +8,10 @@ using System.Text.RegularExpressions;
 
 namespace Report.Securities
 {
-    public class GuoXinSecurities : ReportParser
+    //海通证券
+    public class HaiTongSecurities:ReportParser
     {
-        //国信证券
-        public GuoXinSecurities(string pdReportPath)
+        public HaiTongSecurities(string pdReportPath)
             : base(pdReportPath)
         {
             if (this.isValid)
@@ -28,48 +28,51 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("GuoXinSecurities.GuoXinSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("HaiTongSecurities.HaiTongSecurities(string pdReportPath): " + e.Message);
                 }
             }
         }
 
-        /// <summary>
-        /// stockNameAndCode is used for locate the rating and rating changes
-        /// eg:
-        /// "餐饮旅游 [Table_StockInfo] 黄山旅游（600054） 谨慎推荐 
-        /// 2013 年三季报点评 （维持评级） "
-        /// No price infomation is extracted.
-        /// </summary>
-        /// <returns></returns>
         public override bool extractStockOtherInfo()
         {
             //extract stock price, stock rating and stock rating change
-            Regex stockNameAndCode = new Regex(@"[\u4e00-\u9fa5]+ *[(（]?\d{6}(\.[a-zA-Z]+)?[)）]?\D");//匹配“泸州老窖（000568）”
-            Regex stockR = new Regex(@"谨慎推荐|推荐|中性|回避");
-            Regex stockRC = new Regex("[（(][\u4e00-\u9fa5]+评级[）)]");
+            Regex stockRRC = new Regex(@"^(买 入|增 持|中 性|减 持|买入|增持|中性|减持) *[\u4e00-\u9fa5]{2,3}");
+            Regex stockR = new Regex(@"(买 入|增 持|中 性|减 持|买入|增持|中性|减持)");
+            Regex stockPricePattern = new Regex(@"收盘(价|于)[ ：:]\d+\.\d+ ?元");
+            Regex stockPrice = new Regex(@"\d+\.\d+");
 
             int index = 0;
-            bool hasRMatched = false, hasRCMatched = false;
+            bool hasRRCMatched = false, hasPriceMatched = false;
             foreach (var line in lines)
             {
+                if (hasRRCMatched && hasPriceMatched) { break; }
                 string trimedLine = line.Trim();
-                if (stockNameAndCode.IsMatch(trimedLine))
+                if (!hasRRCMatched && stockRRC.IsMatch(trimedLine))
                 {
-                    if (stockR.IsMatch(trimedLine))
-                    {
-                        anaReport.StockRating = stockR.Match(trimedLine).Value;
-                        hasRMatched = true;
 
-                        if (stockRC.IsMatch(lines[index + 1]))
-                        {
-                            anaReport.RatingChanges = stockRC.Match(lines[index + 1]).Value.Replace("(", "").Replace("（", "").Replace(")", "").Replace("）", "").Replace("评级", "");
-                            hasRCMatched = true;
-                        }
+                    string srrc = stockRRC.Match(trimedLine).Value;
+                    string sr = stockR.Match(srrc).Value;
+                    anaReport.StockRating = sr.Replace(" ", "");
+                    anaReport.RatingChanges = srrc.Replace(sr, "").Trim();
+
+                    hasRRCMatched = true;
+                }
+                if (!hasPriceMatched && stockPricePattern.IsMatch(trimedLine))
+                {
+                    try
+                    {
+                        anaReport.StockPrice = float.Parse(stockPrice.Match(line).Value);
+                        //anaReport.StockPrice.ToString();
+                        hasPriceMatched = true;
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceError("HaiTongSecurities.extractStockOtherInfo(): " + e.Message);
                     }
                 }
                 index++;
             }
-            if (hasRMatched && hasRCMatched)
+            if (hasRRCMatched && hasPriceMatched)
             {
                 return true;
             }
@@ -89,7 +92,10 @@ namespace Report.Securities
 
             Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
 
-            //Regex picOrTabHead = new Regex(@"^(图|表) *\d{1,2}");
+            Regex picOrTabHead = new Regex(@"^(附)?(图|表) *\d{1,3}");//added
+            Regex newRefReportTail = new Regex(@".*?(点评|报告|简报|行业)[：-]?.*?20[01][0-9]\.?[01][0-9]\.?[0123][0-9]$");//added
+            Regex certificateNum = new Regex("执业证书编号[:：]");
+            Regex extra = new Regex("^((分产品收入和毛利率数据。)|(利润表主要数据。))$");
 
             List<string> newParas = new List<string>();
             foreach (var para in paras)
@@ -103,7 +109,19 @@ namespace Report.Securities
                 {
                     continue;
                 }
-                if (trimedPara.StartsWith("作者保证报告所采用的数据均来自合规渠道，"))//added
+                if (extra.IsMatch(trimedPara))//added
+                {
+                    continue;
+                }
+                if (certificateNum.IsMatch(trimedPara))//added
+                {
+                    continue;
+                }
+                if (newRefReportTail.IsMatch(trimedPara))//added
+                {
+                    continue;
+                }
+                if (picOrTabHead.IsMatch(trimedPara))//added
                 {
                     continue;
                 }
@@ -113,7 +131,7 @@ namespace Report.Securities
                     else
                     {
                         string shuju = noteShuju.Match(trimedPara).Value;
-                        string judgeStr = trimedPara.Replace(shuju, "");
+                        string judgeStr = trimedPara.Replace(shuju, "").Replace("，左轴）", "").Replace("，右轴）", "");//modified
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
                 }
@@ -123,7 +141,7 @@ namespace Report.Securities
                     else
                     {
                         string ziliao = noteZiliao.Match(trimedPara).Value;
-                        string judgeStr = trimedPara.Replace(ziliao, "");
+                        string judgeStr = trimedPara.Replace(ziliao, "").Replace("，左轴）", "").Replace("，右轴）", "");//modified
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
                 }
@@ -133,7 +151,7 @@ namespace Report.Securities
                     else
                     {
                         string zhu = noteZhu.Match(trimedPara).Value;
-                        string judgeStr = trimedPara.Replace(zhu, "");
+                        string judgeStr = trimedPara.Replace(zhu, "").Replace("，左轴）", "").Replace("，右轴）", "");//modified
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
                 }

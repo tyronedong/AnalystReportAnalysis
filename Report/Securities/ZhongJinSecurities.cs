@@ -9,7 +9,7 @@ using org.apache.pdfbox.pdmodel;
 
 namespace Report.Securities
 {
-    class ZhongJinSecurities : ReportParser
+    public class ZhongJinSecurities : ReportParser
     {
         //中金公司
         public ZhongJinSecurities(string pdReportPath)
@@ -147,7 +147,7 @@ namespace Report.Securities
                         }
                         catch (Exception e)
                         {
-                            Trace.TraceError("GuoJunSecurities.extractStockOtherInfo(): " + e.Message);
+                            Trace.TraceError("ZhongJinSecurities.extractStockOtherInfo(): " + e.Message);
                         }
                     }
                 }

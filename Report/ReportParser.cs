@@ -10,7 +10,7 @@ using org.apache.pdfbox.util;
 
 namespace Report
 {
-    class ReportParser
+    public class ReportParser
     {
         public bool isValid = false;
 
@@ -135,7 +135,7 @@ namespace Report
             string content = "", normaledPara; 
             MatchCollection matchCol;
             Regex isContent = new Regex("[\u4e00-\u9fa5a][，。；]");
-            Regex normalizedText = new Regex("[，,。.；;：:“”'\"《<》>？?{}\\[\\]【】()（）*&^$￥#…@！!~·`|+＋\\-－×_—=/、% 0-9a-zA-Z\u4e00-\u9fa5a]+");
+            Regex normalizedText = new Regex("[，,。.．；;：:“”'\"《<》>？?{}\\[\\]【】()（）*&^$￥#…@！!~·`|+＋\\-－×_—=/、%％ 0-9a-zA-Z\u4e00-\u9fa5a]+");
             foreach (var para in finalParas)
             {
                 if (isContent.IsMatch(para))

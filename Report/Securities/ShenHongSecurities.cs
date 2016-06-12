@@ -8,10 +8,10 @@ using System.Text.RegularExpressions;
 
 namespace Report.Securities
 {
-    public class GuoJinSecurities : ReportParser
+    //申万宏源
+    public class ShenHongSecurities : ReportParser
     {
-        //国金证券
-        public GuoJinSecurities(string pdReportPath)
+        public ShenHongSecurities(string pdReportPath)
             : base(pdReportPath)
         {
             if (this.isValid)
@@ -28,38 +28,37 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("GuoJinSecurities.GuoJinSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("ShenHongSecurities.ShenHongSecurities(string pdReportPath): " + e.Message);
                 }
             }
         }
 
         public override bool extractStockOtherInfo()
         {
-            Regex stockR = new Regex(@"买入|增持|中性|减持");
-            Regex stockRC = new Regex(@"[\u4e00-\u9fa5a]+评级");
+            //extract stock price, stock rating and stock rating change
+            //Regex stockRRC = new Regex(@"(买入|增持|持有|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避)[\(（][\u4e00-\u9fa5]{2,3}[\)）]");
+            Regex stockR = new Regex(@"^(买入|增持|中性|减持|看好|看淡)");
+            //Regex stockPrice = new Regex(@"^收盘价（元） *\d+(\.\d+)?");
             Regex stockPrice = new Regex(@"\d+(\.\d+)?");
 
-            bool hasRMatched = false, hasRCMatched = false, hasPriceMatched = false;
+            int index = 0;
+            bool hasRRCMatched = false, hasPriceMatched = false;
             foreach (var line in lines)
             {
-                if (hasRMatched && hasRCMatched && hasPriceMatched) { break; }
+                if (hasRRCMatched && hasPriceMatched) { break; }
                 string trimedLine = line.Trim();
-                if (trimedLine.StartsWith("评级："))
+                if (!hasRRCMatched && stockR.IsMatch(trimedLine))
                 {
-                    if (stockR.IsMatch(trimedLine))
+                    anaReport.StockRating = stockR.Match(trimedLine).Value;
+                    if (lines[index + 1].Contains(' '))
                     {
-                        anaReport.StockRating = stockR.Match(trimedLine).Value;
-                        hasRMatched = true;
+                        anaReport.RatingChanges = lines[index + 1].Trim().Split(' ')[0];
                     }
-                    if (stockRC.IsMatch(trimedLine))
-                    {
-                        anaReport.RatingChanges = stockRC.Match(trimedLine).Value.Replace("评级", "");
-                        hasRCMatched = true;
-                    }
+                    hasRRCMatched = true;
                 }
-                if (trimedLine.StartsWith("市价"))
+                if (!hasPriceMatched && trimedLine.StartsWith("收盘价（元）"))
                 {
-                    if (stockPrice.IsMatch(trimedLine))
+                    if (stockPrice.IsMatch(line))
                     {
                         try
                         {
@@ -69,12 +68,16 @@ namespace Report.Securities
                         }
                         catch (Exception e)
                         {
-                            Trace.TraceError("GuoJinSecurities.extractStockOtherInfo(): " + e.Message);
+                            Trace.TraceError("ShenHongSecurities.extractStockOtherInfo(): " + e.Message);
                         }
                     }
                 }
+                index++;
             }
-            if (hasRMatched && hasRCMatched && hasPriceMatched) { return true; }
+            if (hasRRCMatched && hasPriceMatched)
+            {
+                return true;
+            }
             return false;
         }
 
@@ -88,13 +91,10 @@ namespace Report.Securities
             foreach (var line in lines)
             {
                 string trimedLine = line.Trim();
-                if (trimedLine.StartsWith("长期竞争力评级的说明："))//added
+                if (trimedLine.StartsWith("报告原因："))//added(提高报告原因的优先级使其不被break掉)
                 {
-                    break;
-                }
-                if (trimedLine.StartsWith("优化市盈率计算的说明："))//added
-                {
-                    break;
+                    newLines.Add(line);
+                    continue;
                 }
                 if (InvestRatingStatement.IsMatch(trimedLine))
                 {
@@ -122,7 +122,7 @@ namespace Report.Securities
             Regex mightBeContent = new Regex("[\u4e00-\u9fa5a][，。；]");
 
             Regex refReportHead = new Regex(@"^(\d{1,2} *)?《");
-            Regex refReportTail = new Regex(@"\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?$");
+            Regex refReportTail = new Regex(@"\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?(证券分析师)?$");//modified
 
             Regex noteShuju = new Regex("数据来源：.*$");
             Regex noteZiliao = new Regex("资料来源：.*$");
@@ -130,13 +130,14 @@ namespace Report.Securities
 
             Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
 
-            //Regex picOrTabHead = new Regex(@"^(图|表) *\d{1,2}");
-
-            Regex noteLaiyuan = new Regex("来源：.*$");//added
+            Regex shouyeNote = new Regex("本公司不持有或交易股票及其衍生品.*?客户应全面理解本报告结尾处的[“\"]法律声明[”\"]");//added
+            Regex meiyeNote = new Regex(@"本研究报告仅通过邮件提供给.*?使用。\d{1,3}");//added
+            Regex picOrTabHead = new Regex(@"^(附)?(图|表) *\d{1,3}");//added
 
             List<string> newParas = new List<string>();
             foreach (var para in paras)
             {
+                string curPara = para;
                 string trimedPara = para.Trim();
                 if (refReportHead.IsMatch(trimedPara) && refReportTail.IsMatch(trimedPara))
                 {
@@ -146,15 +147,39 @@ namespace Report.Securities
                 {
                     continue;
                 }
-                if (trimedPara.Contains("来源："))//added
+                if (trimedPara.StartsWith("百万元，百万股"))//added
                 {
-                    if (trimedPara.StartsWith("来源：")) { continue; }
-                    else
-                    {
-                        string laiyuan = noteLaiyuan.Match(trimedPara).Value;
-                        string judgeStr = trimedPara.Replace(laiyuan, "");
-                        if (!mightBeContent.IsMatch(judgeStr)) { continue; }
-                    }
+                    continue;
+                }
+                if (trimedPara.StartsWith("单季度，百万"))//added
+                {
+                    continue;
+                }
+                if (trimedPara.StartsWith("单位：元，百万元，"))//added
+                {
+                    continue;
+                }
+                if (trimedPara.StartsWith("本公司不持有或交易股票及其衍生品，"))//added
+                {
+                    continue;
+                }
+                if (picOrTabHead.IsMatch(trimedPara))//added
+                {
+                    continue;
+                }
+                if (meiyeNote.IsMatch(trimedPara))//added
+                {
+                    string matchedStr = meiyeNote.Match(trimedPara).Value;
+                    trimedPara = trimedPara.Replace(matchedStr, "").Trim();
+                    if (string.IsNullOrEmpty(trimedPara)) { continue; }
+                    curPara = para.Replace(matchedStr, "");
+                }
+                if (shouyeNote.IsMatch(trimedPara))//added
+                {
+                    string matchedStr = shouyeNote.Match(trimedPara).Value;
+                    trimedPara = trimedPara.Replace(matchedStr, "").Trim();
+                    if (string.IsNullOrEmpty(trimedPara)) { continue; }
+                    curPara = para.Replace(matchedStr, "");
                 }
                 if (trimedPara.Contains("数据来源："))
                 {
@@ -186,7 +211,7 @@ namespace Report.Securities
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
                 }
-                newParas.Add(para);
+                newParas.Add(curPara);
             }
             return newParas.ToArray();
         }

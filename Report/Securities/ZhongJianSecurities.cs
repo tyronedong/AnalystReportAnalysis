@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Report.Securities
 {
-    class ZhongJianSecurities : ReportParser
+    public class ZhongJianSecurities : ReportParser
     {
         //中信建投
         public ZhongJianSecurities(string pdReportPath)
