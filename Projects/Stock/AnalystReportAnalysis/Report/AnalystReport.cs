@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Report
 {
-    class AnalystReport
+    public class AnalystReport
     {
         public string ReportTitle { get; set; }
 
@@ -38,7 +38,7 @@ namespace Report
         }
     }
 
-    class Analyst
+    public class Analyst
     {
         public Analyst(string Name, string CertificateNumber, string PhoneNumber, string Email)
         {

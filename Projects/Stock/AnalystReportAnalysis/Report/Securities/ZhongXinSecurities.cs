@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace Report.Securities
 {
-    class ZhongXinSecurities : ReportParser
+    public class ZhongXinSecurities : ReportParser
     {
         //中信证券（2013年及之前的pfd解析乱码）
         public ZhongXinSecurities(string pdReportPath)

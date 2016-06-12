@@ -82,6 +82,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Report\Report.csproj">
+      <Project>{464c19c0-235f-458a-a59b-2267c98261a2}</Project>
+      <Name>Report</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Stock\Stock.csproj">
       <Project>{32bed270-e31b-4ad4-aeeb-fa434495dc1d}</Project>
       <Name>Stock</Name>

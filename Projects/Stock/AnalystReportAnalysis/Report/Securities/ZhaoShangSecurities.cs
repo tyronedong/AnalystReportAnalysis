@@ -11,7 +11,7 @@ using org.apache.pdfbox.util;
 namespace Report.Securities
 {
     //招商证券
-    class ZhaoShangSecurities : ReportParser
+    public class ZhaoShangSecurities : ReportParser
     {
         public ZhaoShangSecurities(string pdReportPath)
             : base(pdReportPath)
