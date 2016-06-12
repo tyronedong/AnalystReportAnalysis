@@ -8,10 +8,10 @@ using System.Text.RegularExpressions;
 
 namespace Report.Securities
 {
-    //安信证券
-    public class AnXinSecurities : ReportParser
+    //天相投顾
+    public class TianTouSecurities : ReportParser
     {
-        public AnXinSecurities(string pdReportPath)
+        public TianTouSecurities(string pdReportPath)
             : base(pdReportPath)
         {
             if (this.isValid)
@@ -22,14 +22,13 @@ namespace Report.Securities
                     lines = pdfText.Split('\n');
                     noABCLines = removeAnyButContentInLines(lines);
                     mergedParas = mergeToParagraph(noABCLines);
-                    base.extractStockBasicInfo();//added
                     noABCParas = removeAnyButContentInParas(mergedParas);
                     finalParas = noABCParas;
                 }
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("AnXinSecurities.AnXinSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("CommonSecurities.CommonSecurities(string pdReportPath): " + e.Message);
                 }
             }
         }
@@ -37,83 +36,45 @@ namespace Report.Securities
         public override bool extractStockOtherInfo()
         {
             //extract stock price, stock rating and stock rating change
-            //Regex stockRRC = new Regex(@"(买入|增持|中性|减持|卖出)[\(（][\u4e00-\u9fa5]{2,3}[\)）]");
-            Regex stockR = new Regex(@"买入|增持|中性|减持|卖出");
-            Regex stockPrice = new Regex(@"\d+\.\d+");
+            Regex stockRRC = new Regex(@"(买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避)[\(（][\u4e00-\u9fa5]{2,3}[\)）]");
+            Regex stockR = new Regex(@"买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避");
+            Regex stockPrice = new Regex(@"\d+(\.\d+)?");
 
-            int index = 0;
             bool hasRRCMatched = false, hasPriceMatched = false;
             foreach (var line in lines)
             {
                 if (hasRRCMatched && hasPriceMatched) { break; }
                 string trimedLine = line.Trim();
-                if (!hasRRCMatched && trimedLine.StartsWith("投资评级"))
+                if (!hasRRCMatched&&stockRRC.IsMatch(line))
                 {
-                    if (stockR.IsMatch(trimedLine))
-                    {
-                        anaReport.StockRating = stockR.Match(trimedLine).Value;
-                        anaReport.RatingChanges = lines[index + 1].Trim().Replace("评级", "");
-                        hasRRCMatched = true;
-                    }
+                    string srrc = stockRRC.Match(line).Value;
+                    anaReport.StockRating = stockR.Match(srrc).Value;
+                    anaReport.RatingChanges = srrc.Replace(anaReport.StockRating, "").Replace("(", "").Replace("（", "").Replace("）", "").Replace(")", "");
+
+                    hasRRCMatched = true;
                 }
-                if (!hasPriceMatched && trimedLine.StartsWith("股价") && trimedLine.EndsWith("元"))
+                if (!hasPriceMatched && trimedLine.StartsWith("当前股价："))
                 {
                     if (stockPrice.IsMatch(trimedLine))
                     {
                         try
                         {
-                            anaReport.StockPrice = float.Parse(stockPrice.Match(trimedLine).Value);
+                            anaReport.StockPrice = float.Parse(stockPrice.Match(line).Value);
                             //anaReport.StockPrice.ToString();
                             hasPriceMatched = true;
                         }
                         catch (Exception e)
                         {
-                            Trace.TraceError("AnXinSecurities.extractStockOtherInfo(): " + e.Message);
+                            Trace.TraceError("TianTouSecurities.extractStockOtherInfo(): " + e.Message);
                         }
                     }
                 }
-                index++;
             }
             if (hasRRCMatched && hasPriceMatched)
             {
                 return true;
             }
             return false;
-        } 
-
-        public override string[] removeAnyButContentInLines(string[] lines)
-        {
-            Regex InvestRatingStatement = new Regex("(^投资评级(的)?说明)|(投资评级(的)?(说明)?[:：]?$)|(评级(标准|说明)[:：]?$)");
-            Regex Statements = new Regex("^(((证券)?分析师(申明|声明|承诺))|((重要|特别)(声|申)明)|(免责(条款|声明|申明))|(法律(声|申)明)|(披露(声|申)明)|(信息披露)|(要求披露))[:：]?$");
-            Regex FirmIntro = new Regex("公司简介[:：]?$");
-            Regex AnalystIntro = new Regex("^(分析师|研究员|作者)(简介|介绍)[\u4e00-\u9fa5a]*?[:：]?$");
-            List<string> newLines = new List<string>();
-            foreach (var line in lines)
-            {
-                string trimedLine = line.Trim();
-                if (trimedLine.StartsWith("收益评级："))
-                {
-                    break;
-                }
-                if (InvestRatingStatement.IsMatch(trimedLine))
-                {
-                    break;
-                }
-                if (Statements.IsMatch(trimedLine))
-                {
-                    break;
-                }
-                if (FirmIntro.IsMatch(trimedLine))
-                {
-                    break;
-                }
-                if (AnalystIntro.IsMatch(trimedLine))
-                {
-                    break;
-                }
-                newLines.Add(line);
-            }
-            return newLines.ToArray();
         }
 
         public override string[] removeAnyButContentInParas(string[] paras)
@@ -129,7 +90,7 @@ namespace Report.Securities
 
             Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
 
-            Regex extra = new Regex("(本报告版权属于安信证券股份有限公司。|各项声明请参见报告尾页。) *$");
+            Regex extra = new Regex(@"^\d* *诚信源于独立，专");
             //Regex picOrTabHead = new Regex(@"^(图|表) *\d{1,2}");
 
             List<string> newParas = new List<string>();
@@ -144,11 +105,7 @@ namespace Report.Securities
                 {
                     continue;
                 }
-                if (trimedPara.StartsWith(anaReport.StockName + "："))//added
-                {
-                    continue;
-                }
-                if (extra.IsMatch(trimedPara))//added
+                if (extra.IsMatch(trimedPara))
                 {
                     continue;
                 }
