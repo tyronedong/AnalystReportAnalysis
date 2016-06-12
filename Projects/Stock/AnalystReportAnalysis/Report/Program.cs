@@ -131,10 +131,35 @@ namespace Report
                     //    //flag = true;
                     //    reportParser = new HaiTongSecurities(filePath);
                     //}
-                    else if (securitiesName.Equals("安信证券"))
+                    //else if (securitiesName.Equals("安信证券"))
+                    //{
+                    //    flag = true;
+                    //    reportParser = new AnXinSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("广发证券"))
+                    //{
+                    //    flag = true;
+                    //    reportParser = new GuangFaSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("天相投顾"))
+                    //{
+                    //    flag = true;
+                    //    reportParser = new TianTouSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("华泰证券"))
+                    //{
+                    //    flag = true;
+                    //    reportParser = new HuaTaiSecurities(filePath);
+                    //}
+                    //else if (securitiesName.Equals("中银国际"))
+                    //{
+                    //    flag = true;
+                    //    reportParser = new ZhongGuoSecurities(filePath);
+                    //}
+                    else if (securitiesName.Equals("东方证券"))
                     {
                         flag = true;
-                        reportParser = new AnXinSecurities(filePath);
+                        reportParser = new DongFangSecurities(filePath);
                     }
                     //if (securitiesName.Equals("中信证券"))
                     //{

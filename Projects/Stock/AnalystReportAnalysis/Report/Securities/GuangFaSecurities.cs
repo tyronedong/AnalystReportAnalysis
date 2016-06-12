@@ -8,10 +8,10 @@ using System.Text.RegularExpressions;
 
 namespace Report.Securities
 {
-    //安信证券
-    public class AnXinSecurities : ReportParser
+    //广发证券
+    class GuangFaSecurities:ReportParser
     {
-        public AnXinSecurities(string pdReportPath)
+        public GuangFaSecurities(string pdReportPath)
             : base(pdReportPath)
         {
             if (this.isValid)
@@ -29,7 +29,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("AnXinSecurities.AnXinSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("GuangFaSecurities.GuangFaSecurities(string pdReportPath): " + e.Message);
                 }
             }
         }
@@ -37,26 +37,24 @@ namespace Report.Securities
         public override bool extractStockOtherInfo()
         {
             //extract stock price, stock rating and stock rating change
-            //Regex stockRRC = new Regex(@"(买入|增持|中性|减持|卖出)[\(（][\u4e00-\u9fa5]{2,3}[\)）]");
-            Regex stockR = new Regex(@"买入|增持|中性|减持|卖出");
+            //Regex stockRRC = new Regex(@"(买入|增持|持有|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避)[\(（][\u4e00-\u9fa5]{2,3}[\)）]");
+            Regex stockR = new Regex(@"买入|谨慎增持|持有|卖出");
             Regex stockPrice = new Regex(@"\d+\.\d+");
 
-            int index = 0;
-            bool hasRRCMatched = false, hasPriceMatched = false;
+            bool hasRMatched = false, hasPriceMatched = false;
             foreach (var line in lines)
             {
-                if (hasRRCMatched && hasPriceMatched) { break; }
+                if (hasRMatched && hasPriceMatched) { break; }
                 string trimedLine = line.Trim();
-                if (!hasRRCMatched && trimedLine.StartsWith("投资评级"))
+                if (!hasRMatched && (trimedLine.StartsWith("公司评级") || trimedLine.StartsWith("行业评级")))
                 {
                     if (stockR.IsMatch(trimedLine))
                     {
                         anaReport.StockRating = stockR.Match(trimedLine).Value;
-                        anaReport.RatingChanges = lines[index + 1].Trim().Replace("评级", "");
-                        hasRRCMatched = true;
+                        hasRMatched = true;
                     }
                 }
-                if (!hasPriceMatched && trimedLine.StartsWith("股价") && trimedLine.EndsWith("元"))
+                if (!hasPriceMatched && trimedLine.StartsWith("当前价格"))
                 {
                     if (stockPrice.IsMatch(trimedLine))
                     {
@@ -68,18 +66,18 @@ namespace Report.Securities
                         }
                         catch (Exception e)
                         {
-                            Trace.TraceError("AnXinSecurities.extractStockOtherInfo(): " + e.Message);
+                            Trace.TraceError("GuangFaSecurities.extractStockOtherInfo(): " + e.Message);
                         }
                     }
                 }
-                index++;
+                
             }
-            if (hasRRCMatched && hasPriceMatched)
+            if (hasRMatched && hasPriceMatched)
             {
                 return true;
             }
             return false;
-        } 
+        }
 
         public override string[] removeAnyButContentInLines(string[] lines)
         {
@@ -91,7 +89,7 @@ namespace Report.Securities
             foreach (var line in lines)
             {
                 string trimedLine = line.Trim();
-                if (trimedLine.StartsWith("收益评级："))
+                if (trimedLine.EndsWith("行业研究小组"))//added
                 {
                     break;
                 }
@@ -129,7 +127,8 @@ namespace Report.Securities
 
             Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
 
-            Regex extra = new Regex("(本报告版权属于安信证券股份有限公司。|各项声明请参见报告尾页。) *$");
+            Regex extra = new Regex("^识别风险，发现价值 *请务必阅读末页的免责声明$");//added
+            Regex newReportHead = new Regex(string.Format("^{0}（{1}）—", anaReport.StockName, anaReport.StockCode));
             //Regex picOrTabHead = new Regex(@"^(图|表) *\d{1,2}");
 
             List<string> newParas = new List<string>();
@@ -144,7 +143,7 @@ namespace Report.Securities
                 {
                     continue;
                 }
-                if (trimedPara.StartsWith(anaReport.StockName + "："))//added
+                if (newReportHead.IsMatch(trimedPara))//added
                 {
                     continue;
                 }

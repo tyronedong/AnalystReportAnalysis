@@ -78,6 +78,8 @@
     <Compile Include="Securities\CommonSecurities.cs" />
     <Compile Include="Handler\CurIdHandler.cs" />
     <Compile Include="Handler\FileHandler.cs" />
+    <Compile Include="Securities\DongFangSecurities.cs" />
+    <Compile Include="Securities\GuangFaSecurities.cs" />
     <Compile Include="Securities\GuoJinSecurities.cs" />
     <Compile Include="Securities\GuoJunSecurities.cs" />
     <Compile Include="Program.cs" />
@@ -87,8 +89,11 @@
     <Compile Include="Handler\TraceHandler.cs" />
     <Compile Include="Securities\GuoXinSecurities.cs" />
     <Compile Include="Securities\HaiTongSecurities.cs" />
+    <Compile Include="Securities\HuaTaiSecurities.cs" />
     <Compile Include="Securities\ShenHongSecurities.cs" />
+    <Compile Include="Securities\TianTouSecurities.cs" />
     <Compile Include="Securities\ZhaoShangSecurities.cs" />
+    <Compile Include="Securities\ZhongGuoSecurities.cs" />
     <Compile Include="Securities\ZhongJianSecurities.cs" />
     <Compile Include="Securities\ZhongJinSecurities.cs" />
     <Compile Include="Securities\ZhongXinSecurities.cs" />

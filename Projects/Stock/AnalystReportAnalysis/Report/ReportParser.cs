@@ -101,8 +101,8 @@ namespace Report
         public virtual bool extractStockOtherInfo()
         {
             //extract stock price, stock rating and stock rating change
-            Regex stockRRC = new Regex(@"(买入|增持|持有|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避)[\(（][\u4e00-\u9fa5]{2,3}[\)）]");
-            Regex stockR = new Regex(@"买入|增持|持有|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避");
+            Regex stockRRC = new Regex(@"(买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避)[\(（][\u4e00-\u9fa5]{2,4}[\)）]");
+            Regex stockR = new Regex(@"买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避");
 
             bool hasRRCMatched = false;
             foreach (var line in lines)
