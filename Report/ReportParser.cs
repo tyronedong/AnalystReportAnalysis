@@ -264,7 +264,7 @@ namespace Report
         {
             Regex mightBeContent = new Regex("[\u4e00-\u9fa5a][，。；]");
 
-            Regex refReportHead = new Regex(@"^(\d{1,2} *)?《");
+            Regex refReportHead = new Regex(@"^(\d{1,2} *\.? *)?《");
             Regex refReportTail = new Regex(@"\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?$");
 
             Regex noteShuju = new Regex("数据来源：.*$");

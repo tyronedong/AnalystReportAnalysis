@@ -28,9 +28,126 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("CommonSecurities.CommonSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("ZhongGuoSecurities.CommonSecurities(string pdReportPath): " + e.Message);
                 }
             }
+        }
+
+        public override bool extractStockInfo()
+        {
+            Regex stockCode = new Regex(@"\d{6}\.[a-zA-Z]{1,4}");
+            Regex stockPrice = new Regex(@"\d+\.\d+");
+            bool hasCodeMatched = false, hasPriceMatched = false;
+
+            base.extractStockBasicInfo();
+            if (string.IsNullOrEmpty(anaReport.StockName) || anaReport.StockName.Equals("中国银行大厦四楼"))
+            {
+                anaReport.StockName = null;
+                foreach (var line in lines)
+                {
+                    string trimedLine = line.Trim();
+                    if (stockCode.IsMatch(trimedLine))
+                    {
+                        anaReport.StockCode = trimedLine.Split('.')[0];
+                        hasCodeMatched = true;
+                        break;
+                    }
+                }
+            }
+            else if (anaReport.StockName.Equals("股票代码"))
+            {
+                anaReport.StockName = null;
+            }
+
+            foreach (var line in lines)
+            {
+                string trimedLine = line.Trim();
+                if (trimedLine.StartsWith("价格：") || trimedLine.StartsWith("收盘价 "))
+                {
+                    if ( stockPrice.IsMatch(trimedLine))
+                    {
+                        try
+                        {
+                            anaReport.StockPrice = float.Parse(stockPrice.Match(line).Value);
+                            //anaReport.StockPrice.ToString();
+                            hasPriceMatched = true;
+                        }
+                        catch (Exception e)
+                        {
+                            Trace.TraceError("ZhongGuoSecurities.extractStockOtherInfo(): " + e.Message);
+                        }
+                    }
+                }
+            }
+
+            return hasCodeMatched && hasPriceMatched;
+        } 
+
+        public override string[] removeAnyButContentInParas(string[] paras)
+        {
+            Regex mightBeContent = new Regex("[\u4e00-\u9fa5a][，。；]");
+
+            Regex refReportHead = new Regex(@"^(\d{1,2} *)?《");
+            Regex refReportTail = new Regex(@"\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?$");
+
+            Regex noteShuju = new Regex("数据来源：.*$");
+            Regex noteZiliao = new Regex("资料来源：.*$");
+            Regex noteZhu = new Regex("注：.*$");
+
+            Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
+
+            Regex extra = new Regex(@"^(\(人民币，百万\)|\(元/台，套\))");//added
+            //Regex picOrTabHead = new Regex(@"^(图|表) *\d{1,2}");
+
+            List<string> newParas = new List<string>();
+            foreach (var para in paras)
+            {
+                string trimedPara = para.Trim();
+                if (refReportHead.IsMatch(trimedPara) && refReportTail.IsMatch(trimedPara))
+                {
+                    continue;
+                }
+                if (indexEntry.IsMatch(trimedPara))
+                {
+                    continue;
+                }
+                if (extra.IsMatch(trimedPara))//added
+                {
+                    continue;
+                }
+                if (trimedPara.Contains("数据来源："))
+                {
+                    if (trimedPara.StartsWith("数据来源：")) { continue; }
+                    else
+                    {
+                        string shuju = noteShuju.Match(trimedPara).Value;
+                        string judgeStr = trimedPara.Replace(shuju, "");
+                        if (!mightBeContent.IsMatch(judgeStr)) { continue; }
+                    }
+                }
+                if (trimedPara.Contains("资料来源："))
+                {
+                    if (trimedPara.StartsWith("资料来源：")) { continue; }
+                    else
+                    {
+                        string ziliao = noteZiliao.Match(trimedPara).Value;
+                        string judgeStr = trimedPara.Replace(ziliao, "");
+                        if (!mightBeContent.IsMatch(judgeStr)) { continue; }
+                    }
+                }
+                if (trimedPara.Contains("注："))
+                {
+                    if (trimedPara.StartsWith("注：")) { continue; }
+                    else
+                    {
+                        string zhu = noteZhu.Match(trimedPara).Value;
+                        string judgeStr = trimedPara.Replace(zhu, "");
+                        if (!mightBeContent.IsMatch(judgeStr)) { continue; }
+                    }
+                }
+                newParas.Add(para);
+            }
+            return newParas.ToArray();
         }
     }
 }
