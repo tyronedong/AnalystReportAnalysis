@@ -90,7 +90,7 @@ namespace Report
                     reports.Clear();
                     foreach (DataRow curRow in curReportsTable.Rows)
                     {
-                        //bool flag = false;
+                        bool flag = false;
                         //get values in row 
                         //var time = curRow[0].ToString();
                         var time = (DateTime)curRow[0];
@@ -103,10 +103,10 @@ namespace Report
                         var person3 = curRow[7].ToString();
                         //update nextCurId
                         nextCurId = id;
-                        if (time.Year != 2013)
-                        {
-                            continue;
-                        }
+                        //if (time.Year != 2013)
+                        //{
+                        //    continue;
+                        //}
                         //judge if current document is handlable
                         if (language.Equals("EN"))
                         {
@@ -232,7 +232,7 @@ namespace Report
                         }
                         else
                         {
-                            //flag = true;
+                            //if (securitiesName.Equals("民生证券")) { flag = true; }
                             reportParser = new CommonSecurities(filePath);
                         }
 
@@ -315,6 +315,7 @@ namespace Report
         /// <param name="person3"></param>
         public static void SetExistedInfo(ref AnalystReport anaReport, ref SqlServerHandler sqlSH, string pdFileName, string reportTitle, string jobber, DateTime time, string person1, string person2, string person3)
         {
+            anaReport._id = pdFileName;
             anaReport.ReportTitle = reportTitle;
             anaReport.PDFileName = pdFileName;
             anaReport.Stockjobber = jobber;
