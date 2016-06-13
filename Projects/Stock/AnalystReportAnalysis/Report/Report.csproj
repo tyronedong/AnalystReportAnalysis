@@ -53,6 +53,18 @@
     <Reference Include="IKVM.Runtime">
       <HintPath>package\PDFBox.NET-1.8.9\bin\IKVM.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>package\CSharpDriver-2.0.2\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>package\CSharpDriver-2.0.2\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core">
+      <HintPath>package\CSharpDriver-2.0.2\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Legacy">
+      <HintPath>package\CSharpDriver-2.0.2\MongoDB.Driver.Legacy.dll</HintPath>
+    </Reference>
     <Reference Include="pdfbox-1.8.9">
       <HintPath>package\PDFBox.NET-1.8.9\bin\pdfbox-1.8.9.dll</HintPath>
     </Reference>
@@ -74,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalystReport.cs" />
+    <Compile Include="Handler\MongoDBHandler.cs" />
     <Compile Include="Securities\AnXinSecurities.cs" />
     <Compile Include="Securities\CommonSecurities.cs" />
     <Compile Include="Handler\CurIdHandler.cs" />

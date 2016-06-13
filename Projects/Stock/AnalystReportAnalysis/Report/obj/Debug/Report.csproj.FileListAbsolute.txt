@@ -34,3 +34,15 @@ D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Misc.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Report\obj\Debug\Report.csprojResolveAssemblyReference.cache
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Stock.exe
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Stock.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Bson.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Core.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Legacy.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Bson.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Bson.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Core.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Core.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Legacy.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Legacy.xml
