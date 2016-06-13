@@ -128,8 +128,8 @@ namespace Report.Securities
             Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
 
             Regex extra = new Regex("^识别风险，发现价值 *请务必阅读末页的免责声明$");//added
-            Regex newReportHead = new Regex(string.Format("^{0}（{1}）—", anaReport.StockName, anaReport.StockCode));
-            //Regex picOrTabHead = new Regex(@"^(图|表) *\d{1,2}");
+            Regex newReportHead = new Regex(string.Format("^{0}（{1}）—", anaReport.StockName, anaReport.StockCode));//added
+            Regex picOrTabHead = new Regex(@"^(图|表|图表) *\d{1,2}");//added
 
             List<string> newParas = new List<string>();
             foreach (var para in paras)
@@ -140,6 +140,10 @@ namespace Report.Securities
                     continue;
                 }
                 if (indexEntry.IsMatch(trimedPara))
+                {
+                    continue;
+                }
+                if (picOrTabHead.IsMatch(trimedPara))//added
                 {
                     continue;
                 }

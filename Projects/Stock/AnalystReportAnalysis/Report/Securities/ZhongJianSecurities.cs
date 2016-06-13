@@ -79,5 +79,74 @@ namespace Report.Securities
             if (hasPriceMatched && hasRRCMatched) { return true; }
             return false;
         }
+
+        public override string[] removeAnyButContentInParas(string[] paras)
+        {
+            Regex mightBeContent = new Regex("[\u4e00-\u9fa5a][，。；]");
+
+            Regex refReportHead = new Regex(@"^(\d{1,2} *\.? *)?《");
+            Regex refReportTail = new Regex(@"\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?$");
+
+            Regex noteShuju = new Regex("数据来源：.*$");
+            Regex noteZiliao = new Regex("资料来源：.*$");
+            Regex noteZhu = new Regex("注：.*$");
+
+            Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
+
+            Regex picOrTabHead = new Regex(@"^(图|表|图表) *\d{1,2}");
+
+            Regex newRefReportHead = new Regex(@"^\d{4}[-\./]?\d{1,2}([-\./]?\d{1,2})?$");//added
+            Regex newRefReportTail = new Regex("》 *$");//added
+
+            List<string> newParas = new List<string>();
+            foreach (var para in paras)
+            {
+                string trimedPara = para.Trim();
+                if (refReportHead.IsMatch(trimedPara) && refReportTail.IsMatch(trimedPara))
+                {
+                    continue;
+                }
+                if (indexEntry.IsMatch(trimedPara))
+                {
+                    continue;
+                }
+                if (newRefReportHead.IsMatch(trimedPara) && newRefReportTail.IsMatch(trimedPara))//added
+                {
+                    continue;
+                }
+                if (trimedPara.Contains("数据来源："))
+                {
+                    if (trimedPara.StartsWith("数据来源：")) { continue; }
+                    else
+                    {
+                        string shuju = noteShuju.Match(trimedPara).Value;
+                        string judgeStr = trimedPara.Replace(shuju, "");
+                        if (!mightBeContent.IsMatch(judgeStr)) { continue; }
+                    }
+                }
+                if (trimedPara.Contains("资料来源："))
+                {
+                    if (trimedPara.StartsWith("资料来源：")) { continue; }
+                    else
+                    {
+                        string ziliao = noteZiliao.Match(trimedPara).Value;
+                        string judgeStr = trimedPara.Replace(ziliao, "");
+                        if (!mightBeContent.IsMatch(judgeStr)) { continue; }
+                    }
+                }
+                if (trimedPara.Contains("注："))
+                {
+                    if (trimedPara.StartsWith("注：")) { continue; }
+                    else
+                    {
+                        string zhu = noteZhu.Match(trimedPara).Value;
+                        string judgeStr = trimedPara.Replace(zhu, "");
+                        if (!mightBeContent.IsMatch(judgeStr)) { continue; }
+                    }
+                }
+                newParas.Add(para);
+            }
+            return newParas.ToArray();
+        }
     }
 }
