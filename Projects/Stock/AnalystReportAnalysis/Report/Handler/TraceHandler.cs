@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Report.Handler
 {
-    class TraceHandler : TraceListener
+    public class TraceHandler : TraceListener
     {
         private string fileLoc = ConfigurationManager.AppSettings["log_file_location"];
 

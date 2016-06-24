@@ -130,8 +130,8 @@ namespace Report.Securities
 
             Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
 
-            Regex shouyeNote = new Regex("本公司不持有或交易股票及其衍生品.*?客户应全面理解本报告结尾处的[“\"]法律声明[”\"]");//added
-            Regex meiyeNote = new Regex(@"本研究报告仅通过邮件提供给.*?使用。\d{1,3}");//added
+            Regex shouyeNote = new Regex("^本公司不持有或交易股票及其衍生品.*?客户应全面理解本报告结尾.*");//added
+            Regex meiyeNote = new Regex(@"^本研究报告仅通过邮件提供给.*?使用。\d{1,3}.*");//added
             Regex picOrTabHead = new Regex(@"^(附)?(图|表) *\d{1,3}");//added
 
             List<string> newParas = new List<string>();

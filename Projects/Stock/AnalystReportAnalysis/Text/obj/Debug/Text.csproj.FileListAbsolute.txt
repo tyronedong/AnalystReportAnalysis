@@ -1,0 +1,8 @@
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\Text.exe.config
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\Text.exe
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\Text.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Text\obj\Debug\Text.csprojResolveAssemblyReference.cache
+D:\workingwc\Stock\AnalystReportAnalysis\Text\obj\Debug\Text.exe
+D:\workingwc\Stock\AnalystReportAnalysis\Text\obj\Debug\Text.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\LibSVMsharp.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\LibSVMsharp.pdb

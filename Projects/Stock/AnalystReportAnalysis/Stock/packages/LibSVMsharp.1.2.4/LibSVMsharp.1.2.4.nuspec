@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>LibSVMsharp</id>
+    <version>1.2.4</version>
+    <title>LibSVMsharp</title>
+    <authors>ccerhan</authors>
+    <owners>ccerhan</owners>
+    <licenseUrl>https://raw.githubusercontent.com/ccerhan/LibSVMsharp/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/ccerhan/LibSVMsharp</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>LibSVMsharp is a simple and easy-to-use C# wrapper for Support Vector Machines. It uses the latest LibSVM version 3.20 which released on 15th of November in 2014.</description>
+    <summary />
+    <releaseNotes>Minor changes:
+* Null checks are added to the methods in SVM class.</releaseNotes>
+    <language>en_US</language>
+    <tags>libsvm svm C# machinelearning classification regression</tags>
+  </metadata>
+</package>
