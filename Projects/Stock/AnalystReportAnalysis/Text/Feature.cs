@@ -10,12 +10,79 @@ namespace Text
 {
     class Feature
     {
-        public static bool ChiFeatureExtract()
+        public static List<FeatureItem> LoadChiFeature(string fileName)
         {
-            Dictionary<string, double> wordChiValueDic = GetWordChiValueDic("zhengli");
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="featRatio"></param>
+        /// <param name="globalWeightType"></param>
+        /// <returns></returns>
+        public static bool ChiFeatureExtract(string fileName, double featRatio = 0.4, string globalWeightType = "idf")
+        {
+            //Dictionary<string, double> wordChiValueDic = GetWordChiValueDic("zhengli");
+            Dictionary<string, WordItem> wordItemDic = GetWordItemDic();
+            Dictionary<string, double> wordChiValueDic = GetWordChiValueDic(ref wordItemDic);
             var dicSort = from objDic in wordChiValueDic orderby objDic.Value descending select objDic;
 
+            List<FeatureItem> featureItems = new List<FeatureItem>();
+            int numberOfFeat = (int)(featRatio * wordChiValueDic.Count);
+            int N = LabeledItem.numberOfZhengli + LabeledItem.numberOfFuli;
+            for (int i = 0; i < numberOfFeat; i++)
+            {
+                FeatureItem featureItem = new FeatureItem();
+                featureItem.id = i + 1;
+                featureItem.featureWord = dicSort.ElementAt(i).Key;
+                if (globalWeightType.Equals("idf"))
+                {
+                    WordItem wordItem = wordItemDic[featureItem.featureWord];
+                    featureItem.globalWeight = Math.Log10(N * 1.0 / (wordItem.zhengliCount + wordItem.fuliCount + 1));
+                }
+                featureItems.Add(featureItem);
+            }
+
+            if (FileHandler.SaveFeatures(fileName, featureItems)) return true;
             return false;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="wordItemDic"></param>
+        /// <returns></returns>
+        static Dictionary<string, double> GetWordChiValueDic(ref Dictionary<string, WordItem> wordItemDic)
+        {
+            Dictionary<string, double> wordChiValueDic = new Dictionary<string, double>();
+
+            //Dictionary<string, WordItem> wordItemDic = GetWordItemDic();
+            double N = LabeledItem.numberOfZhengli + LabeledItem.numberOfFuli;
+
+            double A = 0, B = 0, C = 0, D = 0;
+            foreach (var wordItemKvp in wordItemDic)
+            {
+                double chiValue = 0;
+                string word = wordItemKvp.Key;
+                WordItem wordItem = wordItemKvp.Value;
+
+                A = wordItem.zhengliCount;
+                B = wordItem.fuliCount;
+                C = LabeledItem.numberOfZhengli - A;
+                D = LabeledItem.numberOfFuli - B;
+
+                if ((A + C) * (A + B) * (B + D) * (C + D) == 0)
+                    chiValue = 0;
+                else
+                    chiValue = (N * Math.Pow((A * D - B * C), 2)) / ((A + C) * (A + B) * (B + D) * (C + D));
+
+                wordChiValueDic.Add(word, chiValue);
+            }
+
+            return wordChiValueDic;
         }
 
         /// <summary>

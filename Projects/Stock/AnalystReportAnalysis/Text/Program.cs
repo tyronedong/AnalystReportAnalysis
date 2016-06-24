@@ -12,7 +12,8 @@ namespace Text
     {
         static void Main(string[] args)
         {
-            Feature.ChiFeatureExtract();
+            string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\Model\feature.txt";
+            Feature.ChiFeatureExtract(fileName);
 
             Console.WriteLine();
         }
@@ -58,11 +59,11 @@ namespace Text
                 Trace.TraceInformation(line.Key + ":" + line.Value);
             }
 
-            SVM.Train.ExecuteTrain();
+            //SVM.Train.ExecuteTrain();
 
             Console.ReadLine();
         }
 
-       
+        
     }
 }
