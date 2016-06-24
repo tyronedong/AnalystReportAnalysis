@@ -11,15 +11,52 @@ namespace Report.Handler
 {
     class MongoDBHandler
     {
-        string ins_mongoDBConnectionString = ConfigurationManager.AppSettings["mongodbConnectionString"];
-        string ins_mongoDBName = ConfigurationManager.AppSettings["insert_mongodbname"];
-        string ins_mongoDBCollName = ConfigurationManager.AppSettings["insert_mongodbcollectionname"];
+        //variables for insert into mongoDB
+        string ins_mongoDBConnectionString;
+        string ins_mongoDBName;
+        string ins_mongoDBCollName;
         
         IMongoClient ins_mgclient;
         IMongoDatabase ins_mgdatabase;
         IMongoCollection<AnalystReport> ins_mgcollection;
 
-        public MongoDBHandler() { }
+        //variables for query from mongoDB
+        string query_mongoDBConnectionString;
+        string query_mongoDBName;
+        string query_mongoDBCollName;
+
+        IMongoClient query_mgclient;
+        IMongoDatabase query_mgdatabase;
+        IMongoCollection<AnalystReport> query_mgcollection;
+
+        /// <summary>
+        /// </summary>
+        /// <param name="authority">Three optional values for param 'authority': "InsertOnly", "QueryOnly" or "InsertQuery"</param>
+        public MongoDBHandler(string authority)
+        {
+            if (authority.Equals("InsertOnly"))
+            {
+                ins_mongoDBConnectionString = ConfigurationManager.AppSettings["mongodbConnectionString"];
+                ins_mongoDBName = ConfigurationManager.AppSettings["insert_mongodbname"];
+                ins_mongoDBCollName = ConfigurationManager.AppSettings["insert_mongodbcollectionname"];
+            }
+            else if (authority.Equals("QueryOnly"))
+            {
+                query_mongoDBConnectionString = ConfigurationManager.AppSettings["mongodbConnectionString"];
+                query_mongoDBName = ConfigurationManager.AppSettings["insert_mongodbname"];
+                query_mongoDBCollName = ConfigurationManager.AppSettings["insert_mongodbcollectionname"];
+            }
+            else
+            {
+                ins_mongoDBConnectionString = ConfigurationManager.AppSettings["mongodbConnectionString"];
+                ins_mongoDBName = ConfigurationManager.AppSettings["insert_mongodbname"];
+                ins_mongoDBCollName = ConfigurationManager.AppSettings["insert_mongodbcollectionname"];
+
+                query_mongoDBConnectionString = ConfigurationManager.AppSettings["mongodbConnectionString"];
+                query_mongoDBName = ConfigurationManager.AppSettings["insert_mongodbname"];
+                query_mongoDBCollName = ConfigurationManager.AppSettings["insert_mongodbcollectionname"];
+            }
+        }
 
         public bool Init()
         {
