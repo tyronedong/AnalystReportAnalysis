@@ -64,4 +64,11 @@ namespace Text
             
         }
     }
+
+    class FeatureItem
+    {
+        public int id { get; set; }
+        public string featureWord { get; set; }
+        public double globalWeight { get; set; }
+    }
 }
