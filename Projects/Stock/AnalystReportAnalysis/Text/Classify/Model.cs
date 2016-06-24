@@ -7,7 +7,7 @@ using LibSVMsharp;
 using LibSVMsharp.Helpers;
 using LibSVMsharp.Extensions;
 
-namespace Text
+namespace Text.Classify
 {
     class Model
     {

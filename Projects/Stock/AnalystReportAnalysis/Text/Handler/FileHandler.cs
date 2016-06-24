@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
+using Text.Classify.Item;
 
 namespace Text.Handler
 {
@@ -34,11 +35,11 @@ namespace Text.Handler
                 string[] attrs = line.Split(' ');
                 if (attrs.Length == 3)
                 {
-
+                    featureItems.Add(new FeatureItem(Int32.Parse(attrs[0]), attrs[1], double.Parse(attrs[2])));
                 }
             }
 
-            return null;
+            return featureItems;
         }
     }
 }
