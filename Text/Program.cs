@@ -13,7 +13,9 @@ namespace Text
         static void Main(string[] args)
         {
             string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\Model\feature.txt";
-            Feature.ChiFeatureExtract(fileName);
+            //Feature.ChiFeatureExtract(fileName);
+
+            List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
 
             Console.WriteLine();
         }
@@ -64,6 +66,12 @@ namespace Text
             Console.ReadLine();
         }
 
-        
+        static void Test2()
+        {
+            string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\Model\feature.txt";
+            List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
+
+
+        }
     }
 }

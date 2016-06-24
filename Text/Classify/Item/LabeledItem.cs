@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Text
+namespace Text.Classify.Item
 {
     class LabeledItem
     {
@@ -46,29 +46,5 @@ namespace Text
             }
             return wordCountDic;
         }
-    }
-
-    class WordItem
-    {
-        public string word { get; set; }
-        public int totalCount { get; set; }
-        public int zhengliCount { get; set; }
-        public int fuliCount { get; set; }
-
-        public WordItem(string word, bool isZhengli)
-        {
-            this.word = word;
-            this.totalCount = 1;
-            if (isZhengli) { this.zhengliCount = 1; this.fuliCount = 0; }
-            else { this.zhengliCount = 0; this.fuliCount = 1; }
-            
-        }
-    }
-
-    class FeatureItem
-    {
-        public int id { get; set; }
-        public string featureWord { get; set; }
-        public double globalWeight { get; set; }
     }
 }
