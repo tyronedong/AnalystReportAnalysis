@@ -11,7 +11,7 @@ namespace Text.Classify
 {
     class Model
     {
-        SVMModel model;
+        public SVMModel model;
 
         public Model() { this.model = null; }
 
@@ -36,18 +36,18 @@ namespace Text.Classify
             // Select the parameter set
             SVMParameter parameter = new SVMParameter();
             parameter.Type = SVMType.C_SVC;
-            parameter.Kernel = SVMKernelType.RBF;
+            parameter.Kernel = SVMKernelType.LINEAR;
             parameter.C = 1;
             parameter.Gamma = 1;
 
-            //// Do cross validation to check this parameter set is correct for the dataset or not
-            //double[] crossValidationResults; // output labels
-            //int nFold = 5;
-            //trainingSet.CrossValidation(parameter, nFold, out crossValidationResults);
+            // Do cross validation to check this parameter set is correct for the dataset or not
+            double[] crossValidationResults; // output labels
+            int nFold = 5;
+            trainingSet.CrossValidation(parameter, nFold, out crossValidationResults);
 
-            //// Evaluate the cross validation result
-            //// If it is not good enough, select the parameter set again
-            //double crossValidationAccuracy = trainingSet.EvaluateClassificationProblem(crossValidationResults);
+            // Evaluate the cross validation result
+            // If it is not good enough, select the parameter set again
+            double crossValidationAccuracy = trainingSet.EvaluateClassificationProblem(crossValidationResults);
 
             // Train the model, If your parameter set gives good result on cross validation
             this.model = trainingSet.Train(parameter);
@@ -76,15 +76,16 @@ namespace Text.Classify
         /// <returns></returns>
         private SVMNode[] ConvertFeatVector(double[] featVector)
         {
-            SVMNode[] vector = new SVMNode[featVector.Length];
+            List<SVMNode> vector = new List<SVMNode>();
             
             int idx = 0;
             foreach (var featValue in featVector)
             {
-                vector[idx] = new SVMNode(idx, featValue);
                 idx++;
+                if (featValue == 0) { continue; }
+                else { vector.Add(new SVMNode(idx, featValue)); }
             }
-            return vector;
+            return vector.ToArray();
         }
     }
 }

@@ -6,3 +6,15 @@ D:\workingwc\Stock\AnalystReportAnalysis\Text\obj\Debug\Text.exe
 D:\workingwc\Stock\AnalystReportAnalysis\Text\obj\Debug\Text.pdb
 D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\LibSVMsharp.dll
 D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\LibSVMsharp.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Bson.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.Core.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.Legacy.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Bson.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Bson.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.Core.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.Core.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.Legacy.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.Legacy.xml

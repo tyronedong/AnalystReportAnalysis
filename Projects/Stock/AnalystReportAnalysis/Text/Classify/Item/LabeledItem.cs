@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Text.Classify.Item
 {
+    [Serializable]
     class LabeledItem
     {
         public static int numberOfZhengli { get; set; }

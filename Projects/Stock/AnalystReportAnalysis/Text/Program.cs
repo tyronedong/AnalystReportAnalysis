@@ -4,20 +4,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Configuration;
 using Text.Handler;
+using Text.Classify;
+using Text.Classify.Item;
 
 namespace Text
 {
     class Program
     {
+        static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
+
         static void Main(string[] args)
         {
-            string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\Model\feature.txt";
-            //Feature.ChiFeatureExtract(fileName);
+            Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
+            Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
+            
+            //List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
+            //Test2();
+            
+            //SelectAndSaveFulis();
+            //ExtractAndSaveChiFeatures();
+            //GenerateLibSVMInputFile();
+            //ExecuteTrain();
+            ExecutePredict();
 
-            Console.WriteLine();
+            Console.ReadLine();
         }
 
         static void Test()
@@ -68,10 +81,87 @@ namespace Text
 
         static void Test2()
         {
-            string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\Model\feature.txt";
+            
+            Console.WriteLine();
+        }
+
+        static void ExecutePredict()
+        {
+            //string trainSetFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\trainset.txt";
+            string modelFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\model.txt";
+            string text = "目前期间费用因上市不久故发生的管理较高，占收入比约在9% -10%10%左右，后续有望降低。";
+            Model model = new Model();
+            model.LoadModel(modelFile);
+
+            //double[] vec = model.Predict(trainSetFile);
+            double v = model.Predict(Feature.GetFeatureVec(text));
+            //model.Predict()
+            Console.WriteLine("Model predict finished");
+        }
+
+        static void ExecuteTrain()
+        {
+            string trainSetFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\trainset.txt";
+            string modelFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\model.txt";
+            Model model = new Model();
+            model.Train(trainSetFile);
+
+            model.SaveModel(modelFile);
+            Console.WriteLine("Model train finished");
+        }
+
+        static void GenerateLibSVMInputFile()
+        {
+            string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
+            string trainSetFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\trainset.txt";
+
+            List<string> trainSet = new List<string>();
+
             List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
+            List<LabeledItem> lItems = FileHandler.LoadLabeledItems(preprocess_result_file);
 
+            foreach (var lItem in lItems)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(lItem.label);
+                sb.Append(' ');
+                int idx = 1;
+                foreach (var fItem in fItems)
+                {
+                    if (lItem.wordCountDic.ContainsKey(fItem.featureWord))
+                    {
+                        sb.Append(idx);
+                        sb.Append(':');
+                        double tfidf = lItem.wordCountDic[fItem.featureWord] * fItem.globalWeight;
+                        sb.Append(tfidf.ToString("0.000000"));
+                        sb.Append(' ');
+                    }
+                    else { }//do nothing//sb.Append(0.0); }
+                    idx++;
+                }
+                trainSet.Add(sb.ToString());
+            }
+            if(FileHandler.SaveStringArray(trainSetFile, trainSet.ToArray()))
+                Console.WriteLine("GenerateLibSVMInputFile() execute success");
+            else
+                Console.WriteLine("GenerateLibSVMInputFile() execute failed");
+        }
 
+        static void ExtractAndSaveChiFeatures()
+        {
+            string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
+            if (Feature.ChiFeatureExtract(fileName))
+                Console.WriteLine("ExtractAndSaveChiFeatures() execute success");
+            else
+                Console.WriteLine("ExtractAndSaveChiFeatures() execute failed");
+        }
+
+        static void SelectAndSaveFulis()
+        {
+            if (RandomSelect.ExecuteSelect())
+                Console.WriteLine("SelectAndSaveFulis() execute success");
+            else
+                Console.WriteLine("SelectAndSaveFulis() execute failed");
         }
     }
 }
