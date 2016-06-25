@@ -11,6 +11,27 @@ namespace Text.Classify
 {
     class Feature
     {
+        public static double[] GetFeatureVec(string sentence)
+        {
+            List<double> featVec = new List<double>();
+            string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
+            
+            List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
+            Dictionary<string, int> wordCountDic = TextPreProcess.GetWordCountDic(sentence);
+
+            foreach (var fItem in fItems)
+            {
+                if (wordCountDic.ContainsKey(fItem.featureWord))
+                {
+                    double tfidf = wordCountDic[fItem.featureWord] * fItem.globalWeight;
+                    featVec.Add(tfidf);
+                }
+                else { featVec.Add(0); }
+            }
+
+            return featVec.ToArray();
+        }
+
         public static List<FeatureItem> LoadChiFeature(string fileName)
         {
             return FileHandler.LoadFeatures(fileName);
@@ -23,7 +44,7 @@ namespace Text.Classify
         /// <param name="featRatio"></param>
         /// <param name="globalWeightType"></param>
         /// <returns></returns>
-        public static bool ChiFeatureExtract(string fileName, double featRatio = 0.4, string globalWeightType = "idf")
+        public static bool ChiFeatureExtract(string fileName, double featRatio = 0.4, double minChiValue = 5, string globalWeightType = "idf")
         {
             //Dictionary<string, double> wordChiValueDic = GetWordChiValueDic("zhengli");
             Dictionary<string, WordItem> wordItemDic = GetWordItemDic();
@@ -35,6 +56,7 @@ namespace Text.Classify
             int N = LabeledItem.numberOfZhengli + LabeledItem.numberOfFuli;
             for (int i = 0; i < numberOfFeat; i++)
             {
+                if (dicSort.ElementAt(i).Value < minChiValue) { break; }
                 FeatureItem featureItem = new FeatureItem();
                 featureItem.id = i + 1;
                 featureItem.featureWord = dicSort.ElementAt(i).Key;

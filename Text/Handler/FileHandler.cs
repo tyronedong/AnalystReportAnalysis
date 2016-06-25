@@ -5,12 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Configuration;
 using Text.Classify.Item;
 
 namespace Text.Handler
 {
     class FileHandler
     {
+
+        public static bool SaveStringArray(string fileName, string[] strs)
+        {
+            try { File.WriteAllLines(fileName, strs); }
+            catch (Exception e) { Trace.TraceError("Text.Handler.FileHandler.SaveStringArray(string fileName, string[] strs): " + e.ToString()); return false; }
+            return true;
+        }
+
+        public static string[] LoadStringArray(string fileName)
+        {
+            try { return File.ReadAllLines(fileName); ;}
+            catch (Exception e) { Trace.TraceError("Text.Handler.FileHandler.LoadStringArray(string fileName): " + e.ToString()); return null; }
+        }
+
         public static bool SaveFeatures(string fileName, List<FeatureItem> featureItems)
         {
             List<string> featureLines = new List<string>();
@@ -40,6 +56,33 @@ namespace Text.Handler
             }
 
             return featureItems;
+        }
+
+        public static bool SaveLabeledItems(string fileName, List<LabeledItem> labeledItems)
+        {
+            try
+            {
+                //序列化
+                FileStream fs = new FileStream(fileName, FileMode.Create);
+
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(fs, labeledItems);
+                fs.Close();
+            }
+            catch (Exception e) { Trace.TraceError("Text.Handler.FileHandler.SaveLabeledItems(string fileName, List<LabeledItem> labeledItems): " + e.ToString()); return false; }
+            return true;
+        }
+
+        public static List<LabeledItem> LoadLabeledItems(string fileName)
+        {
+            try
+            {
+                FileStream fs = new FileStream(fileName, FileMode.Open);
+                BinaryFormatter bf = new BinaryFormatter();
+                List<LabeledItem> labeledItems = bf.Deserialize(fs) as List<LabeledItem>;
+                return labeledItems;
+            }
+            catch (Exception e) { Trace.TraceError("Text.Handler.FileHandler.LoadLabeledItems(string fileName): " + e.ToString()); return null; }
         }
     }
 }
