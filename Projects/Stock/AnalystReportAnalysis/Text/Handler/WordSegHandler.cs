@@ -66,7 +66,7 @@ namespace Text.Handler
         public bool isValid = false;
         private List<KeyValuePair<string, string>> partitionResult;
 
-        const string path = @"..\NLPIR\NLPIR.dll";//设定dll的路径
+        const string path = @".\NLPIR\NLPIR.dll";//设定dll的路径
         //对函数进行申明
         [DllImport(path, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, EntryPoint = "NLPIR_Init")]
         public static extern bool NLPIR_Init(String sInitDirPath, int encoding, String sLicenseCode);
@@ -129,7 +129,7 @@ namespace Text.Handler
         public WordSegHandler()
         {
             partitionResult = new List<KeyValuePair<string, string>>();
-            if (!NLPIR_Init(@"..\NLPIR", 0, ""))//给出Data文件所在的路径，注意根据实际情况修改。
+            if (!NLPIR_Init(@".\NLPIR", 0, ""))//给出Data文件所在的路径，注意根据实际情况修改。
             {
                 System.Console.WriteLine("Init ICTCLAS failed!");
                 isValid = false;

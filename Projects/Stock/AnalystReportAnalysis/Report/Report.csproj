@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{464C19C0-235F-458A-A59B-2267C98261A2}</ProjectGuid>
+    <ProjectGuid>{4DC4024C-4ED1-427E-9EF2-B96034CE1997}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Report</RootNamespace>
@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -32,26 +32,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="commons-logging">
-      <HintPath>package\PDFBox.NET-1.8.9\bin\commons-logging.dll</HintPath>
-    </Reference>
-    <Reference Include="fontbox-1.8.9">
-      <HintPath>package\PDFBox.NET-1.8.9\bin\fontbox-1.8.9.dll</HintPath>
-    </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
       <HintPath>package\PDFBox.NET-1.8.9\bin\IKVM.OpenJDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="IKVM.OpenJDK.SwingAWT">
       <HintPath>package\PDFBox.NET-1.8.9\bin\IKVM.OpenJDK.SwingAWT.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Text">
-      <HintPath>package\PDFBox.NET-1.8.9\bin\IKVM.OpenJDK.Text.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Util">
-      <HintPath>package\PDFBox.NET-1.8.9\bin\IKVM.OpenJDK.Util.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.Runtime">
-      <HintPath>package\PDFBox.NET-1.8.9\bin\IKVM.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="MongoDB.Bson">
       <HintPath>package\CSharpDriver-2.0.2\MongoDB.Bson.dll</HintPath>
@@ -59,25 +44,15 @@
     <Reference Include="MongoDB.Driver">
       <HintPath>package\CSharpDriver-2.0.2\MongoDB.Driver.dll</HintPath>
     </Reference>
-    <Reference Include="MongoDB.Driver.Core">
-      <HintPath>package\CSharpDriver-2.0.2\MongoDB.Driver.Core.dll</HintPath>
-    </Reference>
     <Reference Include="MongoDB.Driver.Legacy">
       <HintPath>package\CSharpDriver-2.0.2\MongoDB.Driver.Legacy.dll</HintPath>
     </Reference>
     <Reference Include="pdfbox-1.8.9">
       <HintPath>package\PDFBox.NET-1.8.9\bin\pdfbox-1.8.9.dll</HintPath>
     </Reference>
-    <Reference Include="Spire.License">
-      <HintPath>bin\Spire.License.dll</HintPath>
-    </Reference>
-    <Reference Include="Spire.Pdf">
-      <HintPath>bin\Spire.Pdf.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -86,20 +61,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalystReport.cs" />
-    <Compile Include="Handler\MongoDBHandler.cs" />
-    <Compile Include="Securities\AnXinSecurities.cs" />
-    <Compile Include="Securities\CommonSecurities.cs" />
     <Compile Include="Handler\CurIdHandler.cs" />
     <Compile Include="Handler\FileHandler.cs" />
+    <Compile Include="Handler\MongoDBHandler.cs" />
+    <Compile Include="Handler\Parser.cs" />
+    <Compile Include="Handler\SqlServerHandler.cs" />
+    <Compile Include="Handler\TraceHandler.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportParser.cs" />
+    <Compile Include="Securities\AnXinSecurities.cs" />
+    <Compile Include="Securities\CommonSecurities.cs" />
     <Compile Include="Securities\DongFangSecurities.cs" />
     <Compile Include="Securities\GuangFaSecurities.cs" />
     <Compile Include="Securities\GuoJinSecurities.cs" />
     <Compile Include="Securities\GuoJunSecurities.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReportParser.cs" />
-    <Compile Include="Handler\SqlServerHandler.cs" />
-    <Compile Include="Handler\TraceHandler.cs" />
     <Compile Include="Securities\GuoXinSecurities.cs" />
     <Compile Include="Securities\HaiTongSecurities.cs" />
     <Compile Include="Securities\HuaTaiSecurities.cs" />
@@ -110,17 +86,19 @@
     <Compile Include="Securities\ZhongJianSecurities.cs" />
     <Compile Include="Securities\ZhongJinSecurities.cs" />
     <Compile Include="Securities\ZhongXinSecurities.cs" />
+    <Compile Include="StockData.cs" />
+    <Compile Include="Stocks\AnXinStock.cs" />
+    <Compile Include="Stocks\ChangJiangStock.cs" />
+    <Compile Include="Stocks\CommonStock.cs" />
+    <Compile Include="Stocks\DongBeiStock.cs" />
+    <Compile Include="Stocks\DongXingStock.cs" />
+    <Compile Include="Stocks\FangZhengStock.cs" />
+    <Compile Include="Stocks\PingAnStock.cs" />
+    <Compile Include="Stocks\ShenYinStock.cs" />
+    <Compile Include="Stocks\XingYeStock.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Stock\Stock.csproj">
-      <Project>{32bed270-e31b-4ad4-aeeb-fa434495dc1d}</Project>
-      <Name>Stock</Name>
-    </ProjectReference>
+    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

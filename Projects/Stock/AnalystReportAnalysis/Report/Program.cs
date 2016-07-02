@@ -11,9 +11,9 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
-using Stock;
 using Report.Handler;
 using Report.Securities;
+using Report.Stocks;
 
 namespace Report
 {
@@ -328,7 +328,7 @@ namespace Report
                     Trace.TraceError("Program.Execute(): " + e.Message);
                     Thread.Sleep(10000);
                     continue;
-                }  
+                }
             }//while(true)
             return true;
         }
