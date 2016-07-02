@@ -9,7 +9,7 @@ using LibSVMsharp.Extensions;
 
 namespace Text.Classify
 {
-    class Model
+    public class Model
     {
         public SVMModel model;
 
@@ -55,7 +55,7 @@ namespace Text.Classify
             //return true;
         }
 
-        public double[] Predict(string fileName)
+        public double[] Predicts(string fileName)
         {
             SVMProblem testSet = SVMProblemHelper.Load(fileName);
             double[] predictResults = testSet.Predict(model);
@@ -67,6 +67,38 @@ namespace Text.Classify
             SVMNode[] vector = ConvertFeatVector(featVector);
             double predictResult = model.Predict(vector);
             return predictResult;
+        }
+
+        /// <summary>
+        /// Get the input of a single sentence and return the feature vector extracted from the sentence
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public double Predict(string sentence)
+        {
+            double[] featVector = Feature.GetFeatureVec(sentence);
+            double predictResult = Predict(featVector);
+            return predictResult;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="content">content is the extracted result stored in MongoDB with field name 'content'</param>
+        /// <returns></returns>
+        public string[] GetPositiveCases(string content)
+        {
+            List<string> positiveCases = new List<string>();
+            content = content.Replace("\n", "");
+            string[] sentences = content.Split('。');
+
+            foreach (var sentence in sentences)
+            {
+                double predictResult = Predict(sentence);
+                if (predictResult == 1)
+                    positiveCases.Add(sentence);
+            }
+            return positiveCases.ToArray();
         }
 
         /// <summary>

@@ -1,0 +1,44 @@
+Project Report:
+依赖项说明：
+1、pdfbox
+pdfbox-1.8.9.dll;
+IKVM.OpenJDK.Core.dll;
+IKVM.OpenJDK.SwingAWT.dll
+2、mongodb
+MongoDB.Bson.dll;
+MongoDB.Driver.Core.dll;
+MongoDB.Driver.Legacy.dll;
+3、nlpir
+文件夹NLPIR（包含Data文件夹和nlpir.dll文件）必须放到bin/Debug目录下
+3、configuration(.net程序集)
+System.Configuration 4.0.0.0;
+配置项说明：
+
+Project Text:
+依赖项说明：
+1、excel(.net程序集)
+Microsoft.Office.Interop.Excel.dll;
+2、libsvm
+LibSVMsharp.dll;
+注：libsvm.dll必须手动copy到当前的bin/Debug目录下
+3、nlpir
+注：NLPIR文件夹必须手动copy到当前的bin/Debug目录下（写成配置项）
+4、mongodb
+MongoDB.Bson.dll;
+MongoDB.Driver.Core.dll;
+MongoDB.Driver.Legacy.dll;
+5、configuration(.net程序集)
+System.Configuration 4.0.0.0;
+配置项说明：
+
+Project Demostrate:
+依赖项说明：
+1、form(.net程序集)
+System.Windows.Forms
+2、Project Report
+nlpir
+3、Project Text
+libsvm
+配置项说明：
+
+1、libsvm.dll必须手动copy到当前的bin/Debug目录下

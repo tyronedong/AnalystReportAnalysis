@@ -20,10 +20,10 @@ namespace Text
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            
+
             //List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
             //Test2();
-            
+
             //SelectAndSaveFulis();
             //ExtractAndSaveChiFeatures();
             //GenerateLibSVMInputFile();
@@ -77,12 +77,6 @@ namespace Text
             //SVM.Train.ExecuteTrain();
 
             Console.ReadLine();
-        }
-
-        static void Test2()
-        {
-            
-            Console.WriteLine();
         }
 
         static void ExecutePredict()
@@ -141,7 +135,7 @@ namespace Text
                 }
                 trainSet.Add(sb.ToString());
             }
-            if(FileHandler.SaveStringArray(trainSetFile, trainSet.ToArray()))
+            if (FileHandler.SaveStringArray(trainSetFile, trainSet.ToArray()))
                 Console.WriteLine("GenerateLibSVMInputFile() execute success");
             else
                 Console.WriteLine("GenerateLibSVMInputFile() execute failed");
