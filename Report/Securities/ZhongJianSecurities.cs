@@ -148,5 +148,16 @@ namespace Report.Securities
             }
             return newParas.ToArray();
         }
+
+        public override bool extractDate()
+        {
+            //发布日期： 2013 年6 月24 日
+            //分析日期： 2008 年03 月25 日
+
+            if (base.extractDate())
+            { return true; }
+
+            return false;
+        }
     }
 }

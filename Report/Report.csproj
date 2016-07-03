@@ -87,7 +87,6 @@
     <Compile Include="Securities\ZhongJinSecurities.cs" />
     <Compile Include="Securities\ZhongXinSecurities.cs" />
     <Compile Include="StockData.cs" />
-    <Compile Include="Stocks\AnXinStock.cs" />
     <Compile Include="Stocks\ChangJiangStock.cs" />
     <Compile Include="Stocks\CommonStock.cs" />
     <Compile Include="Stocks\DongBeiStock.cs" />

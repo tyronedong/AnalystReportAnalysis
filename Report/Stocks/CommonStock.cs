@@ -10,6 +10,7 @@ using Report.Handler;
 
 namespace Report.Stocks
 {
+    //Abandoned
     //通用的抽取
     public class CommonStock:StockData
     {

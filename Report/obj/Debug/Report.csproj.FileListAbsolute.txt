@@ -41,3 +41,47 @@ D:\我的文档\Visual Studio 2013\Projects\AnalystReportAnalysis\Report\bin\Deb
 D:\我的文档\Visual Studio 2013\Projects\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Core.xml
 D:\我的文档\Visual Studio 2013\Projects\AnalystReportAnalysis\Report\obj\Debug\Report.exe
 D:\我的文档\Visual Studio 2013\Projects\AnalystReportAnalysis\Report\obj\Debug\Report.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Report.exe.config
+D:\workingwc\Stock\AnalystReportAnalysis\Report\obj\Debug\Report.exe
+D:\workingwc\Stock\AnalystReportAnalysis\Report\obj\Debug\Report.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Report.exe
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\Report.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Core.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.SwingAWT.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Bson.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Legacy.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\pdfbox-1.8.9.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.Runtime.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Util.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Security.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Text.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.XML.API.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Beans.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Media.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.AWT.WinForms.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Charsets.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Core.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\commons-logging.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\junit.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\fontbox-1.8.9.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\jempbox-1.8.9.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\bcmail-jdk15-1.44.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\bcprov-jdk15-1.44.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\icu4j-3.8.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.Runtime.JNI.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Management.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Naming.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Jdbc.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Remoting.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Corba.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\IKVM.OpenJDK.Misc.dll
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Bson.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Bson.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Legacy.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Legacy.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Core.pdb
+D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Core.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Report\obj\Debug\Report.csprojResolveAssemblyReference.cache

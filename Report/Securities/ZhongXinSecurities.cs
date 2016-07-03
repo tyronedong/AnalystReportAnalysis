@@ -81,5 +81,13 @@ namespace Report.Securities
             }
             return newLines.ToArray();
         }
+
+        public override bool extractDate()
+        {
+            if (base.extractDate())
+            { return true; }
+
+            return false;
+        }
     }
 }

@@ -76,5 +76,37 @@ namespace Report.Securities
             }
             return false;
         }
+
+        public override bool extractDate()
+        {
+            if (base.extractDate())
+            { return true; }
+
+            Regex regDate1 = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日");//2013年04月19日  纺织服装 / 服装Ⅱ 
+            Regex regDate2 = new Regex(@"^20\d{2}-[01]\d-[0-3]\d$");
+
+            string format1 = "yyyy年MM月dd日";
+            string format2 = "yyyy-MM-dd";
+            
+            foreach (var line in lines)
+            {
+                string trimedLine = line.Trim();//remove whitespace from head and tail
+
+                if (regDate1.IsMatch(trimedLine))
+                {
+                    string dateStr1 = regDate1.Match(trimedLine).Value.Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr1, format1, System.Globalization.CultureInfo.CurrentCulture);
+                    return true;
+                }
+                if (regDate2.IsMatch(trimedLine))
+                {
+                    string dateStr2 = regDate2.Match(trimedLine).Value.Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr2, format2, System.Globalization.CultureInfo.CurrentCulture);
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

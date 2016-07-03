@@ -1,0 +1,681 @@
+﻿华泰联合
+长城证券
+国泰君安
+招商证券
+中金公司
+申万宏源
+平安证券
+南方证券
+天相投顾
+大鹏证券
+博时基金
+健桥证券
+泰阳证券
+证券信息
+计委经济
+美林证券
+广电在线
+MIDWEST RESEARCH
+J.P. Morgan
+Morgan Stanley
+CSFB
+Deutsche Bank
+Wall Street Strategies
+CLSA 
+HSBC
+Lehman Brothers 
+深交所
+渤海证券
+Bloomberg
+西南证券
+兴安证券
+天同证券
+华隆投资
+财富证券
+浙江证券
+湘财证券
+闽发证券
+广发证券
+国海证券
+天同基金
+中证投资
+周明海询
+东北证券
+亚洲证券
+民生证券
+中信证券
+东吴证券
+深圳怀新
+长江证券
+天力投资
+南方基金
+华泰证券
+巨田证券
+汉唐证券
+国都证券
+光大证券
+国信证券
+海通证券
+中航证券
+武汉证券
+兴业证券
+银河证券
+东方证券
+天一证券
+中石化工
+北京证券
+国联证券
+中国人民银行
+国发中心
+上海证券
+世纪证券
+国税局
+恒远证券
+蔚深证券
+广东证券
+经济景气监测中心
+华西证券
+青海证券
+中泰证券
+中关村证券
+民族证券
+中国社科院
+北方证券
+Natixis
+无效
+深证信息
+新疆证券
+巨丰投资
+博星投资
+大通证券
+宏源证券
+万联证券
+第一上海
+社科院
+中富证券 
+清华大学
+CIBC
+川财证券
+国家信息中心
+湘财合丰基金
+中证资讯
+东骥基金
+北京首证
+中信建投
+南京大学
+UBS Warburg
+国元证券
+第一证券
+红塔证券
+中原证券
+海富通基金
+国盛证券
+益邦投资
+万隆投资
+三元顾问
+国家外汇管理局
+东方高圣
+深发展
+宝来金融集团
+中国人民大学
+浙江大学
+中信证券（浙江）
+国家统计局
+中银国际
+华林证券 
+融通基金
+证券业协会
+北京汇正财经
+济南金融
+上证综研
+第一创业证券
+江苏天鼎
+citigroup
+技术经济管理研究
+金信研究
+财贸经济
+长信基金
+方正、泰阳证券
+昆仑证券
+中国证监会
+香港理工大学
+上海证管办
+万国测评
+经济研究参考
+虎杰投资
+中央财经大学
+中国国际工程咨询公司
+巨潮资讯
+中国外资
+华东政法学院
+中国证券报
+国家发改委
+科技证券
+中山大学
+北京大学
+经济学动态
+恒生银行
+大时代投资
+国家计委
+天则经济研究所
+中经网
+上期所
+南京证券
+国金证券
+证券市场周刊
+外经贸研究院
+山西大学
+信息产业部
+渤海投顾
+上海上市公司董秘协会
+山东神光
+江西财经大学
+中融基金
+浙江省上市办
+国家信息数据中心
+联合课题调研组
+中国国情与发展研究所
+华安新兴
+方正证券
+北京物资学院
+金元证券
+山西财大
+江海证券
+亚洲开发银行
+证券时报
+上交所
+夏商投资
+久恒期货
+港澳资讯
+大连北部资产 
+西北证券
+东海证券
+银华投资
+山西证券
+新时代证券
+Mizuho
+河北证券
+广州证券
+今日投资
+宝华经济研究
+广州万隆
+君策证券
+民安证券
+北京邮电大学
+北京首放
+辽宁证券
+国家林业局
+大同证券
+证券导刊
+金融时报
+UOBKayHian
+华尔街日报
+北京数字一百
+北京中环
+嘉实基金
+招商基金
+McGraw-Hill
+招商国通
+凯基证券
+易繁咨询
+大福证券
+BNP PARIBAS
+Goldman Sachs
+SBI E2-Capital
+上海财大
+JOVIAN
+BCA
+DBS
+KIM ENG
+诺安基金
+巨田基金
+NOMURA
+京华山一
+MACQUARIE
+工商东亚
+piperJaffray
+ABN.AMRO
+景顺长城
+Auerbach Grayson
+Jefferies
+CAZEVONE
+DIR
+新鸿基金融集团
+鹏华基金
+湘财荷银
+泰信基金
+易方达基金
+BEAR STEARNS
+华夏基金
+河南神火集团
+元富证券
+A.G.Edwards & Sons,Inc.
+银华基金
+WRHAMBRECHT+CO
+世界银行
+Phillip Securities
+国家财政部
+安邦集团
+天弘基金
+Roth Capital Partners
+麦肯锡全球研究学院
+国泰基金
+长盛基金
+华宝兴业基金
+银河基金
+宝盈基金
+东吴基金
+汉宇资本
+富国基金
+华富基金
+广发基金
+德邦证券
+友邦华泰基金
+中远集团
+天治基金
+上投摩根富林明
+农银证券
+光大保德信基金
+台证投顾
+申万巴黎基金
+致富证券
+九富投资
+中汇银
+国投瑞银
+中国银行
+大成基金
+国联基金
+大和国泰
+长城基金
+国联安基金
+scotia capital
+数聚源
+FitchRatings
+kingswaygroup（汇富集团）
+ING wholesale banking
+South China Today
+东方信邦
+经济观察报
+上证报
+中银国际基金
+CIMB
+华鑫证券
+中信基金
+东莞证券
+建华投顾
+人大财经委
+国海富兰克林基金
+华安基金
+中投证券
+远东证券
+工银瑞信
+河南九鼎
+交银施罗德
+汇添富基金
+兴业基金
+君之创咨询
+上海德鼎
+长江巴黎百富勤
+仲量联行
+汇丰晋信基金
+中国龙投资网
+首创证券
+国开证券
+金牛期货
+BARCLAYS CAPITAL
+郑州商品交易所
+群益证券
+jennings capital
+施罗德集团
+莫尼塔公司
+Mirae Asset 
+Korea Investment
+安信证券
+汇盈证券
+日兴资产管理公司
+中海基金
+中邮创业基金
+招商银行
+首创期货
+建银国际
+Brean Murray Carret
+SinoPac
+金榜证券
+SIG
+RHB
+Evolution Securities
+DMG & Partners Securities
+DAVY
+Lloyds TSB
+鲁证期货
+银河期货
+3V Capital
+兆丰国际投顾
+Global
+富邦金控
+时富金融服务集团
+Maxim Group
+gilford securities
+道亨证券
+AFFIN
+HANSONWEST HOUSE
+PALI RESEARCH
+mitsubishi
+Platinum Broking
+渤海投资
+OSK Research
+Standard & Poor’s 
+AME Capital
+日信证券
+SOCIETE GENERALE
+Rodman and Renshaw
+Credit Suisse
+R.W.Pressprich & Co,Inc.
+BMO Capital Markets
+Nab Capital 
+Bank of America
+Dundee
+Thomas Weisel Partners
+TD Securities
+Sterne Agee
+PI Financial
+Zacks
+Wedbush
+Laurentian Bank
+Desjardins
+Global Hunter
+IIIR
+太平洋证券
+信达证券
+联讯证券
+华融证券
+西部证券
+华龙证券
+财达证券
+爱建证券
+WOORI
+英大证券
+东兴证券
+恒泰证券
+财通证券
+OCBC
+容维投资
+同信证券
+浙商证券
+Cygnus
+交银国际
+Edison
+Hapoalim
+东航金融
+英皇金融集团
+TA SECURITIES
+Cantor Fitzgerald
+西杰优盛
+Yuanta
+GoodMorning Shinhan Securities
+华宝证券
+M Partners
+RedChip
+百川资讯
+招商期货
+中天证券
+IIFL
+恒泰长财证券
+thomson reuters
+华创证券
+华福证券
+开源证券
+Shinhan
+Samsung Securities 
+Think 20/20
+Daishin
+中邮证券
+长城国瑞
+Bank M
+Chardan
+Daewoo
+HYUNDAI
+银泰证券
+招银国际
+华金证券
+诚浩证券
+华安证券
+中山证券
+天源证券
+天风证券
+中信万通
+万和证券
+和兴证券
+联储证券
+五矿证券
+工银国际
+SGX
+DnB NOR
+Oriental Patron
+OLP
+Ladenburg Thalmann
+DMG Research
+valuEngine
+Sushil Financial
+AURIGA
+Finansa
+CRYSTAL
+Mixed Co.
+garwood
+Keefe
+Vicarage Capital
+MF Global
+SSI
+Salman Partners
+Santander
+Singular
+Taglich Brothers
+Wilson HTM
+CORPBANCA
+Indiabulls
+Earnings Expert
+BGB
+E.L. & C. Baillieu
+FirstEnergy Capital
+GRIFFIN
+Ho Chi Minh
+emergingmarketsdirect
+ANZ
+Itaú BBA
+Nikko Cordial
+Aizawa
+Hanwha
+DekaBank
+blominvestbank
+National Bank
+Fundamental
+TriPoint
+JANCO
+RS PLATOU
+MILLER TABAK
+Pareto
+Orpheus CAPITALS
+Meristem
+Loewen
+BUALUANG SECURITIES
+Religare
+oekom
+大华投顾
+华泰金融控股
+bancofator
+Tong Yang
+Disclosure Insight
+Hardman & Co.
+Montrose
+Dougherty
+Evercore Partners
+Standard Chartered
+Volksbank  AG
+SMM
+Moody’s
+Finam
+LarrainVial
+SDA
+AM Mindpow
+Mongolia
+Phoenix
+海通国际
+大连证券
+上海爱建信托
+吉林信托
+天勤证券
+中国科技国际信托
+厦门国际信托
+日盛投顾
+安信国际
+Streetwise
+Vermilion 
+TREFIS
+J.J.B. Hilliard
+FirstCall
+B&K
+财富里昂
+Capital Economics.
+高华证券
+信达国际
+Clarkson
+瑞银证券
+SEB Enskilda
+Bradesco
+BAHANA
+BENCHMARK
+CITISEC ONLINE
+finncap
+IBI
+INDUSTRIAL ALLIANCE
+INDIGO EQUITY RESEARCH
+Investec Securities
+Karvy Comtrade
+Life Tech Capital
+Maybank IB Research
+MACKIE RESEARCH
+Mcadams Wright Ragen
+Natureo finance
+PHU HUNG SECURITIES
+Pritchard Capital Partners
+Paradigm Capital
+RBS
+Redbook Research
+Research in China
+Steubing AG
+Swedbnk
+Thanachart Securities
+Tisco Securities
+ALLENBY CAPITAL
+Merchant Securities
+William Blair & Company
+Wunderlich Securities
+Lohia Securities Ltd.
+FIM
+URALSIB CAPITAL
+Octagon
+VEM Aktienbank
+Viet Capital
+Jacob Securities
+Euro Pacific Capitl
+Ambit Capital
+Leerink Swann
+Baird Equity Research
+Exane Bnp Paribas
+TOPEKA CAPITAL MARKETS
+KT Zmico
+ALTACORP CAPITAL
+Arihant capital markets
+Centrum Equity Research
+CNI Research
+农银国际
+广证恒生
+Primasia
+SMC
+Anand Rathi
+Lombard Street
+Systematix
+CPM
+中债资信
+QuamIA
+敦沛金融
+富昌证券
+国浩资本
+泓福证券
+胜利证券
+粤海证券
+越秀证券
+永丰证券
+大唐金融
+高信证券
+金利丰证券
+南华集团
+UNION GAMING
+Drewry Maritime
+PAX
+Summit
+AM Capital
+宏信证券
+大华银行
+广发期货
+Gavekal Dragonomics
+GAZPROMBANK
+中国国际期货
+RBC
+中信建投国际
+BERNSTEIN RESEARCH
+Hilliard Lyons
+长雄证券
+中信建投期货
+SBI
+富邦证券
+Raymond James
+兴证期货
+申银万国期货
+光大期货
+安信期货
+财通国际
+银河国际
+宝通证券
+VTB Capital
+信达澳银
+泰康资产
+新华基金
+大摩华鑫
+农银汇理
+创金合信
+德邦基金
+兴业全球
+东方基金
+泰达宏利
+财通基金
+东海基金
+圆信永丰
+浦银安盛
+华宸未来
+信诚基金
+申万菱信
+太平洋资产
+汇业证券
+耀才证券
+尚乘财富
+BEA securities
+VPBS
+SIS
+SBERBANK
+康宏证券
+东证期货
+齐鲁国际
+工银亚洲
+五矿期货
+中信期货
+华鑫期货
+华信证券
+中航期货
+国泰君安期货
+宝城期货
+恒泰期货
+中财期货
+九州证券
+浙商期货
+方正中期期货

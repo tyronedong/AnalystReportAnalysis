@@ -252,5 +252,15 @@ namespace Report.Securities
             }
             return newLines.ToArray();
         }
+
+        public override bool extractDate()
+        {
+            //2009年10月14日
+
+            if (base.extractDate())
+            { return true; }
+
+            return false;
+        }
     }
 }

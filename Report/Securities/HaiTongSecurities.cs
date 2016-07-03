@@ -159,5 +159,29 @@ namespace Report.Securities
             }
             return newParas.ToArray();
         }
+
+        public override bool extractDate()
+        {
+            if (base.extractDate())
+            { return true; }
+
+            Regex regDate = new Regex(@"20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日$");
+
+            string format = "yyyy年MM月dd日";
+
+            foreach (var line in lines)
+            {
+                string trimedLine = line.Trim();//remove whitespace from head and tail
+
+                if (regDate.IsMatch(trimedLine))
+                {
+                    string dateStr = regDate.Match(trimedLine).Value.Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr, format, System.Globalization.CultureInfo.CurrentCulture);
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
