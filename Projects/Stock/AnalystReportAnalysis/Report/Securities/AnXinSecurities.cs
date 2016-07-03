@@ -186,5 +186,41 @@ namespace Report.Securities
             }
             return newParas.ToArray();
         }
+
+        public override bool extractDate()
+        {
+            if (base.extractDate())
+            { return true; }
+
+            Regex regDate1 = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日 *$");//2013 年 06 月 17 日 
+            Regex regDate2 = new Regex(@"报告日期： *20\d{2}-[01]\d-[0-3]\d");//报告日期： 2010-01-18
+
+            string format1 = "yyyy年MM月dd日";
+            string format2 = "报告日期：yyyy-MM-dd";
+
+            bool hasTimeMatched = false;
+            foreach (var line in lines)
+            {
+                string norLine = line.Replace("Table_Title", "").Trim();
+
+                if (regDate1.IsMatch(norLine))
+                {
+                    string dateStr1 = regDate1.Match(norLine).Value.Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr1, format1, System.Globalization.CultureInfo.CurrentCulture);
+                    hasTimeMatched = true;
+                    break;
+                }
+                if (regDate2.IsMatch(norLine))
+                {
+                    string dateStr2 = regDate2.Match(norLine).Value.Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr2, format2, System.Globalization.CultureInfo.CurrentCulture);
+                    hasTimeMatched = true;
+                    break;
+                }
+            }
+
+            if (hasTimeMatched) { return true; }
+            return false;
+        }
     }
 }

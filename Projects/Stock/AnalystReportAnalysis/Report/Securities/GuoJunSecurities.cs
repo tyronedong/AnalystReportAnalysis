@@ -34,9 +34,9 @@ namespace Report.Securities
             }
         }
 
-        public override AnalystReport executeExtract()
+        public override AnalystReport executeExtract_withdb()
         {
-            return base.executeExtract();
+            return base.executeExtract_withdb();
         }
 
         public override bool extractStockBasicInfo()
@@ -242,6 +242,30 @@ namespace Report.Securities
                 newLines.Add(line);
             }
             return newLines.ToArray();
+        }
+
+        public override bool extractDate()
+        {
+            if (base.extractDate())
+            { return true; }
+
+            Regex regDate = new Regex(@"^20\d{2}\.[01]\d\.[0-3]\d$");
+
+            string format = "yyyy.MM.dd";
+            
+            foreach (var line in lines)
+            {
+                string trimedLine = line.Trim();//remove whitespace from head and tail
+
+                if (regDate.IsMatch(trimedLine))
+                {
+                    string dateStr = regDate.Match(trimedLine).Value;
+                    anaReport.Date = DateTime.ParseExact(dateStr, format, System.Globalization.CultureInfo.CurrentCulture);
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

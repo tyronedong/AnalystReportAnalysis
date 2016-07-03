@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 namespace Report.Securities
 {
     //广发证券
-    class GuangFaSecurities:ReportParser
+    public class GuangFaSecurities:ReportParser
     {
         public GuangFaSecurities(string pdReportPath)
             : base(pdReportPath)
@@ -188,6 +188,41 @@ namespace Report.Securities
                 newParas.Add(para);
             }
             return newParas.ToArray();
+        }
+
+        public override bool extractDate()
+        {
+            if (base.extractDate())
+            { return true; }
+
+            Regex regDate1 = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日 *$");//2011 年 6 月 14 日
+            Regex regDate2 = new Regex(@"报告日期 *20\d{2}-[01]\d-[0-3]\d");//报告日期 2014-01-15 
+
+            string format1 = "yyyy年MM月dd日";
+            string format2 = "报告日期yyyy-MM-dd";
+
+            bool hasTimeMatched = false;
+            foreach (var line in lines)
+            {
+                string trimedLine = line.Trim();
+                if (regDate1.IsMatch(trimedLine))
+                {
+                    string dateStr1 = regDate1.Match(trimedLine).Value.Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr1, format1, System.Globalization.CultureInfo.CurrentCulture);
+                    hasTimeMatched = true;
+                    break;
+                }
+                if (regDate2.IsMatch(trimedLine))
+                {
+                    string dateStr2 = regDate2.Match(trimedLine).Value.Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr2, format2, System.Globalization.CultureInfo.CurrentCulture);
+                    hasTimeMatched = true;
+                    break;
+                }
+            }
+
+            if (hasTimeMatched) { return true; }
+            return false;
         }
     }
 }

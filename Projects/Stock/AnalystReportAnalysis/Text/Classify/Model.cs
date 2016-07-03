@@ -89,7 +89,7 @@ namespace Text.Classify
         public string[] GetPositiveCases(string content)
         {
             List<string> positiveCases = new List<string>();
-            content = content.Replace("\n", "");
+            content = content.Replace("\n", "。");//ignore all paragraph information
             string[] sentences = content.Split('。');
 
             foreach (var sentence in sentences)

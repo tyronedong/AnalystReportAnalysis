@@ -143,5 +143,15 @@ namespace Report.Securities
             }
             return newParas.ToArray();
         }
+
+        public override bool extractDate()
+        {
+            //报告日期：2010 年2 月27 日
+
+            if (base.extractDate())
+            { return true; }
+
+            return false;
+        }
     }
 }

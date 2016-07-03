@@ -27,24 +27,33 @@ namespace Report
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            Execute();
+            //Execute();
 
-            System.Console.ReadLine();
+            //System.Console.ReadLine();
 
-            //Some();
+            Some();
 
             System.Console.ReadLine();
         }
 
-        //static bool Some()
-        //{
-        //    string path = @"C:\Users\Administrator\Desktop\陈琦《新GRE核心词汇考法精析》（再要你命3000）破解合成打印版.pdf";
+        static bool Some()
+        {
+            //string path = @"C:\Users\Administrator\Desktop\陈琦《新GRE核心词汇考法精析》（再要你命3000）破解合成打印版.pdf";
 
-        //    ReportParser rp = new ReportParser(path);
-        //    string txt = rp.loadPDFText();
+            //ReportParser rp = new ReportParser(path);
+            //string txt = rp.loadPDFText();
+            string path = @"F:\事们\进行中\分析师报告\分析师研报\分析师报告按证券分\中金\20070420-中金公司-丽珠集团：2007年1季度业绩回顾：经营性每股收益0.19元，同比增长152%，好于预期，审慎推荐.pdf";
+            string txt = ReportParser.loadPDFText(path);
 
-        //    return false;
-        //}
+
+            //string format1 = "yyyy年MM月dd日";
+            //string format2 = "报告日期：yyyy-MM-dd";
+
+
+            //string dateStr1 = "2013年12月13日";
+            //DateTime d = DateTime.ParseExact(dateStr1, format1, System.Globalization.CultureInfo.CurrentCulture);
+            return false;
+        }
 
         static bool Execute()
         {
@@ -123,10 +132,10 @@ namespace Report
                                 curSecur = securitiesName;
                                 //update nextCurId
                                 nextCurId = id;
-                                //if (time.Year != 2013)
-                                //{
-                                //    continue;
-                                //}
+                                if (time.Year != 2013)
+                                {
+                                    continue;
+                                }
                                 //judge if current document is handlable
                                 if (language.Equals("EN"))
                                 {
@@ -151,110 +160,112 @@ namespace Report
                                     //flag = true;
                                     reportParser = new ShenHongSecurities(filePath);
                                 }
-                                else if (securitiesName.Equals("海通证券"))
-                                {
-                                    //flag = true;
-                                    reportParser = new HaiTongSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("国泰君安"))
-                                {
-                                    reportParser = new GuoJunSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("中信证券"))
-                                {
-                                    //flag = true;
-                                    reportParser = new ZhongXinSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("中金公司"))
-                                {
-                                    reportParser = new ZhongJinSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("招商证券"))
-                                {
-                                    reportParser = new ZhaoShangSecurities(filePath);
-                                }
+                                //else if (securitiesName.Equals("海通证券"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new HaiTongSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("国泰君安"))
+                                //{
+                                //    reportParser = new GuoJunSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("中信证券"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new ZhongXinSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("中金公司"))
+                                //{
+                                //    reportParser = new ZhongJinSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("招商证券"))
+                                //{
+                                //    reportParser = new ZhaoShangSecurities(filePath);
+                                //}
                                 else if (securitiesName.Equals("安信证券"))
                                 {
-                                    //flag = true;
+                                    flag = true;
                                     reportParser = new AnXinSecurities(filePath);
                                 }
-                                else if (securitiesName.Equals("广发证券"))
-                                {
-                                    //flag = true;
-                                    reportParser = new GuangFaSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("天相投顾"))
-                                {
-                                    //flag = true;
-                                    reportParser = new TianTouSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("国金证券"))
-                                {
-                                    //flag = true;
-                                    reportParser = new GuoJinSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("华泰证券"))
-                                {
-                                    //flag = true;
-                                    reportParser = new HuaTaiSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("中银国际"))
-                                {
-                                    //flag = true;
-                                    reportParser = new ZhongGuoSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("东方证券"))
-                                {
-                                    //flag = true;
-                                    reportParser = new DongFangSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("国信证券"))
-                                {
-                                    //flag = true;
-                                    reportParser = new GuoXinSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("中信建投"))
-                                {
-                                    //flag = true;
-                                    reportParser = new ZhongJianSecurities(filePath);
-                                }
-                                else if (securitiesName.Equals("长江证券"))
-                                {
-                                    stockData = new StockData(filePath);
-                                    stockParser = new ChangJiangStock(stockData);
-                                }
-                                else if (securitiesName.Equals("兴业证券"))
-                                {
-                                    stockData = new StockData(filePath);
-                                    stockParser = new XingYeStock(stockData);
-                                }
-                                else if (securitiesName.Equals("平安证券"))
-                                {
-                                    stockData = new StockData(filePath);
-                                    stockParser = new PingAnStock(stockData);
-                                }
-                                else if (securitiesName.Equals("东北证券"))
-                                {
-                                    stockData = new StockData(filePath);
-                                    //stockData.setStockjobber("东北证券");
-                                    stockParser = new DongBeiStock(stockData);
-                                    //stockParser.extrcactContent();
-                                }
-                                else if (securitiesName.Equals("东兴证券"))
-                                {
-                                    stockData = new StockData(filePath);
-                                    stockParser = new DongXingStock(stockData);
-                                }
-                                else if (securitiesName.Equals("方正证券"))
-                                {
-                                    stockData = new StockData(filePath);
-                                    stockParser = new FangZhengStock(stockData);
-                                }
-                                else
-                                {
-                                    //if (securitiesName.Equals("民生证券")) { flag = true; }
-                                    reportParser = new CommonSecurities(filePath);
-                                }
+                                //else if (securitiesName.Equals("广发证券"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new GuangFaSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("天相投顾"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new TianTouSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("国金证券"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new GuoJinSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("华泰证券"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new HuaTaiSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("中银国际"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new ZhongGuoSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("东方证券"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new DongFangSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("国信证券"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new GuoXinSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("中信建投"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new ZhongJianSecurities(filePath);
+                                //}
+                                //else if (securitiesName.Equals("长江证券"))
+                                //{
+                                //    //flag = true;
+                                //    reportParser = new CommonSecurities(filePath);
+                                //    //stockData = new StockData(filePath);
+                                //    //stockParser = new ChangJiangStock(stockData);
+                                //}
+                                //else if (securitiesName.Equals("兴业证券"))
+                                //{
+                                //    stockData = new StockData(filePath);
+                                //    stockParser = new XingYeStock(stockData);
+                                //}
+                                //else if (securitiesName.Equals("平安证券"))
+                                //{
+                                //    stockData = new StockData(filePath);
+                                //    stockParser = new PingAnStock(stockData);
+                                //}
+                                //else if (securitiesName.Equals("东北证券"))
+                                //{
+                                //    stockData = new StockData(filePath);
+                                //    //stockData.setStockjobber("东北证券");
+                                //    stockParser = new DongBeiStock(stockData);
+                                //    //stockParser.extrcactContent();
+                                //}
+                                //else if (securitiesName.Equals("东兴证券"))
+                                //{
+                                //    stockData = new StockData(filePath);
+                                //    stockParser = new DongXingStock(stockData);
+                                //}
+                                //else if (securitiesName.Equals("方正证券"))
+                                //{
+                                //    stockData = new StockData(filePath);
+                                //    stockParser = new FangZhengStock(stockData);
+                                //}
+                                //else
+                                //{
+                                //    //if (securitiesName.Equals("民生证券")) { flag = true; }
+                                //    reportParser = new CommonSecurities(filePath);
+                                //}
 
                                 AnalystReport curAnReport = new AnalystReport();
                                 //handle the data
@@ -262,7 +273,7 @@ namespace Report
                                 {
                                     if (reportParser.isValid)
                                     {
-                                        curAnReport = reportParser.executeExtract();
+                                        curAnReport = reportParser.executeExtract_withdb();
                                         SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
                                         reportParser.CloseAll();
                                     }
@@ -286,10 +297,10 @@ namespace Report
                                 }
 
                                 reports.Add(curAnReport);
-                                //if (flag)
-                                //{
-                                //    System.Console.WriteLine("Hello");
-                                //}
+                                if (flag)
+                                {
+                                    System.Console.WriteLine("Hello");
+                                }
                                 //update nextCurId
                                 nextCurId = id;
                             }
@@ -300,11 +311,12 @@ namespace Report
                             }
                         }//for
                         //insert reports list to mongoDB
-                        if (!mgDBH.InsertMany(reports))
-                        {
-                            isError = true;
-                            break;
-                        }
+                        //debug
+                        //if (!mgDBH.InsertMany(reports))
+                        //{
+                        //    isError = true;
+                        //    break;
+                        //}
 
                         //set curid to id file
                         curIH.SetCurIdToFile(nextCurId);

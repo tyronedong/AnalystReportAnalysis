@@ -127,7 +127,8 @@ namespace Report.Handler
                 if (NLPIR_Init(nlpirDllDir, 0, ""))
                     isNLPIR_Init = true;
 
-                string userDicDIR = ConfigurationManager.ConnectionStrings["USERDIC_DIR"].ConnectionString.ToString();
+                //string userDicDIR = ConfigurationManager.ConnectionStrings["USERDIC_DIR"].ConnectionString.ToString();
+                string userDicDIR = @".\NLPIR\Data";
                 NLPIR_ImportUserDict(userDicDIR + "\\UserDic.txt");
             }
         }

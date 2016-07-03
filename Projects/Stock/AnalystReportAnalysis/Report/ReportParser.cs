@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Configuration;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using org.apache.pdfbox.pdmodel;
@@ -14,6 +16,7 @@ namespace Report
     {
         public bool isValid = false;
 
+        protected string pdfPath;
         protected string pdfText;
         protected string[] lines;
         protected string[] noABCLines;
@@ -37,6 +40,7 @@ namespace Report
 
         public ReportParser(string pdfPath)
         {
+            this.pdfPath = pdfPath;
             anaReport = new AnalystReport();
             try
             {
@@ -50,13 +54,86 @@ namespace Report
             }
         }
 
-        public virtual AnalystReport executeExtract()
+        //public ReportParser(string pdfPath, string stockjobber)
+        //{
+        //    anaReport = new AnalystReport();
+        //    anaReport.Stockjobber = stockjobber;
+        //    try
+        //    {
+        //        pdfReport = PDDocument.load(pdfPath);
+        //        isValid = true;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Trace.TraceError("ReportParser.ReportParser(string pdfPath, string stockjobber): " + e.Message);
+        //        isValid = false;
+        //    }
+        //}
+
+        public static string getStockjobber(string pdfPath)
+        {
+            string SecurityNameDicPath = ConfigurationManager.AppSettings["SecurityNameDic_Path"];
+            string[] securityNames = loadSecurityNames(SecurityNameDicPath);
+            
+            //judge by pdfPath
+            foreach (var name in securityNames)
+            {
+                if (pdfPath.Contains(name))
+                    return name;
+            }
+
+            //judge by pdf context
+            string context = loadPDFText(pdfPath);
+            if (string.IsNullOrEmpty(context)) { return null; }//null if text is null
+            string[] lines = context.Split('\n').Reverse().ToArray();//从后往前搜索证券公司的名字
+            foreach (var line in lines)
+            {
+                foreach (var name in securityNames)
+                {
+                    if (line.Contains(name))
+                        return name;
+                }
+            }
+
+            return null;//null if not found
+        }
+
+        private static string[] loadSecurityNames(string dicPath)
+        {
+            
+            try
+            {
+                List<string> dic = new List<string>();
+                if (dic == null) dic = new List<string>();
+                string[] lines = File.ReadAllLines(dicPath);
+                foreach (string line in lines)
+                {
+                    dic.Add(line);
+                }
+
+                return dic.ToArray();
+            }
+            catch (Exception ex) { return null; }
+        }
+
+        public virtual AnalystReport executeExtract_withdb()
         {
             extractStockInfo();
             extractContent();
             return anaReport;
         }
-        
+
+        public virtual AnalystReport executeExtract_nodb()
+        {
+            extractStockInfo();
+            extractContent();
+
+            extractDate();
+            extractAnalysts();
+            
+            return anaReport;
+        }
+
         public virtual bool extractStockInfo()
         {
             bool f1 = extractStockBasicInfo();
@@ -164,33 +241,61 @@ namespace Report
         }
 
         /// <summary>
-        /// This method has been abandoned cause Date info already exists in database.
+        /// This is the basic time extractor. Only when the returned value is true can the result be credible.
         /// </summary>
         /// <returns></returns>
-        public virtual string extractDate()
+        public virtual bool extractDate()
         {
             //just get date from database
-            return null;
+            Regex dateInPath = new Regex(@"20\d{2}[01]\d[0-3]\d");
+
+            Regex regDate1 = new Regex(@"(报告|分析|发布)日期[:：]？ *20\d{2} ?[-年] ?[01]\d ?[-月] ?[0-3]\d ?日?");
+            Regex regDate2 = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日$");
+            //Regex regDate3 = new Regex(@"^20\d{2}\.[01]\d\.[0-3]\d$");
+
+            string format = "yyyyMMdd";
+
+            string format1 = "报告日期yyyy-MM-dd";
+            string format2 = "yyyy年MM月dd日";
+            //string format3 = "yyyy.MM.dd";
+            
+            if (dateInPath.IsMatch(pdfPath))
+            {
+                string dateString = dateInPath.Match(pdfPath).Value;
+                anaReport.Date = DateTime.ParseExact(dateString, format, System.Globalization.CultureInfo.CurrentCulture);
+                return true;
+            }
+
+            foreach (var line in lines)
+            {
+                string trimedLine = line.Trim();//remove whitespace from head and tail
+
+                if (regDate1.IsMatch(trimedLine))
+                {
+                    string dateStr1 = regDate1.Match(trimedLine).Value.Replace(":", "").Replace("：", "").Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr1, format1, System.Globalization.CultureInfo.CurrentCulture);
+                    return true;
+                }
+                if (regDate2.IsMatch(trimedLine))
+                {
+                    string dateStr2 = regDate2.Match(trimedLine).Value.Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr2, format2, System.Globalization.CultureInfo.CurrentCulture);
+                    return true;
+                }
+                //if (regDate3.IsMatch(trimedLine))
+                //{
+                //    string dateStr3 = regDate3.Match(trimedLine).Value;
+                //    anaReport.Date = DateTime.ParseExact(dateStr3, format3, System.Globalization.CultureInfo.CurrentCulture);
+                //    return true;
+                //}
+            }
+
+            return false;
         }
 
-        /// <summary>
-        /// This method has been temporarily abandoned cause Analysts info already exists in database though not integral enough.
-        /// </summary>
-        /// <returns></returns>
         public virtual string extractAnalysts()
         {
             return null;
-        }
-
-        public string loadPDFText()
-        {
-            try
-            {
-                PDFTextStripper pdfStripper = new PDFTextStripper();
-                string text = pdfStripper.getText(pdfReport).Replace("\r\n", "\n");
-                return text;
-            }
-            catch (Exception e) { return null; }  
         }
 
         public virtual string[] removeTableInLines(string[] lines)
@@ -292,6 +397,10 @@ namespace Report
                 {
                     continue;
                 }
+                if (picOrTabHead.IsMatch(trimedPara))
+                {
+                    continue;
+                }
                 if (trimedPara.Contains("数据来源："))
                 {
                     if (trimedPara.StartsWith("数据来源：")) { continue; }
@@ -325,6 +434,30 @@ namespace Report
                 newParas.Add(para);
             }
             return newParas.ToArray();
+        }
+
+        public static string loadPDFText(string pdfPath)
+        {
+            try
+            {
+                PDDocument pdfReport = PDDocument.load(pdfPath);
+                PDFTextStripper pdfStripper = new PDFTextStripper();
+                string text = pdfStripper.getText(pdfReport).Replace("\r\n", "\n");
+                pdfReport.close();
+                return text;
+            }
+            catch (Exception e) { return null; }
+        }
+
+        public string loadPDFText()
+        {
+            try
+            {
+                PDFTextStripper pdfStripper = new PDFTextStripper();
+                string text = pdfStripper.getText(pdfReport).Replace("\r\n", "\n");
+                return text;
+            }
+            catch (Exception e) { return null; }
         }
 
         public virtual string[] mergeToParagraph(string[] lines)

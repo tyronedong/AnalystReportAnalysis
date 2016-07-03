@@ -215,5 +215,13 @@ namespace Report.Securities
             }
             return newParas.ToArray();
         }
+
+        public override bool extractDate()
+        {
+            if (base.extractDate())
+            { return true; }
+
+            return false;
+        }
     }
 }

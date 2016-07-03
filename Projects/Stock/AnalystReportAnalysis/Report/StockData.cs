@@ -681,7 +681,6 @@ namespace Report
 
                 }
 
-
             //东阿阿胶(000423)/11.7 元
             string regexDate = "^[0-9]+[ ]*年[ ]*[0-9]+[ ]*月[ ]*[0-9]+[ ]*日$"; //日期正则表达式
             Regex regDate = new Regex(regexDate);
