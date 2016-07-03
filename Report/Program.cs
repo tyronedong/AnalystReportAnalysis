@@ -27,11 +27,11 @@ namespace Report
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            //Execute();
+            Execute();
 
             //System.Console.ReadLine();
 
-            Some();
+            //Some();
 
             System.Console.ReadLine();
         }
@@ -42,16 +42,16 @@ namespace Report
 
             //ReportParser rp = new ReportParser(path);
             //string txt = rp.loadPDFText();
-            string path = @"F:\事们\进行中\分析师报告\分析师研报\分析师报告按证券分\中金\20070420-中金公司-丽珠集团：2007年1季度业绩回顾：经营性每股收益0.19元，同比增长152%，好于预期，审慎推荐.pdf";
-            string txt = ReportParser.loadPDFText(path);
+            //string path = @"F:\事们\进行中\分析师报告\分析师研报\分析师报告按证券分\中金\20070420-中金公司-丽珠集团：2007年1季度业绩回顾：经营性每股收益0.19元，同比增长152%，好于预期，审慎推荐.pdf";
+            //string txt = ReportParser.loadPDFText(path);
 
 
             //string format1 = "yyyy年MM月dd日";
             //string format2 = "报告日期：yyyy-MM-dd";
+            string format3 = "yyyy-M-d";
 
-
-            //string dateStr1 = "2013年12月13日";
-            //DateTime d = DateTime.ParseExact(dateStr1, format1, System.Globalization.CultureInfo.CurrentCulture);
+            string dateStr1 = "2013-9-9";
+            DateTime d = DateTime.ParseExact(dateStr1, format3, System.Globalization.CultureInfo.CurrentCulture);
             return false;
         }
 
@@ -182,11 +182,11 @@ namespace Report
                                 //{
                                 //    reportParser = new ZhaoShangSecurities(filePath);
                                 //}
-                                else if (securitiesName.Equals("安信证券"))
-                                {
-                                    flag = true;
-                                    reportParser = new AnXinSecurities(filePath);
-                                }
+                                //else if (securitiesName.Equals("安信证券"))
+                                //{
+                                //    flag = true;
+                                //    reportParser = new AnXinSecurities(filePath);
+                                //}
                                 //else if (securitiesName.Equals("广发证券"))
                                 //{
                                 //    //flag = true;
@@ -227,13 +227,13 @@ namespace Report
                                 //    //flag = true;
                                 //    reportParser = new ZhongJianSecurities(filePath);
                                 //}
-                                //else if (securitiesName.Equals("长江证券"))
-                                //{
-                                //    //flag = true;
-                                //    reportParser = new CommonSecurities(filePath);
-                                //    //stockData = new StockData(filePath);
-                                //    //stockParser = new ChangJiangStock(stockData);
-                                //}
+                                else if (securitiesName.Equals("长江证券"))
+                                {
+                                    flag = true;
+                                    reportParser = new ChangJiangSecurities(filePath);
+                                    //stockData = new StockData(filePath);
+                                    //stockParser = new ChangJiangStock(stockData);
+                                }
                                 //else if (securitiesName.Equals("兴业证券"))
                                 //{
                                 //    stockData = new StockData(filePath);
@@ -273,8 +273,18 @@ namespace Report
                                 {
                                     if (reportParser.isValid)
                                     {
-                                        curAnReport = reportParser.executeExtract_withdb();
-                                        SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
+                                        if (false)
+                                        {
+                                            curAnReport = reportParser.executeExtract_withdb();
+                                            SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
+                                        }
+
+                                        if (true)
+                                        {
+                                            curAnReport = reportParser.executeExtract_nodb();
+                                            curAnReport.Stockjobber = securitiesName;
+                                        }
+                                        
                                         reportParser.CloseAll();
                                     }
                                     else

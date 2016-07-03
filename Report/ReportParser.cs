@@ -178,8 +178,8 @@ namespace Report
         public virtual bool extractStockOtherInfo()
         {
             //extract stock price, stock rating and stock rating change
-            Regex stockRRC = new Regex(@"(买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避)[\(（][\u4e00-\u9fa5]{2,4}[\)）]");
-            Regex stockR = new Regex(@"买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避");
+            Regex stockRRC = new Regex(@"(看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避)[\(（][\u4e00-\u9fa5]{2,4}[\)）]");
+            Regex stockR = new Regex(@"看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避");
 
             bool hasRRCMatched = false;
             foreach (var line in lines)
@@ -251,14 +251,22 @@ namespace Report
 
             Regex regDate1 = new Regex(@"(报告|分析|发布)日期[:：]？ *20\d{2} ?[-年] ?[01]\d ?[-月] ?[0-3]\d ?日?");
             Regex regDate2 = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日$");
-            //Regex regDate3 = new Regex(@"^20\d{2}\.[01]\d\.[0-3]\d$");
+
+            Regex regDate1f = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日");
+            Regex regDate2f = new Regex(@"20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日$");
+            Regex regDate3f = new Regex(@"20\d{2}\.[01]\d\.[0-3]\d");
+            Regex regDate4f = new Regex(@"20\d{2}-[01]\d-[0-3]\d");
 
             string format = "yyyyMMdd";
 
             string format1 = "报告日期yyyy-MM-dd";
             string format2 = "yyyy年MM月dd日";
-            //string format3 = "yyyy.MM.dd";
             
+            string format1f = "yyyy年MM月dd日";
+            string format2f = "yyyy年MM月dd日";
+            string format3f = "yyyy.MM.dd";
+            string format4f = "yyyy-MM-dd";
+
             if (dateInPath.IsMatch(pdfPath))
             {
                 string dateString = dateInPath.Match(pdfPath).Value;
@@ -266,6 +274,7 @@ namespace Report
                 return true;
             }
 
+            bool hasFalseDateMatched = false;
             foreach (var line in lines)
             {
                 string trimedLine = line.Trim();//remove whitespace from head and tail
@@ -282,12 +291,31 @@ namespace Report
                     anaReport.Date = DateTime.ParseExact(dateStr2, format2, System.Globalization.CultureInfo.CurrentCulture);
                     return true;
                 }
-                //if (regDate3.IsMatch(trimedLine))
-                //{
-                //    string dateStr3 = regDate3.Match(trimedLine).Value;
-                //    anaReport.Date = DateTime.ParseExact(dateStr3, format3, System.Globalization.CultureInfo.CurrentCulture);
-                //    return true;
-                //}
+
+                if (!hasFalseDateMatched && regDate1f.IsMatch(trimedLine))
+                {
+                    string dateStr1f = regDate1f.Match(trimedLine).Value.Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr1f, format1f, System.Globalization.CultureInfo.CurrentCulture);
+                    hasFalseDateMatched = true;
+                }
+                if (!hasFalseDateMatched && regDate2f.IsMatch(trimedLine))
+                {
+                    string dateStr2f = regDate2f.Match(trimedLine).Value.Replace(" ", "");
+                    anaReport.Date = DateTime.ParseExact(dateStr2f, format2f, System.Globalization.CultureInfo.CurrentCulture);
+                    hasFalseDateMatched = true;
+                }
+                if (!hasFalseDateMatched && regDate3f.IsMatch(trimedLine))
+                {
+                    string dateStr3f = regDate3f.Match(trimedLine).Value;
+                    anaReport.Date = DateTime.ParseExact(dateStr3f, format3f, System.Globalization.CultureInfo.CurrentCulture);
+                    hasFalseDateMatched = true;
+                }
+                if (!hasFalseDateMatched && regDate4f.IsMatch(trimedLine))
+                {
+                    string dateStr4f = regDate4f.Match(trimedLine).Value;
+                    anaReport.Date = DateTime.ParseExact(dateStr4f, format4f, System.Globalization.CultureInfo.CurrentCulture);
+                    hasFalseDateMatched = true;
+                }
             }
 
             return false;

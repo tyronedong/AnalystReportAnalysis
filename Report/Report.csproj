@@ -71,6 +71,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportParser.cs" />
     <Compile Include="Securities\AnXinSecurities.cs" />
+    <Compile Include="Securities\ChangJiangSecurities.cs" />
     <Compile Include="Securities\CommonSecurities.cs" />
     <Compile Include="Securities\DongFangSecurities.cs" />
     <Compile Include="Securities\GuangFaSecurities.cs" />
@@ -87,7 +88,6 @@
     <Compile Include="Securities\ZhongJinSecurities.cs" />
     <Compile Include="Securities\ZhongXinSecurities.cs" />
     <Compile Include="StockData.cs" />
-    <Compile Include="Stocks\ChangJiangStock.cs" />
     <Compile Include="Stocks\CommonStock.cs" />
     <Compile Include="Stocks\DongBeiStock.cs" />
     <Compile Include="Stocks\DongXingStock.cs" />
@@ -97,7 +97,9 @@
     <Compile Include="Stocks\XingYeStock.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
