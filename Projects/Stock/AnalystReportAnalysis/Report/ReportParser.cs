@@ -74,11 +74,20 @@ namespace Report
         //    }
         //}
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pdfPath"></param>
+        /// <returns>
+        /// null if wrong
+        /// empty if not found
+        /// </returns>
         public static string getStockjobber(string pdfPath)
         {
             string SecurityNameDicPath = ConfigurationManager.AppSettings["SecNameDic_Path"];
             string[] securityNames = loadSecurityNames(SecurityNameDicPath);
-            
+
+            if (securityNames == null) { return null; }//null if wrong
             //judge by pdfPath
             foreach (var name in securityNames)
             {
@@ -99,7 +108,7 @@ namespace Report
                 }
             }
 
-            return null;//null if not found
+            return "";//empty if not found
         }
 
         private static string[] loadSecurityNames(string dicPath)
