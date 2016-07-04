@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Configuration;
 
 namespace Text.Handler
 {
@@ -66,7 +67,9 @@ namespace Text.Handler
         public bool isValid = false;
         private List<KeyValuePair<string, string>> partitionResult;
 
+        //const string NLPIR_path = ConfigurationManager.AppSettings["NLPIR_Path"];
         const string path = @".\NLPIR\NLPIR.dll";//设定dll的路径
+        //const string path = Path.Combine(NLPIR_path, "NLPIR.dll");//设定dll的路径
         //对函数进行申明
         [DllImport(path, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, EntryPoint = "NLPIR_Init")]
         public static extern bool NLPIR_Init(String sInitDirPath, int encoding, String sLicenseCode);

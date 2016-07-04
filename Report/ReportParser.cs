@@ -76,7 +76,7 @@ namespace Report
 
         public static string getStockjobber(string pdfPath)
         {
-            string SecurityNameDicPath = ConfigurationManager.AppSettings["SecurityNameDic_Path"];
+            string SecurityNameDicPath = ConfigurationManager.AppSettings["SecNameDic_Path"];
             string[] securityNames = loadSecurityNames(SecurityNameDicPath);
             
             //judge by pdfPath

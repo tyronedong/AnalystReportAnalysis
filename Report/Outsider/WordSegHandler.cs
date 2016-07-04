@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Diagnostics;
+using System.Configuration;
 
 namespace Report.Outsider
 {
@@ -67,7 +68,8 @@ namespace Report.Outsider
         public bool isValid = false;
         private List<KeyValuePair<string, string>> partitionResult;
 
-        const string path = @".\NLPIR\NLPIR.dll";//设定dll的路径
+        const string path = @".\NLPIR\NLPIR.dll";
+
         //对函数进行申明
         [DllImport(path, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, EntryPoint = "NLPIR_Init")]
         public static extern bool NLPIR_Init(String sInitDirPath, int encoding, String sLicenseCode);
@@ -138,6 +140,7 @@ namespace Report.Outsider
             else 
             {
                 string userDictPath = @".\NLPIR\userdict.txt";
+                //string userDictPath = Path.Combine(NLPIR_path, "userdict.txt");
                 int k = NLPIR_ImportUserDict(userDictPath);
 
                 Console.WriteLine("Import " + k + " user dict items");
