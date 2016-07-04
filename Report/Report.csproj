@@ -74,6 +74,7 @@
     <Compile Include="Securities\AnXinSecurities.cs" />
     <Compile Include="Securities\ChangJiangSecurities.cs" />
     <Compile Include="Securities\CommonSecurities.cs" />
+    <Compile Include="Securities\DongBeiSecurities.cs" />
     <Compile Include="Securities\DongFangSecurities.cs" />
     <Compile Include="Securities\GuangFaSecurities.cs" />
     <Compile Include="Securities\GuoJinSecurities.cs" />

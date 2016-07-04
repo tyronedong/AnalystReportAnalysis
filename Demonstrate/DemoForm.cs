@@ -84,7 +84,12 @@ namespace Demonstrate
 
             string securitiesName = ReportParser.getStockjobber(filePath);
 
-            if (string.IsNullOrEmpty(securitiesName))
+            //if (string.IsNullOrEmpty(securitiesName))
+            //{
+            //    reportParser = new CommonSecurities(filePath);
+            //}
+            if (securitiesName == null) { return "File of security name list not found. Check the configuration item \"SecNameDic_Path\" and make sure it is right."; }
+            else if (securitiesName.Equals(""))
             {
                 reportParser = new CommonSecurities(filePath);
             }
