@@ -40,6 +40,13 @@ namespace Report
 
     public class Analyst
     {
+        public Analyst() { }
+
+        public Analyst(string Name)
+        {
+            this.Name = Name;
+        }
+
         public Analyst(string Name, string CertificateNumber, string PhoneNumber, string Email)
         {
             this.Name = Name;

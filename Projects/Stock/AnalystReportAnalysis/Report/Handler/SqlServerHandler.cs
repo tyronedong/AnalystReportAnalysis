@@ -29,10 +29,14 @@ namespace Report.Handler
         private Dictionary<string, Analyst> personTable;
 
         private static string sqlConnectionString = ConfigurationManager.AppSettings["SqlConnectionString"];
-        private static string storedProcName_Person = ConfigurationManager.AppSettings["StoredProcName_Person"];
-        private static string storedProcName_Report = ConfigurationManager.AppSettings["StoredProcName_Report"];
-        private static string storedProcName_Report2 = ConfigurationManager.AppSettings["StoredProcName_Report2"];
-        private static string numOnceSelect = ConfigurationManager.AppSettings["num_once_select"];
+        //private static string storedProcName_Person = ConfigurationManager.AppSettings["StoredProcName_Person"];
+        //private static string storedProcName_Report = ConfigurationManager.AppSettings["StoredProcName_Report"];
+        //private static string storedProcName_Report2 = ConfigurationManager.AppSettings["StoredProcName_Report2"];
+        //private static string numOnceSelect = ConfigurationManager.AppSettings["num_once_select"];
+        private static string storedProcName_Person = "[dbo].[selectAllPerson]";
+        private static string storedProcName_Report = "[dbo].[selectTopN]";
+        private static string storedProcName_Report2 = "[dbo].[selectByGUID]";
+        private static string numOnceSelect = "100";
 
         public SqlServerHandler()
         {

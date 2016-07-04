@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Diagnostics;
 
-namespace Text.Handler
+namespace Report.Outsider
 {
     [StructLayout(LayoutKind.Explicit)]
     public struct result_t
@@ -164,19 +165,26 @@ namespace Text.Handler
 
         public bool ExecutePartition(string text)
         {
-            partitionResult.Clear();
-            IntPtr intPtr = NLPIR_ParagraphProcess(text);//切分结果保存为IntPtr类型
-            String str = Marshal.PtrToStringAnsi(intPtr);//将切分结果转换为string
-
-            string[] parArray = str.Split(' ');
-            foreach (string curPar in parArray)
+            try
             {
-                string[] wordC = curPar.Split('/');
-                if (wordC.Length != 2) { continue; }
-                partitionResult.Add(new KeyValuePair<string, string>(wordC[1], wordC[0]));
-            }
+                partitionResult.Clear();
+                IntPtr intPtr = NLPIR_ParagraphProcess(text);//切分结果保存为IntPtr类型
+                String str = Marshal.PtrToStringAnsi(intPtr);//将切分结果转换为string
 
-            return true;
+                string[] parArray = str.Split(' ');
+                foreach (string curPar in parArray)
+                {
+                    string[] wordC = curPar.Split('/');
+                    if (wordC.Length != 2) { continue; }
+                    partitionResult.Add(new KeyValuePair<string, string>(wordC[1], wordC[0]));
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("Report.Outsider.WordSegHandler.ExecutePartition(string text): " + e.Message);   
+                return false;
+            }
         }
 
         public string[] GetNoStopWords()

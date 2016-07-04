@@ -11,6 +11,27 @@ namespace Text.Classify
 {
     class Feature
     {
+        public static double[] GetFeatureVec(string sentence, ref WordSegHandler wsH)
+        {
+            List<double> featVec = new List<double>();
+            string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
+
+            List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
+            Dictionary<string, int> wordCountDic = TextPreProcess.GetWordCountDic(sentence, ref wsH);
+
+            foreach (var fItem in fItems)
+            {
+                if (wordCountDic.ContainsKey(fItem.featureWord))
+                {
+                    double tfidf = wordCountDic[fItem.featureWord] * fItem.globalWeight;
+                    featVec.Add(tfidf);
+                }
+                else { featVec.Add(0); }
+            }
+
+            return featVec.ToArray();
+        }
+
         public static double[] GetFeatureVec(string sentence)
         {
             List<double> featVec = new List<double>();
