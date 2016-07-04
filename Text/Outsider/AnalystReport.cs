@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Text.Outsider
 {
+    //from Report
     public class AnalystReport
     {
         public string _id { get; set; }

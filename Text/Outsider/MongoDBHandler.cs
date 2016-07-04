@@ -11,6 +11,7 @@ using System.Diagnostics;
 
 namespace Text.Outsider
 {
+    //from Report.Handler
     class MongoDBHandler
     {
         private string authority;

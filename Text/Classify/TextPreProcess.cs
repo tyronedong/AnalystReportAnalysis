@@ -14,6 +14,25 @@ namespace Text.Classify
     {
         static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
 
+        public static Dictionary<string, int> GetWordCountDic(string sentence, ref WordSegHandler wsH)
+        {   
+            if (!wsH.isValid) { Trace.TraceError("Text.Classify.TextPreProcess.GetWordCountDic() goes wrong"); return null; }
+            wsH.ExecutePartition(sentence);
+            string[] words = wsH.GetNoStopWords();
+
+            Dictionary<string, int> wordCountDic = new Dictionary<string, int>();
+            foreach (var word in words)
+            {
+                //could add a word normalize function in this placce so that numbers could be regarded as one word
+                if (wordCountDic.ContainsKey(word)) { wordCountDic[word]++; }
+                else
+                {
+                    wordCountDic.Add(word, 1);
+                }
+            }
+            return wordCountDic;
+        }
+
         public static Dictionary<string, int> GetWordCountDic(string sentence)
         {
             WordSegHandler wsH = new WordSegHandler();

@@ -163,9 +163,9 @@ namespace Demonstrate
             else if (securitiesName.Equals("长江证券"))
             {
                 //flag = true;
-                //reportParser = new CommonSecurities(filePath);
-                stockData = new StockData(filePath);
-                stockParser = new ChangJiangStock(stockData);
+                reportParser = new CommonSecurities(filePath);
+                //stockData = new StockData(filePath);
+                //stockParser = new ChangJiangStock(stockData);
             }
             else if (securitiesName.Equals("兴业证券"))
             {
@@ -333,9 +333,9 @@ namespace Demonstrate
                 else if (securitiesName.Equals("长江证券"))
                 {
                     //flag = true;
-                    //reportParser = new CommonSecurities(filePath);
-                    stockData = new StockData(filePath);
-                    stockParser = new ChangJiangStock(stockData);
+                    reportParser = new CommonSecurities(filePath);
+                    //stockData = new StockData(filePath);
+                    //stockParser = new ChangJiangStock(stockData);
                 }
                 else if (securitiesName.Equals("兴业证券"))
                 {

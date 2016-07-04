@@ -6,14 +6,20 @@ using System.Threading.Tasks;
 using LibSVMsharp;
 using LibSVMsharp.Helpers;
 using LibSVMsharp.Extensions;
+using Text.Handler;
 
 namespace Text.Classify
 {
     public class Model
     {
         public SVMModel model;
+        private WordSegHandler wsH;
 
-        public Model() { this.model = null; }
+        public Model()
+        {
+            this.model = null;
+            this.wsH = new WordSegHandler();
+        }
 
         //public Model(string fileName) { this.model = SVM.LoadModel(fileName); }
 
@@ -76,7 +82,7 @@ namespace Text.Classify
         /// <returns></returns>
         public double Predict(string sentence)
         {
-            double[] featVector = Feature.GetFeatureVec(sentence);
+            double[] featVector = Feature.GetFeatureVec(sentence, ref wsH);
             double predictResult = Predict(featVector);
             return predictResult;
         }

@@ -9,12 +9,15 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using org.apache.pdfbox.pdmodel;
 using org.apache.pdfbox.util;
+using Report.Outsider;
 
 namespace Report
 {
     public class ReportParser
     {
         public bool isValid = false;
+
+        protected WordSegHandler wsH;
 
         protected string pdfPath;
         protected string pdfText;
@@ -45,6 +48,7 @@ namespace Report
             try
             {
                 pdfReport = PDDocument.load(pdfPath);
+                wsH = new WordSegHandler();//added to nodb handle
                 isValid = true;
             }
             catch (Exception e)
@@ -321,9 +325,137 @@ namespace Report
             return false;
         }
 
-        public virtual string extractAnalysts()
+        /// <summary>
+        /// We only extract the first name meet in the context and asume it was the analyst
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool extractAnalysts()
         {
-            return null;
+            List<Analyst> analysts = new List<Analyst>();
+            
+            if (!wsH.isValid) 
+            {
+                Trace.TraceError("ReportParser.extractAnalysts(): NLPIR init failed");
+                return false; 
+            }
+
+            int index = 0; bool hasAnalystMatched = false;
+            foreach (var line in lines)
+            {
+                if (!wsH.ExecutePartition(line))
+                { index++; continue; }
+
+                string[] analystsNames = wsH.GetPersonNames();
+                
+                if (analystsNames.Length == 0)
+                { index++; continue; }
+
+                Analyst analyst = getAnalyst(analystsNames[0], index);
+                
+                if (analyst == null)
+                { index++; continue; }
+                else
+                {
+                    anaReport.Analysts.Add(analyst);
+                    hasAnalystMatched = true;
+                    break;
+                }
+            }
+            return hasAnalystMatched;
+        }
+
+        private Analyst getAnalyst(string name, int index)
+        {
+            List<string> infoLines = new List<string>();
+            Analyst analyst = new Analyst(name);
+
+            string regexStr = "[a-z0-9]+([._\\-]*[a-zA-Z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+"; //邮箱正则表达式  Sxg5661@163.com这个例子比较少，A-Z可以看情况取舍
+            Regex regEmail = new Regex(regexStr);
+
+            string regexPhone1 = "[0-9]+[ ]*[-][ ]*[0-9]+[ ]*[-][ ]*[0-9]+";
+            Regex regPhone1 = new Regex(regexPhone1);
+            string regexPhone2 = "[0-9]+[ ]*[-][ ]*[0-9]+";
+            Regex regPhone2 = new Regex(regexPhone2);
+            string regexPhone3 = "[0-9]+[ ]*[－][ ]*[0-9]+[ ]*[－][ ]*[0-9]+";
+            Regex regPhone3 = new Regex(regexPhone3);
+            string regexPhone4 = "[0-9]+[ ]*[－][ ]*[0-9]+";
+            Regex regPhone4 = new Regex(regexPhone4);
+            string regexPhone5 = "[0-9]+[ ]*[—][ ]*[0-9]+[ ]*[－][ ]*[0-9]+";
+            Regex regPhone5 = new Regex(regexPhone5);
+            string regexPhone6 = "[0-9]+[ ]*[－][ ]*[0-9]+";
+            Regex regPhone6 = new Regex(regexPhone6);
+            string regexPhone7 = "[(][ ]*[0-9]+[ ]*[)][ ]*[0-9]+";
+            Regex regPhone7 = new Regex(regexPhone7);
+
+            string regexSAC = @"S\d{13}";
+            Regex regSAC = new Regex(regexSAC);
+
+            for (int i = 0; i < 6; i++)
+            {
+                if (index + i >= lines.Length - 1) { break; }
+                infoLines.Add(lines[index + i]);
+            }
+
+            bool hasEmailMatched = false, hasPhoneMatched = false, hasSACMatched = false;
+            foreach (var line in infoLines)
+            {
+                if (hasEmailMatched && hasPhoneMatched && hasSACMatched) { break; }
+
+                if (!hasEmailMatched && regEmail.IsMatch(line))
+                {
+                    analyst.Email = regEmail.Match(line).Value;
+                    hasEmailMatched = true;
+                }
+
+                if (!hasPhoneMatched && regPhone1.IsMatch(line))
+                {
+                    analyst.PhoneNumber = regPhone1.Match(line).Value;
+                    hasPhoneMatched = true;
+                }
+                else if (!hasPhoneMatched && regPhone2.IsMatch(line))
+                {
+                    analyst.PhoneNumber = regPhone2.Match(line).Value;
+                    hasPhoneMatched = true;
+                }
+                else if (!hasPhoneMatched && regPhone3.IsMatch(line))
+                {
+                    analyst.PhoneNumber = regPhone3.Match(line).Value;
+                    hasPhoneMatched = true;
+                }
+                else if (!hasPhoneMatched && regPhone4.IsMatch(line))
+                {
+                    analyst.PhoneNumber = regPhone4.Match(line).Value;
+                    hasPhoneMatched = true;
+                }
+                else if (!hasPhoneMatched && regPhone5.IsMatch(line))
+                {
+                    analyst.PhoneNumber = regPhone5.Match(line).Value;
+                    hasPhoneMatched = true;
+                }
+                else if (!hasPhoneMatched && regPhone6.IsMatch(line))
+                {
+                    analyst.PhoneNumber = regPhone6.Match(line).Value;
+                    hasPhoneMatched = true;
+                }
+                else if (!hasPhoneMatched && regPhone7.IsMatch(line))
+                {
+                    analyst.PhoneNumber = regPhone7.Match(line).Value;
+                    hasPhoneMatched = true;
+                }
+
+                if (!hasSACMatched && regSAC.IsMatch(line))
+                {
+                    analyst.CertificateNumber = regSAC.Match(line).Value;
+                    hasSACMatched = true;
+                }
+            }
+
+            if(!(hasEmailMatched||hasPhoneMatched||hasSACMatched))
+            {
+                return null;
+            } 
+
+            return analyst;
         }
 
         public virtual string[] removeTableInLines(string[] lines)
