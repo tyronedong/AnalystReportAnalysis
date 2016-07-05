@@ -18,10 +18,14 @@ namespace Report.Handler
         string ins_mongoDBConnectionString;
         string ins_mongoDBName;
         string ins_mongoDBCollName;
-        
-        IMongoClient ins_mgclient;
+
+        //IMongoClient ins_mgclient;
+        //IMongoDatabase ins_mgdatabase;
+        //IMongoCollection<AnalystReport> ins_mgcollection;
+        MongoClient ins_mgclient;
         IMongoDatabase ins_mgdatabase;
         IMongoCollection<AnalystReport> ins_mgcollection;
+
 
         //variables for query from mongoDB
         string query_mongoDBHost;
@@ -99,7 +103,7 @@ namespace Report.Handler
             }
             catch (Exception e)
             {
-                Trace.TraceError("MongoDBHandler.Init(): " + e.Message);
+                Trace.TraceError("MongoDBHandler.Init(): " + e.ToString());
                 return false;
             }
             return true;
@@ -109,12 +113,12 @@ namespace Report.Handler
         {
             try
             {
-                var insertTask = ins_mgcollection.InsertManyAsync(insertList);
+                var insertTask =  ins_mgcollection.InsertManyAsync(insertList);
                 insertTask.Wait();
             }
             catch (Exception e)
             {
-                Trace.TraceWarning("MongoDBHandler.InsertMany(): " + e.Message);
+                Trace.TraceWarning("MongoDBHandler.InsertMany(): " + e.ToString());
                 return false;
             }
             return true;

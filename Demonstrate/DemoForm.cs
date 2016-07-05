@@ -82,7 +82,7 @@ namespace Demonstrate
         private string Extract_nodb(string filePath)
         {
             ReportParser reportParser = null;
-            StockData stockData = null, stockParser = null;
+            //StockData stockData = null, stockParser = null;
 
             string securitiesName = ReportParser.getStockjobber(filePath);
 
@@ -232,14 +232,14 @@ namespace Demonstrate
                 }
                 else { return "Extract failed!"; }
             }
-            else if (stockParser != null)
-            {
-                stockParser.extrcactContent();
-                //stockParser.extractDetail(stockParser.loadPDFLines());
-                Report.Program.DataTransform(ref stockParser, ref curAnReport);
-                curAnReport.Stockjobber = securitiesName;
-                //Report.Program.SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
-            }
+            //else if (stockParser != null)
+            //{
+            //    stockParser.extrcactContent();
+            //    //stockParser.extractDetail(stockParser.loadPDFLines());
+            //    Report.Program.DataTransform(ref stockParser, ref curAnReport);
+            //    curAnReport.Stockjobber = securitiesName;
+            //    //Report.Program.SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
+            //}
             else { return "Extract failed!"; }
 
             return GetExtractionResult(curAnReport, ref this.model);
@@ -276,7 +276,7 @@ namespace Demonstrate
 
                 //get pdf file parser by securities
                 ReportParser reportParser = null;
-                StockData stockData = null, stockParser = null;
+                //StockData stockData = null, stockParser = null;
                 if (securitiesName.Equals("长江证券"))
                 {
                     //flag = true;
@@ -413,13 +413,13 @@ namespace Demonstrate
                     }
                     else { return "Extract failed!"; }
                 }
-                else if (stockParser != null)
-                {
-                    stockParser.extrcactContent();
-                    //stockParser.extractDetail(stockParser.loadPDFLines());
-                    Report.Program.DataTransform(ref stockParser, ref curAnReport);
-                    Report.Program.SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
-                }
+                //else if (stockParser != null)
+                //{
+                //    stockParser.extrcactContent();
+                //    //stockParser.extractDetail(stockParser.loadPDFLines());
+                //    Report.Program.DataTransform(ref stockParser, ref curAnReport);
+                //    Report.Program.SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
+                //}
                 else { return "Extract failed!"; }
 
                 return GetExtractionResult(curAnReport, ref this.model);

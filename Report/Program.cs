@@ -150,14 +150,14 @@ namespace Report
                                 string filePath = FileHandler.GetFilePathByName(curRootPath, id);
                                 if (filePath == null)
                                 {
-                                    //isError = true;
-                                    //break;
-                                    continue;
+                                    isError = true;
+                                    break;
+                                    //continue;
                                 }
 
                                 //get pdf file parser by securities
                                 ReportParser reportParser = null;
-                                StockData stockData = null, stockParser = null;
+                                //StockData stockData = null, stockParser = null;
                                 if (securitiesName.Equals("长江证券"))
                                 {
                                     //flag = true;
@@ -289,13 +289,13 @@ namespace Report
                                 {
                                     if (reportParser.isValid)
                                     {
-                                        if (false)
+                                        if (true)
                                         {
                                             curAnReport = reportParser.executeExtract_withdb();
                                             SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
                                         }
 
-                                        if (true)
+                                        if (false)
                                         {
                                             curAnReport = reportParser.executeExtract_nodb(ref wsH);
                                             curAnReport.Stockjobber = securitiesName;
@@ -309,13 +309,13 @@ namespace Report
                                         break;
                                     }
                                 }
-                                else if (stockParser != null)
-                                {
-                                    stockParser.extrcactContent();
-                                    //stockParser.extractDetail(stockParser.loadPDFLines());
-                                    DataTransform(ref stockParser, ref curAnReport);
-                                    SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
-                                }
+                                //else if (stockParser != null)
+                                //{
+                                //    stockParser.extrcactContent();
+                                //    //stockParser.extractDetail(stockParser.loadPDFLines());
+                                //    DataTransform(ref stockParser, ref curAnReport);
+                                //    SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
+                                //}
                                 else
                                 {
                                     nextCurId = id;
@@ -323,10 +323,10 @@ namespace Report
                                 }
 
                                 reports.Add(curAnReport);
-                                if (flag)
-                                {
-                                    System.Console.WriteLine("Hello");
-                                }
+                                //if (flag)
+                                //{
+                                //    System.Console.WriteLine("Hello");
+                                //}
                                 //update nextCurId
                                 nextCurId = id;
                             }
@@ -338,11 +338,11 @@ namespace Report
                         }//for
                         //insert reports list to mongoDB
                         //debug
-                        //if (!mgDBH.InsertMany(reports))
-                        //{
-                        //    isError = true;
-                        //    break;
-                        //}
+                        if (!mgDBH.InsertMany(reports))
+                        {
+                            isError = true;
+                            break;
+                        }
 
                         //set curid to id file
                         curIH.SetCurIdToFile(nextCurId);
@@ -395,23 +395,23 @@ namespace Report
                 anaReport.StockName = reportTitle.Split('：')[0];
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="stockData"></param>
-        /// <param name="anaReport"></param>
-        /// <returns></returns>
-        public static bool DataTransform(ref StockData stockData, ref AnalystReport anaReport)
-        {
-            anaReport.Content = ContentTransform(stockData.Content);
-            //anaReport.Content = stockData.Content;
-            anaReport.RatingChanges = stockData.RatingChanges;
-            anaReport.StockCode = stockData.StockCode;
-            anaReport.StockName = stockData.StockName;
-            anaReport.StockPrice = stockData.StockPrice;
-            anaReport.StockRating = stockData.StockRating;
-            return true;
-        }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="stockData"></param>
+        ///// <param name="anaReport"></param>
+        ///// <returns></returns>
+        //public static bool DataTransform(ref StockData stockData, ref AnalystReport anaReport)
+        //{
+        //    anaReport.Content = ContentTransform(stockData.Content);
+        //    //anaReport.Content = stockData.Content;
+        //    anaReport.RatingChanges = stockData.RatingChanges;
+        //    anaReport.StockCode = stockData.StockCode;
+        //    anaReport.StockName = stockData.StockName;
+        //    anaReport.StockPrice = stockData.StockPrice;
+        //    anaReport.StockRating = stockData.StockRating;
+        //    return true;
+        //}
 
         public static string ContentTransform(string content)
         {
