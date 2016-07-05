@@ -28,7 +28,7 @@ namespace Report.Handler
             }
             catch (Exception e)
             {
-                Trace.TraceError("FileHandler.GetFilePathByName(string rootPath, string fileName): " + e.Message);
+                Trace.TraceError("FileHandler.GetFilePathByName(string rootPath, string fileName): " + e.ToString());
                 return null;
             }
         }
