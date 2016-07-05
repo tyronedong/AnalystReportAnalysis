@@ -22,7 +22,7 @@ Microsoft.Office.Interop.Excel.dll;
 LibSVMsharp.dll;
 注：libsvm.dll必须手动copy到当前的bin/Debug目录下
 3、nlpir
-注：NLPIR文件夹必须手动copy到当前的bin/Debug目录下（写成配置项）
+注：NLPIR文件夹必须手动copy到当前的bin/Debug目录下
 4、mongodb
 MongoDB.Bson.dll;
 MongoDB.Driver.Core.dll;
@@ -40,5 +40,3 @@ nlpir
 3、Project Text
 libsvm
 配置项说明：
-
-1、libsvm.dll必须手动copy到当前的bin/Debug目录下

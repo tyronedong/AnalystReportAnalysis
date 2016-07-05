@@ -76,27 +76,26 @@
     <Compile Include="Securities\CommonSecurities.cs" />
     <Compile Include="Securities\DongBeiSecurities.cs" />
     <Compile Include="Securities\DongFangSecurities.cs" />
+    <Compile Include="Securities\DongXingSecurities.cs" />
+    <Compile Include="Securities\FangZhengSecurities.cs" />
+    <Compile Include="Securities\GuangDaSecurities.cs" />
     <Compile Include="Securities\GuangFaSecurities.cs" />
     <Compile Include="Securities\GuoJinSecurities.cs" />
     <Compile Include="Securities\GuoJunSecurities.cs" />
     <Compile Include="Securities\GuoXinSecurities.cs" />
     <Compile Include="Securities\HaiTongSecurities.cs" />
     <Compile Include="Securities\HuaTaiSecurities.cs" />
+    <Compile Include="Securities\MinShengSecurities.cs" />
+    <Compile Include="Securities\PingAnSecurities.cs" />
     <Compile Include="Securities\ShenHongSecurities.cs" />
+    <Compile Include="Securities\ShenWanSecurities.cs" />
     <Compile Include="Securities\TianTouSecurities.cs" />
+    <Compile Include="Securities\XingYeSecurities.cs" />
     <Compile Include="Securities\ZhaoShangSecurities.cs" />
     <Compile Include="Securities\ZhongGuoSecurities.cs" />
     <Compile Include="Securities\ZhongJianSecurities.cs" />
     <Compile Include="Securities\ZhongJinSecurities.cs" />
     <Compile Include="Securities\ZhongXinSecurities.cs" />
-    <Compile Include="StockData.cs" />
-    <Compile Include="Stocks\CommonStock.cs" />
-    <Compile Include="Stocks\DongBeiStock.cs" />
-    <Compile Include="Stocks\DongXingStock.cs" />
-    <Compile Include="Stocks\FangZhengStock.cs" />
-    <Compile Include="Stocks\PingAnStock.cs" />
-    <Compile Include="Stocks\ShenYinStock.cs" />
-    <Compile Include="Stocks\XingYeStock.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

@@ -8,9 +8,9 @@ using System.Text.RegularExpressions;
 
 namespace Report.Securities
 {
-    public class ChangJiangSecurities : ReportParser
+    public class MinShengSecurities : ReportParser
     {
-        public ChangJiangSecurities(string pdReportPath)
+        public MinShengSecurities(string pdReportPath)
             : base(pdReportPath)
         {
             if (this.isValid)
@@ -27,7 +27,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("ChangJiangSecurities.CommonSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("MinShengSecurities.MinShengSecurities(string pdReportPath): " + e.Message);
                 }
             }
         }
@@ -35,48 +35,62 @@ namespace Report.Securities
         public override bool extractStockOtherInfo()
         {
             //extract stock price, stock rating and stock rating change
-            Regex stockRRC = new Regex(@"评级 {1,}(看好|中性|看淡|推荐|谨慎推荐|减持|无投资评级) {1,}[\u4e00-\u9fa5]{2,4} *$");//评级 推荐 维持  
-            Regex stockR = new Regex(@"看好|中性|看淡|推荐|谨慎推荐|减持|无投资评级");
+            Regex stockRRC = new Regex(@"(看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避) *[\u4e00-\u9fa5]{1,4}评级");//谨慎推荐    首次评级 
+            Regex stockR = new Regex(@"看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|谨慎推荐|推荐|回避");
 
-            bool hasRRCMatched = false;
+            Regex stockPrice = new Regex(@"\d+\.\d+");
+
+            bool hasRRCMatched = false, hasPriceMatched = false;
             foreach (var line in lines)
             {
                 string trimedLine = line.Trim();
-                if (stockRRC.IsMatch(line))
+                if (hasPriceMatched && hasRRCMatched) { break; }
+                if (!hasRRCMatched && stockRRC.IsMatch(line))
                 {
                     string srrc = stockRRC.Match(line).Value;
                     anaReport.StockRating = stockR.Match(srrc).Value;
-                    anaReport.RatingChanges = srrc.Replace(anaReport.StockRating, "").Replace("评级", "").Trim();
+                    anaReport.RatingChanges = srrc.Replace(anaReport.StockRating, "").Replace("(", "").Replace("（", "").Replace("）", "").Replace(")", "").Replace("/", "").Replace("评级","").Trim();
 
                     hasRRCMatched = true;
-                    break;
+                }
+                if (!hasPriceMatched && trimedLine.StartsWith("收盘价（元）"))
+                {
+                    if (stockPrice.IsMatch(trimedLine))
+                    {
+                        try
+                        {
+                            anaReport.StockPrice = float.Parse(stockPrice.Match(line).Value);
+                            //anaReport.StockPrice.ToString();
+                            hasPriceMatched = true;
+                        }
+                        catch (Exception e)
+                        {
+                            Trace.TraceError("MinShengSecurities.extractStockInfo(): " + e.Message);
+                        }
+                    }
                 }
             }
-            if (hasRRCMatched)
-            {
-                return true;
-            }
-            return false;
+            return hasPriceMatched && hasRRCMatched;
         }
 
         public override string[] removeAnyButContentInParas(string[] paras)
         {
             Regex mightBeContent = new Regex("[\u4e00-\u9fa5a][，。；]");
 
-            Regex refReportHead = new Regex(@"^(\d{1,2} *\.? *)?《");
+            Regex refReportHead = new Regex(@"^(\d{1,2} *[.、]? *)?《");
             Regex refReportTail = new Regex(@"\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?$");
+            Regex refReportHT = new Regex(@"^《.*》$");
 
             Regex noteShuju = new Regex("数据来源：.*$");
             Regex noteZiliao = new Regex("资料来源：.*$");
             Regex noteZhu = new Regex("注：.*$");
 
-            Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
+            Regex indexEntry = new Regex(@"\.{9,} *\d{1,3}$");
 
             Regex picOrTabHead = new Regex(@"^(图|表|图表) *\d{1,2}");
-            Regex extra = new Regex("^(本报告的信息均来自已公开信息，关于信息的准确性与完|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监)");//added
+            Regex extra = new Regex("^(请通过合法途径获取本公司研究报告，如经由未经|本报告的信息均来自已公开信息，关于信息的准确性与完|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监)");//added
 
-            Regex title = new Regex(@"评级 {1,}(看好|中性|看淡|推荐|谨慎推荐|减持|无投资评级)");//added
-            Regex refReport = new Regex(@"^《.*?星期[一二三四五六日天]");//《二季度营收下滑，费用率下降带来净利率提升》2013/7/30 星期二
+            Regex refReport = new Regex(@"^\d{1,2} *[.、]?.*\.\d{1,2}$");//added
 
             List<string> newParas = new List<string>();
             foreach (var para in paras)
@@ -86,7 +100,15 @@ namespace Report.Securities
                 {
                     continue;
                 }
+                if (refReportHT.IsMatch(trimedPara))
+                {
+                    continue;
+                }
                 if (indexEntry.IsMatch(trimedPara))
+                {
+                    continue;
+                }
+                if (refReport.IsMatch(trimedPara))//added
                 {
                     continue;
                 }
@@ -96,19 +118,6 @@ namespace Report.Securities
                 }
                 if (picOrTabHead.IsMatch(trimedPara))
                 {
-                    continue;
-                }
-                if (title.IsMatch(trimedPara))
-                {
-                    continue;
-                }
-                if (refReport.IsMatch(trimedPara))
-                {
-                    continue;
-                }
-                if (trimedPara.Contains("公司报告(点评报告)"))//added
-                {
-                    newParas.Add(para.Replace("公司报告(点评报告)", "").Trim());
                     continue;
                 }
                 if (trimedPara.Contains("数据来源："))
@@ -144,46 +153,6 @@ namespace Report.Securities
                 newParas.Add(para);
             }
             return newParas.ToArray();
-        }
-
-        public override bool extractDate()
-        {
-            if (base.extractDate())
-            { return true; }
-
-            Regex regDate1 = new Regex(@"[（(]\d{6}[)）] *20\d{2}-\d{1,2}-\d{1,2}$");//（300090） 2013-9-9 
-            Regex pureRegDate1 = new Regex(@"20\d{2}-\d{1,2}-\d{1,2}");
-            //Regex regDate2 = new Regex(@"报告日期： *20\d{2}-[01]\d-[0-3]\d");//报告日期： 2010-01-18
-
-            //string format1 = "yyyy年MM月dd日";
-            //string format2 = "报告日期：yyyy-MM-dd";
-
-            bool hasTimeMatched = false;
-            foreach (var line in lines)
-            {
-                string trimedLine = line.Trim();
-
-                if (regDate1.IsMatch(trimedLine))
-                {
-                    string dateStr1 = regDate1.Match(trimedLine).Value.Replace(" ", "");
-                    string pDateStr1 = pureRegDate1.Match(dateStr1).Value;
-                    string[] times = pDateStr1.Split('-');
-                    anaReport.Date = new DateTime(Int32.Parse(times[0]), Int32.Parse(times[1]), Int32.Parse(times[2]));
-                    //anaReport.Date = DateTime.ParseExact(dateStr1, format1, System.Globalization.CultureInfo.CurrentCulture);
-                    hasTimeMatched = true;
-                    break;
-                }
-                //if (regDate2.IsMatch(norLine))
-                //{
-                //    string dateStr2 = regDate2.Match(norLine).Value.Replace(" ", "");
-                //    anaReport.Date = DateTime.ParseExact(dateStr2, format2, System.Globalization.CultureInfo.CurrentCulture);
-                //    hasTimeMatched = true;
-                //    break;
-                //}
-            }
-
-            if (hasTimeMatched) { return true; }
-            return false;
         }
     }
 }

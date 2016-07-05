@@ -41,6 +41,10 @@ namespace Report
             anaReport = null;
         }
 
+        /// <summary>
+        /// with database
+        /// </summary>
+        /// <param name="pdfPath"></param>
         public ReportParser(string pdfPath)
         {
             this.pdfPath = pdfPath;
@@ -48,7 +52,7 @@ namespace Report
             try
             {
                 pdfReport = PDDocument.load(pdfPath);
-                wsH = new WordSegHandler();//added to nodb handle
+                //wsH = new WordSegHandler();//added to nodb handle
                 isValid = true;
             }
             catch (Exception e)
@@ -57,6 +61,28 @@ namespace Report
                 isValid = false;
             }
         }
+
+        ///// <summary>
+        ///// no database
+        ///// </summary>
+        ///// <param name="pdfPath"></param>
+        ///// <param name="wsH"></param>
+        //public ReportParser(string pdfPath, ref WordSegHandler wsH)
+        //{
+        //    this.pdfPath = pdfPath;
+        //    anaReport = new AnalystReport();
+        //    try
+        //    {
+        //        pdfReport = PDDocument.load(pdfPath);
+        //        this.wsH = wsH;
+        //        isValid = true;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Trace.TraceError("ReportParser.ReportParser(string pdfPath): " + e.Message);
+        //        isValid = false;
+        //    }
+        //}
 
         //public ReportParser(string pdfPath, string stockjobber)
         //{
@@ -136,8 +162,10 @@ namespace Report
             return anaReport;
         }
 
-        public virtual AnalystReport executeExtract_nodb()
+        public virtual AnalystReport executeExtract_nodb(ref WordSegHandler wsH)
         {
+            this.wsH = wsH;
+
             extractStockInfo();
             extractContent();
 
@@ -191,8 +219,8 @@ namespace Report
         public virtual bool extractStockOtherInfo()
         {
             //extract stock price, stock rating and stock rating change
-            Regex stockRRC = new Regex(@"(看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避)[\(（][\u4e00-\u9fa5]{2,4}[\)）]");
-            Regex stockR = new Regex(@"看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避");
+            Regex stockRRC = new Regex(@"(看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避) *(([\(（][\u4e00-\u9fa5]{2,4}[\)）])|(/[\u4e00-\u9fa5]{2,4}))");//推荐(维持)||推荐/维持
+            Regex stockR = new Regex(@"看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|谨慎推荐|推荐|回避");
 
             bool hasRRCMatched = false;
             foreach (var line in lines)
@@ -202,7 +230,7 @@ namespace Report
                 {
                     string srrc = stockRRC.Match(line).Value;
                     anaReport.StockRating = stockR.Match(srrc).Value;
-                    anaReport.RatingChanges = srrc.Replace(anaReport.StockRating, "").Replace("(", "").Replace("（", "").Replace("）", "").Replace(")", "");
+                    anaReport.RatingChanges = srrc.Replace(anaReport.StockRating, "").Replace("(", "").Replace("（", "").Replace("）", "").Replace(")", "").Replace("/","").Trim();
 
                     hasRRCMatched = true;
                     break;
@@ -225,7 +253,7 @@ namespace Report
             string content = "", normaledPara; 
             MatchCollection matchCol;
             Regex isContent = new Regex("[\u4e00-\u9fa5a][，。；]");
-            Regex normalizedText = new Regex("[，,。.．；;：:“”'\"《<》>？?{}\\[\\]【】()（）*&^$￥#…@！!~·`|+＋\\-－×_—=/、%％ 0-9a-zA-Z\u4e00-\u9fa5a]+");
+            Regex normalizedText = new Regex("[，,。.．；;：:“”'\"《<》>？?{}\\[\\]【】()（）*&^$￥#…@！!~～·`|+＋\\-－×_—=/、%％ 0-9a-zA-Z\u4e00-\u9fa5a]+");
             foreach (var para in finalParas)
             {
                 if (isContent.IsMatch(para))
@@ -262,23 +290,34 @@ namespace Report
             //just get date from database
             Regex dateInPath = new Regex(@"20\d{2}[01]\d[0-3]\d");
 
-            Regex regDate1 = new Regex(@"(报告|分析|发布)日期[:：]？ *20\d{2} ?[-年] ?[01]\d ?[-月] ?[0-3]\d ?日?");
-            Regex regDate2 = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日$");
+            Regex regDate1 = new Regex(@"(报告|分析|发布)日期[:：]？ *20\d{2} ?[-.年] ?\d{1,2} ?[-.月] ?\d{1,2} ?日?");
+            Regex regDate2 = new Regex(@"^20\d{2} ?年 ?\d{1,2} ?月 ?\d{1,2} ?日$");
+            //Regex regDate2 = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日$");
+            //Regex regDate3 = new Regex(@"^20\d{2} ?年 ?\d ?月 ?[0-3]\d ?日$");
+            //Regex regDate4 = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?\d ?日$");
+            //Regex regDate5 = new Regex(@"^20\d{2} ?年 ?\d ?月 ?\d ?日$");
 
-            Regex regDate1f = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日");
-            Regex regDate2f = new Regex(@"20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日$");
-            Regex regDate3f = new Regex(@"20\d{2}\.[01]\d\.[0-3]\d");
-            Regex regDate4f = new Regex(@"20\d{2}-[01]\d-[0-3]\d");
+            Regex regDate1f = new Regex(@"^20\d{2} ?年 ?\d{1,2} ?月 ?\d{1,2} ?日");
+            Regex regDate2f = new Regex(@"20\d{2} ?年 ?\d{1,2} ?月 ?\d{1,2} ?日$");
+            Regex regDate3f = new Regex(@"20\d{2} ?\. ?\d{1,2} ?\. ?\d{1,2}");
+            Regex regDate4f = new Regex(@"20\d{2} ?- ?\d{1,2} ?- ?\d{1,2}");
+            //Regex regDate1f = new Regex(@"^20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日");
+            //Regex regDate2f = new Regex(@"20\d{2} ?年 ?[01]\d ?月 ?[0-3]\d ?日$");
+            //Regex regDate3f = new Regex(@"20\d{2}\.[01]\d\.[0-3]\d");
+            //Regex regDate4f = new Regex(@"20\d{2}-[01]\d-[0-3]\d");
 
             string format = "yyyyMMdd";
 
-            string format1 = "报告日期yyyy-MM-dd";
-            string format2 = "yyyy年MM月dd日";
+            //string format1 = "报告日期yyyy-MM-dd";
+            //string format2 = "yyyy年MM月dd日";
+            //string format3 = "yyyy年M月dd日";
+            //string format4 = "yyyy年MM月d日";
+            //string format5 = "yyyy年M月d日";
             
-            string format1f = "yyyy年MM月dd日";
-            string format2f = "yyyy年MM月dd日";
-            string format3f = "yyyy.MM.dd";
-            string format4f = "yyyy-MM-dd";
+            //string format1f = "yyyy年MM月dd日";
+            //string format2f = "yyyy年MM月dd日";
+            //string format3f = "yyyy.MM.dd";
+            //string format4f = "yyyy-MM-dd";
 
             if (dateInPath.IsMatch(pdfPath))
             {
@@ -294,44 +333,110 @@ namespace Report
 
                 if (regDate1.IsMatch(trimedLine))
                 {
-                    string dateStr1 = regDate1.Match(trimedLine).Value.Replace(":", "").Replace("：", "").Replace(" ", "");
-                    anaReport.Date = DateTime.ParseExact(dateStr1, format1, System.Globalization.CultureInfo.CurrentCulture);
+                    string dateStr1 = regDate1.Match(trimedLine).Value.Replace(":", "").Replace("：", "").Replace(" ", "").Replace("报告", "").Replace("分析", "").Replace("发布", "").Replace("日期", "").Trim();
+                    string curFormat = GetDateStrFormat(dateStr1);
+                    //if (curFormat == null) { continue; }
+                    anaReport.Date = DateTime.ParseExact(dateStr1, curFormat, System.Globalization.CultureInfo.CurrentCulture);
                     return true;
                 }
                 if (regDate2.IsMatch(trimedLine))
                 {
                     string dateStr2 = regDate2.Match(trimedLine).Value.Replace(" ", "");
-                    anaReport.Date = DateTime.ParseExact(dateStr2, format2, System.Globalization.CultureInfo.CurrentCulture);
+                    string curFormat = GetDateStrFormat(dateStr2);
+                    anaReport.Date = DateTime.ParseExact(dateStr2, curFormat, System.Globalization.CultureInfo.CurrentCulture);
                     return true;
                 }
 
                 if (!hasFalseDateMatched && regDate1f.IsMatch(trimedLine))
                 {
                     string dateStr1f = regDate1f.Match(trimedLine).Value.Replace(" ", "");
-                    anaReport.Date = DateTime.ParseExact(dateStr1f, format1f, System.Globalization.CultureInfo.CurrentCulture);
+                    string curFormat = GetDateStrFormat(dateStr1f);
+                    anaReport.Date = DateTime.ParseExact(dateStr1f, curFormat, System.Globalization.CultureInfo.CurrentCulture);
                     hasFalseDateMatched = true;
                 }
                 if (!hasFalseDateMatched && regDate2f.IsMatch(trimedLine))
                 {
                     string dateStr2f = regDate2f.Match(trimedLine).Value.Replace(" ", "");
-                    anaReport.Date = DateTime.ParseExact(dateStr2f, format2f, System.Globalization.CultureInfo.CurrentCulture);
+                    string curFormat = GetDateStrFormat(dateStr2f);
+                    anaReport.Date = DateTime.ParseExact(dateStr2f, curFormat, System.Globalization.CultureInfo.CurrentCulture);
                     hasFalseDateMatched = true;
                 }
                 if (!hasFalseDateMatched && regDate3f.IsMatch(trimedLine))
                 {
-                    string dateStr3f = regDate3f.Match(trimedLine).Value;
-                    anaReport.Date = DateTime.ParseExact(dateStr3f, format3f, System.Globalization.CultureInfo.CurrentCulture);
+                    string dateStr3f = regDate3f.Match(trimedLine).Value.Replace(" ", "");
+                    string curFormat = GetDateStrFormat(dateStr3f);
+                    anaReport.Date = DateTime.ParseExact(dateStr3f, curFormat, System.Globalization.CultureInfo.CurrentCulture);
                     hasFalseDateMatched = true;
                 }
                 if (!hasFalseDateMatched && regDate4f.IsMatch(trimedLine))
                 {
-                    string dateStr4f = regDate4f.Match(trimedLine).Value;
-                    anaReport.Date = DateTime.ParseExact(dateStr4f, format4f, System.Globalization.CultureInfo.CurrentCulture);
+                    string dateStr4f = regDate4f.Match(trimedLine).Value.Replace(" ", "");
+                    string curFormat = GetDateStrFormat(dateStr4f);
+                    anaReport.Date = DateTime.ParseExact(dateStr4f, curFormat, System.Globalization.CultureInfo.CurrentCulture);
                     hasFalseDateMatched = true;
                 }
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Input string must have the format of yyyy年MM月dd日, yyyy.MM.dd or yyyy-MM-dd
+        /// </summary>
+        /// <param name="dateStr"></param>
+        /// <returns></returns>
+        public string GetDateStrFormat(string dateStr)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (dateStr.Contains("年") || dateStr.Contains("月") || dateStr.Contains("日"))
+            {
+                sb.Append("yyyy年");
+                int mlen = dateStr.IndexOf("月")-dateStr.IndexOf("年");
+                for (int i = 1; i < mlen; i++) { sb.Append("M"); }
+
+                sb.Append("月");
+                
+                int dlen = dateStr.IndexOf("日") - dateStr.IndexOf("月");
+                for (int i = 1; i < mlen; i++) { sb.Append("d"); }
+
+                sb.Append("日");
+
+                return sb.ToString();
+            }
+
+            if (dateStr.Contains("."))
+            {
+                string[] tList = dateStr.Split('.');
+                if (tList.Length != 3) { return null; }
+                
+                for (int i = 0; i < tList[0].Length; i++) { sb.Append("y"); }
+                sb.Append(".");
+
+                for (int i = 0; i < tList[1].Length; i++) { sb.Append("M"); }
+                sb.Append(".");
+
+                for (int i = 0; i < tList[2].Length; i++) { sb.Append("d"); }
+
+                return sb.ToString();
+            }
+
+            if (dateStr.Contains("-"))
+            {
+                string[] tList = dateStr.Split('-');
+                if (tList.Length != 3) { return null; }
+
+                for (int i = 0; i < tList[0].Length; i++) { sb.Append("y"); }
+                sb.Append("-");
+
+                for (int i = 0; i < tList[1].Length; i++) { sb.Append("M"); }
+                sb.Append("-");
+
+                for (int i = 0; i < tList[2].Length; i++) { sb.Append("d"); }
+
+                return sb.ToString();
+            }
+            return null;
         }
 
         /// <summary>
@@ -498,7 +603,7 @@ namespace Report
             Regex InvestRatingStatement = new Regex("(^投资评级(的)?(说明|定义))|(投资评级(的)?(说明|定义)?[:：]?$)|(评级(标准|说明|定义)[:：]?$)");
             Regex Statements = new Regex("^(((证券)?分析师(申明|声明|承诺))|((重要|特别)(声|申)明)|(免责(条款|声明|申明))|(法律(声|申)明)|(披露(声|申)明)|(信息披露)|(要求披露))[:：]?$");
             Regex FirmIntro = new Regex("公司简介[:：]?$");
-            Regex AnalystIntro = new Regex("^(分析师|分析师与联系人|研究员|作者|研究团队)(简介|介绍)[\u4e00-\u9fa5a]*?[:：]?$");
+            Regex AnalystIntro = new Regex("^(分析师|分析师与联系人|分析师与行业专家|研究员|作者|研究团队)(简介|介绍)[\u4e00-\u9fa5a]*?[:：]?$");
             List<string> newLines = new List<string>();
             foreach (var line in lines)
             {
@@ -538,23 +643,28 @@ namespace Report
         {
             Regex mightBeContent = new Regex("[\u4e00-\u9fa5a][，。；]");
 
-            Regex refReportHead = new Regex(@"^(\d{1,2} *\.? *)?《");
+            Regex refReportHead = new Regex(@"^(\d{1,2} *[.、]? *)?《");
             Regex refReportTail = new Regex(@"\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?$");
+            Regex refReportHT = new Regex(@"^《.*》$");
 
             Regex noteShuju = new Regex("数据来源：.*$");
             Regex noteZiliao = new Regex("资料来源：.*$");
             Regex noteZhu = new Regex("注：.*$");
 
-            Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
+            Regex indexEntry = new Regex(@"\.{9,} *\d{1,3}$");
 
             Regex picOrTabHead = new Regex(@"^(图|表|图表) *\d{1,2}");
-            Regex extra = new Regex("^(本报告的信息均来自已公开信息，关于信息的准确性与完|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监)");//added
+            Regex extra = new Regex("^(请通过合法途径获取本公司研究报告，如经由未经|本报告的信息均来自已公开信息，关于信息的准确性与完|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监)");//added
 
             List<string> newParas = new List<string>();
             foreach (var para in paras)
             {
                 string trimedPara = para.Trim();
                 if (refReportHead.IsMatch(trimedPara) && refReportTail.IsMatch(trimedPara))
+                {
+                    continue;
+                }
+                if (refReportHT.IsMatch(trimedPara))
                 {
                     continue;
                 }
