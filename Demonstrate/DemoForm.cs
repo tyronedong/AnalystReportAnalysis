@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Configuration;
 using Report;
-using Report.Stocks;
 using Text.Classify;
 using Report.Handler;
 using Report.Securities;
+using Report.Outsider;
 using System.Diagnostics;
 
 namespace Demonstrate
@@ -22,6 +22,7 @@ namespace Demonstrate
         private string mode = ConfigurationManager.AppSettings["mode"];
 
         private SqlServerHandler sqlSH;
+        private WordSegHandler wsH;
         private Model model;
         private List<string> selectedText;
 
@@ -30,6 +31,7 @@ namespace Demonstrate
             InitializeComponent();
             sqlSH = new SqlServerHandler();
             sqlSH.Init();
+            wsH = new WordSegHandler();
             model = new Model();
             model.LoadModel(@"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\model.txt");
             selectedText = new List<string>();
@@ -93,11 +95,17 @@ namespace Demonstrate
             {
                 reportParser = new CommonSecurities(filePath);
             }
+            else if (securitiesName.Equals("长江证券"))
+            {
+                //flag = true;
+                reportParser = new ChangJiangSecurities(filePath);
+            }
             else if (securitiesName.Equals("申万宏源"))
             {
                 //flag = true;
                 reportParser = new ShenHongSecurities(filePath);
             }
+
             else if (securitiesName.Equals("海通证券"))
             {
                 //flag = true;
@@ -115,6 +123,11 @@ namespace Demonstrate
             else if (securitiesName.Equals("中金公司"))
             {
                 reportParser = new ZhongJinSecurities(filePath);
+            }
+            else if (securitiesName.Equals("兴业证券"))
+            {
+                //flag = true;
+                reportParser = new XingYeSecurities(filePath);
             }
             else if (securitiesName.Equals("招商证券"))
             {
@@ -165,39 +178,40 @@ namespace Demonstrate
                 //flag = true;
                 reportParser = new ZhongJianSecurities(filePath);
             }
-            else if (securitiesName.Equals("长江证券"))
-            {
-                //flag = true;
-                reportParser = new CommonSecurities(filePath);
-                //stockData = new StockData(filePath);
-                //stockParser = new ChangJiangStock(stockData);
-            }
-            else if (securitiesName.Equals("兴业证券"))
-            {
-                stockData = new StockData(filePath);
-                stockParser = new XingYeStock(stockData);
-            }
             else if (securitiesName.Equals("平安证券"))
             {
-                stockData = new StockData(filePath);
-                stockParser = new PingAnStock(stockData);
+                //flag = true;
+                reportParser = new PingAnSecurities(filePath);
+            }
+            else if (securitiesName.Equals("民生证券"))
+            {
+                //flag = true;
+                reportParser = new MinShengSecurities(filePath);
+            }
+            else if (securitiesName.Equals("光大证券"))
+            {
+                //flag = true;
+                reportParser = new GuangDaSecurities(filePath);
             }
             else if (securitiesName.Equals("东北证券"))
             {
-                stockData = new StockData(filePath);
-                //stockData.setStockjobber("东北证券");
-                stockParser = new DongBeiStock(stockData);
-                //stockParser.extrcactContent();
+                //flag = true;
+                reportParser = new DongBeiSecurities(filePath);
             }
             else if (securitiesName.Equals("东兴证券"))
             {
-                stockData = new StockData(filePath);
-                stockParser = new DongXingStock(stockData);
+                //flag = true;
+                reportParser = new DongXingSecurities(filePath);
             }
             else if (securitiesName.Equals("方正证券"))
             {
-                stockData = new StockData(filePath);
-                stockParser = new FangZhengStock(stockData);
+                //flag = true;
+                reportParser = new FangZhengSecurities(filePath);
+            }
+            else if (securitiesName.Equals("申银万国"))
+            {
+                //flag = true;
+                reportParser = new ShenWanSecurities(filePath);
             }
             else
             {
@@ -211,7 +225,7 @@ namespace Demonstrate
             {
                 if (reportParser.isValid)
                 {
-                    curAnReport = reportParser.executeExtract_nodb();
+                    curAnReport = reportParser.executeExtract_nodb(ref wsH);
                     curAnReport.Stockjobber = securitiesName;
                     //Report.Program.SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
                     reportParser.CloseAll();
@@ -263,11 +277,17 @@ namespace Demonstrate
                 //get pdf file parser by securities
                 ReportParser reportParser = null;
                 StockData stockData = null, stockParser = null;
-                if (securitiesName.Equals("申万宏源"))
+                if (securitiesName.Equals("长江证券"))
+                {
+                    //flag = true;
+                    reportParser = new ChangJiangSecurities(filePath);
+                }
+                else if (securitiesName.Equals("申万宏源"))
                 {
                     //flag = true;
                     reportParser = new ShenHongSecurities(filePath);
                 }
+
                 else if (securitiesName.Equals("海通证券"))
                 {
                     //flag = true;
@@ -285,6 +305,11 @@ namespace Demonstrate
                 else if (securitiesName.Equals("中金公司"))
                 {
                     reportParser = new ZhongJinSecurities(filePath);
+                }
+                else if (securitiesName.Equals("兴业证券"))
+                {
+                    //flag = true;
+                    reportParser = new XingYeSecurities(filePath);
                 }
                 else if (securitiesName.Equals("招商证券"))
                 {
@@ -335,39 +360,40 @@ namespace Demonstrate
                     //flag = true;
                     reportParser = new ZhongJianSecurities(filePath);
                 }
-                else if (securitiesName.Equals("长江证券"))
-                {
-                    //flag = true;
-                    reportParser = new CommonSecurities(filePath);
-                    //stockData = new StockData(filePath);
-                    //stockParser = new ChangJiangStock(stockData);
-                }
-                else if (securitiesName.Equals("兴业证券"))
-                {
-                    stockData = new StockData(filePath);
-                    stockParser = new XingYeStock(stockData);
-                }
                 else if (securitiesName.Equals("平安证券"))
                 {
-                    stockData = new StockData(filePath);
-                    stockParser = new PingAnStock(stockData);
+                    //flag = true;
+                    reportParser = new PingAnSecurities(filePath);
+                }
+                else if (securitiesName.Equals("民生证券"))
+                {
+                    //flag = true;
+                    reportParser = new MinShengSecurities(filePath);
+                }
+                else if (securitiesName.Equals("光大证券"))
+                {
+                    //flag = true;
+                    reportParser = new GuangDaSecurities(filePath);
                 }
                 else if (securitiesName.Equals("东北证券"))
                 {
-                    stockData = new StockData(filePath);
-                    //stockData.setStockjobber("东北证券");
-                    stockParser = new DongBeiStock(stockData);
-                    //stockParser.extrcactContent();
+                    //flag = true;
+                    reportParser = new DongBeiSecurities(filePath);
                 }
                 else if (securitiesName.Equals("东兴证券"))
                 {
-                    stockData = new StockData(filePath);
-                    stockParser = new DongXingStock(stockData);
+                    //flag = true;
+                    reportParser = new DongXingSecurities(filePath);
                 }
                 else if (securitiesName.Equals("方正证券"))
                 {
-                    stockData = new StockData(filePath);
-                    stockParser = new FangZhengStock(stockData);
+                    //flag = true;
+                    reportParser = new FangZhengSecurities(filePath);
+                }
+                else if (securitiesName.Equals("申银万国"))
+                {
+                    //flag = true;
+                    reportParser = new ShenWanSecurities(filePath);
                 }
                 else
                 {
