@@ -135,10 +135,10 @@ namespace Report
                                 curSecur = securitiesName;
                                 //update nextCurId
                                 nextCurId = id;
-                                if (time.Year != 2013)
-                                {
-                                    continue;
-                                }
+                                //if (time.Year != 2013)
+                                //{
+                                //    continue;
+                                //}
                                 //judge if current document is handlable
                                 if (language.Equals("EN"))
                                 {
