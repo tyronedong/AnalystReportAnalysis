@@ -25,7 +25,8 @@ namespace Report.Securities
                     noOtherLines = removeOtherInLines(lines);
                     mergedParas = mergeToParagraph(noOtherLines);
                     advancedMergedParas = removeOtherInParas(mergedParas);
-                    finalParas = advancedMergedParas;
+                    noABCParas = removeAnyButContentInParas(advancedMergedParas);
+                    finalParas = noABCParas;
                     //noTableLines = removeTable(lines);
                     //noTableAndOtherLines = removeOther(noTableLines);
                     //mergedParas = mergeToParagraph(noTableAndOtherLines);

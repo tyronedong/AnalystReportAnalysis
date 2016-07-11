@@ -13,7 +13,12 @@ namespace Text.Handler
 {
     class FileHandler
     {
-
+        /// <summary>
+        /// Write all strs into file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="strs"></param>
+        /// <returns></returns>
         public static bool SaveStringArray(string fileName, string[] strs)
         {
             try { File.WriteAllLines(fileName, strs); }

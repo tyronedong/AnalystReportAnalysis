@@ -89,6 +89,8 @@ namespace Report.Securities
 
             Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
 
+            Regex extra = new Regex("^(请通过合法途径获取本公司研究报告，如经由未经|本报告中?的?信息均来(自|源)于?已?公开的?(信息|资料)|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监|请务必阅读|每位主要负责编写本)");//added
+
             //Regex picOrTabHead = new Regex(@"^(图|表) *\d{1,2}");
 
             List<string> newParas = new List<string>();
@@ -104,6 +106,10 @@ namespace Report.Securities
                     continue;
                 }
                 if (trimedPara.StartsWith("作者保证报告所采用的数据均来自合规渠道，"))//added
+                {
+                    continue;
+                }
+                if (extra.IsMatch(trimedPara))//added
                 {
                     continue;
                 }
@@ -136,6 +142,10 @@ namespace Report.Securities
                         string judgeStr = trimedPara.Replace(zhu, "");
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
+                }
+                if (isTableDigits(trimedPara))
+                {
+                    continue;
                 }
                 newParas.Add(para);
             }

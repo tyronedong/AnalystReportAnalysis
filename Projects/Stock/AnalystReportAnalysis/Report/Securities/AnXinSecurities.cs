@@ -122,6 +122,7 @@ namespace Report.Securities
 
             Regex refReportHead = new Regex(@"^(\d{1,2} *)?《");
             Regex refReportTail = new Regex(@"\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?$");
+            //Regex refReportHT = new Regex(@"^《.*》$");
 
             Regex noteShuju = new Regex("数据来源：.*$");
             Regex noteZiliao = new Regex("资料来源：.*$");
@@ -182,6 +183,12 @@ namespace Report.Securities
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
                 }
+
+                if (isTableDigits(trimedPara))
+                {
+                    continue;
+                }
+
                 newParas.Add(para);
             }
             return newParas.ToArray();

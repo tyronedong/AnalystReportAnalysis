@@ -44,6 +44,13 @@ namespace Report
             //string txt = rp.loadPDFText();
             //string path = @"F:\事们\进行中\分析师报告\分析师研报\分析师报告按证券分\中金\20070420-中金公司-丽珠集团：2007年1季度业绩回顾：经营性每股收益0.19元，同比增长152%，好于预期，审慎推荐.pdf";
             //string txt = ReportParser.loadPDFText(path);
+            string path = @"D:\人民大学\分析师报告\2010\2010-6-8\01E0192C-12D7-4035-A0E4-85B1F73A3AB7.PDF";
+            string path2 = @"F:\事们\进行中\分析师报告\分析师研报\分析师报告\000513\20130826-银河证券-丽珠集团-000513-业绩基本符合预期，新品贡献度有望提升.pdf";
+
+            string t = ReportParser.loadPDFText(path);
+            ReportParser rp = new ZhongJinSecurities(path);
+            WordSegHandler wsH = new WordSegHandler();
+            var r = rp.executeExtract_nodb(ref wsH);
 
 
             //string format1 = "yyyy年MM月dd日";
@@ -52,7 +59,7 @@ namespace Report
 
             //string dateStr1 = "2013-9-9";
             //DateTime d = DateTime.ParseExact(dateStr1, format3, System.Globalization.CultureInfo.CurrentCulture);
-            WordSegHandler wsH = new WordSegHandler();
+            
            
             return false;
         }
@@ -150,9 +157,10 @@ namespace Report
                                 string filePath = FileHandler.GetFilePathByName(curRootPath, id);
                                 if (filePath == null)
                                 {
-                                    isError = true;
-                                    break;
-                                    //continue;
+                                    //isError = true;
+                                    //break;
+                                    Trace.TraceWarning("file not found");
+                                    continue;
                                 }
 
                                 //get pdf file parser by securities
@@ -305,8 +313,11 @@ namespace Report
                                     }
                                     else
                                     {
-                                        isError = true;
-                                        break;
+                                        //isError = true;
+                                        //break;
+                                        Trace.TraceError(securitiesName + " is unvalid");
+                                        nextCurId = id;
+                                        continue;
                                     }
                                 }
                                 //else if (stockParser != null)
@@ -336,6 +347,14 @@ namespace Report
                                 continue;
                             }
                         }//for
+                        if (isError)
+                        {
+                            Console.WriteLine("Something wrong within the inner foreach loop!");
+                            Trace.TraceInformation("Something wrong within the inner foreach loop!");
+                            //Thread.Sleep(10000);
+                            isError = true;
+                            break;
+                        }
                         //insert reports list to mongoDB
                         //debug
                         if (!mgDBH.InsertMany(reports))

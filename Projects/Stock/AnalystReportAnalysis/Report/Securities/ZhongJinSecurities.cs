@@ -23,7 +23,8 @@ namespace Report.Securities
                     lines = pdfText.Split('\n');
                     noOtherLines = removeOtherInLines(lines);
                     mergedParas = mergeToParagraph(noOtherLines);
-                    finalParas = mergedParas;
+                    noABCParas = removeAnyButContentInParas(mergedParas);
+                    finalParas = noABCParas;
                 }
                 catch (Exception e)
                 {
@@ -159,21 +160,21 @@ namespace Report.Securities
             return false;
         }
 
-        public override bool extractContent()
-        {
-            //problem: haven't remove something like "分析员，SAC 执业证书编号" and "公司简介"
-            string content = "";
-            Regex isContent = new Regex("[\u4e00-\u9fa5a][，。；]");
-            foreach (var para in mergedParas)
-            {
-                if (isContent.IsMatch(para))
-                {
-                    content += para + '\n';
-                }
-            }
-            anaReport.Content = content;
-            return true;
-        }
+        //public override bool extractContent()
+        //{
+        //    //problem: haven't remove something like "分析员，SAC 执业证书编号" and "公司简介"
+        //    string content = "";
+        //    Regex isContent = new Regex("[\u4e00-\u9fa5a][，。；]");
+        //    foreach (var para in finalParas)
+        //    {
+        //        if (isContent.IsMatch(para))
+        //        {
+        //            content += para + '\n';
+        //        }
+        //    }
+        //    anaReport.Content = content;
+        //    return true;
+        //}
 
         public override string[] removeOtherInLines(string[] lines)
         {

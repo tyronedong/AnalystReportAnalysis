@@ -22,9 +22,11 @@ namespace Report.Securities
                 {
                     pdfText = loadPDFText();
                     lines = pdfText.Split('\n');
-                    noOtherLines = removeOtherInLines(lines);
+                    noABCLines = removeAnyButContentInLines(lines);
+                    noOtherLines = removeOtherInLines(noABCLines);
                     mergedParas = mergeToParagraph(noOtherLines);
-                    finalParas = mergedParas;
+                    noABCParas = removeAnyButContentInParas(mergedParas);
+                    finalParas = noABCParas;
                 }
                 catch (Exception e)
                 {
@@ -161,7 +163,7 @@ namespace Report.Securities
             string content = "";
             Regex isContent = new Regex("[\u4e00-\u9fa5a][，。；]");
             Regex isNotContent = new Regex(@"^《.*\d+");
-            foreach (var para in mergedParas)
+            foreach (var para in finalParas)
             {
                 string normaledPara = para.Replace("[Table_Summary]", "").Replace(" ","").Replace(" ", "").Replace("", "").Trim();
                 if (isNotContent.IsMatch(normaledPara))

@@ -124,6 +124,13 @@ namespace Report.Handler
             return true;
         }
 
+        public int GetCollectionCount()
+        {
+            IMongoQuery query = Query.Empty;
+            var count = query_mgcollection.Count(query);
+            return (int)count;
+        }
+
         public MongoCursor<AnalystReport> FormulateCursor(int quidRank)
         {
             IMongoQuery query = Query.Empty;

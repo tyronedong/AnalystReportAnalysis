@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Text.Classify.Item
 {
+    /// <summary>
+    /// Each instance of WordItem contains a word and informaiton about how many zhengli and fuli docs contain the word.
+    /// totalCount is the sum of zhengliCount and fuliCount
+    /// </summary>
     class WordItem
     {
         public string word { get; set; }

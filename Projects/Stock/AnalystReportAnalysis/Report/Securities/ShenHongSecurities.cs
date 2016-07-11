@@ -123,15 +123,16 @@ namespace Report.Securities
 
             Regex refReportHead = new Regex(@"^(\d{1,2} *)?《");
             Regex refReportTail = new Regex(@"\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?(证券分析师)?$");//modified
+            Regex refReportHT = new Regex(@"^《.*》$");
 
             Regex noteShuju = new Regex("数据来源：.*$");
             Regex noteZiliao = new Regex("资料来源：.*$");
             Regex noteZhu = new Regex("注：.*$");
 
-            Regex indexEntry = new Regex(@"\.{15,} *\d{1,3}$");
+            Regex indexEntry = new Regex(@"\.{9,} *\d{1,3}$");
 
             Regex shouyeNote = new Regex("^本公司不持有或交易股票及其衍生品.*?客户应全面理解本报告结尾.*");//added
-            Regex meiyeNote = new Regex(@"^本研究报告仅通过邮件提供给.*?使用。\d{1,3}.*");//added
+            Regex meiyeNote = new Regex(@"本研究报告仅通过邮件提供给.*?使用。\d{1,3}");//added
             Regex picOrTabHead = new Regex(@"^(附)?(图|表) *\d{1,3}");//added
 
             List<string> newParas = new List<string>();
@@ -210,6 +211,10 @@ namespace Report.Securities
                         string judgeStr = trimedPara.Replace(zhu, "");
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
+                }
+                if (isTableDigits(trimedPara))
+                {
+                    continue;
                 }
                 newParas.Add(curPara);
             }

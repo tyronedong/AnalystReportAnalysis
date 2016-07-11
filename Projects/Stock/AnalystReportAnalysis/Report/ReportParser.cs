@@ -601,9 +601,12 @@ namespace Report
         public virtual string[] removeAnyButContentInLines(string[] lines)
         {
             Regex InvestRatingStatement = new Regex("(^投资评级(的)?(说明|定义))|(投资评级(的)?(说明|定义)?[:：]?$)|(评级(标准|说明|定义)[:：]?$)");
-            Regex Statements = new Regex("^(((证券)?分析师(申明|声明|承诺))|((重要|特别)(声|申)明)|(免责(条款|声明|申明))|(法律(声|申)明)|(披露(声|申)明)|(信息披露)|(要求披露))[:：]?$");
+            Regex Statements = new Regex("^(((证券)?分析师(申明|声明|承诺))|((重要|特别)(声|申)明)|(免责(条款|声明|申明))|(法律(声|申)明)|(独立性(声|申)明)|(披露(声|申)明)|(信息披露)|(要求披露))[:：]?$");
             Regex FirmIntro = new Regex("公司简介[:：]?$");
             Regex AnalystIntro = new Regex("^(分析师|分析师与联系人|分析师与行业专家|研究员|作者|研究团队)(简介|介绍)[\u4e00-\u9fa5a]*?[:：]?$");
+
+            Regex extra = new Regex(@"^银河证券行业评级体系");//added
+
             List<string> newLines = new List<string>();
             foreach (var line in lines)
             {
@@ -621,6 +624,10 @@ namespace Report
                     break;
                 }
                 if (AnalystIntro.IsMatch(trimedLine))
+                {
+                    break;
+                }
+                if(extra.IsMatch(trimedLine))//added
                 {
                     break;
                 }
@@ -651,10 +658,10 @@ namespace Report
             Regex noteZiliao = new Regex("资料来源：.*$");
             Regex noteZhu = new Regex("注：.*$");
 
-            Regex indexEntry = new Regex(@"\.{9,} *\d{1,3}$");
+            Regex indexEntry = new Regex(@"\.{9,}.*\d{1,3}$");
 
             Regex picOrTabHead = new Regex(@"^(图|表|图表) *\d{1,2}");
-            Regex extra = new Regex("^(请通过合法途径获取本公司研究报告，如经由未经|本报告的信息均来自已公开信息，关于信息的准确性与完|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监)");//added
+            Regex extra = new Regex("^(独立性申明：|请通过合法途径获取本公司研究报告，如经由未经|本报告中?的?信息均来(自|源)于?已?公开的?(信息|资料)|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监|请务必阅读|每位主要负责编写本|市场有风险，投资需谨慎|此份報告由群益證券)");//added
 
             List<string> newParas = new List<string>();
             foreach (var para in paras)
@@ -710,9 +717,55 @@ namespace Report
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
                 }
+
+                if (isTableDigits(trimedPara))
+                {
+                    continue;
+                }
+
                 newParas.Add(para);
             }
             return newParas.ToArray();
+        }
+
+        public bool isTableDigits(string para)
+        {
+            //judge if most is digit
+            Regex digi = new Regex(@"[0-9a-zA-Z% .,]{15,}");
+            return digi.IsMatch(para);
+            //int digiCount = 0;
+            //foreach (var c in para)
+            //{
+            //    if (char.IsDigit(c))
+            //    { digiCount++; }
+            //    else if (char.IsWhiteSpace(c))
+            //    { digiCount++; }
+            //    else if (c.Equals('.'))
+            //    { digiCount++; }
+            //    else if (c.Equals('%'))
+            //    { digiCount++; }
+            //    else if(c.Equals('·'))
+            //    { digiCount++; }
+            //    else if(c.Equals('、'))
+            //    { digiCount--; }
+            //}
+            //double dPer = digiCount * 1.0 / para.Length;
+            //if (para.Length < 140)
+            //{
+            //    if (dPer > 0.80)
+            //        return true;
+            //}
+            //else if (dPer < 250)
+            //{
+            //    if (dPer > 0.75)
+            //        return true;
+            //}
+            //else
+            //{
+            //    if (dPer > 0.65)
+            //        return true;
+            //}
+            //return false;
         }
 
         public static string loadPDFText(string pdfPath)
