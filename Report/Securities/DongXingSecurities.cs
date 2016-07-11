@@ -114,6 +114,12 @@ namespace Report.Securities
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
                 }
+
+                if (isTableDigits(trimedPara))
+                {
+                    continue;
+                }
+
                 newParas.Add(para.Replace("DONGXING SECURITIES", "").Trim());
             }
             return newParas.ToArray();

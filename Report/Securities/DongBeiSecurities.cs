@@ -114,7 +114,7 @@ namespace Report.Securities
             Regex indexEntry = new Regex(@"\.{9,} *\d{1,3}$");
 
             Regex picOrTabHead = new Regex(@"^(图|表|图表) *\d{1,2}");
-            Regex extra = new Regex("^(本报告的信息均来自已公开信息，关于信息的准确性与完|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监)");//added
+            Regex extra = new Regex(@"^(本报告的信息均来自已公开信息，关于信息的准确性与完|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监|(\d{1,3} *)?郑重声明)");//added
 
             List<string> newParas = new List<string>();
             foreach (var para in paras)
@@ -170,6 +170,12 @@ namespace Report.Securities
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
                 }
+
+                if (isTableDigits(trimedPara))
+                {
+                    continue;
+                }
+
                 newParas.Add(para.Replace("[Table_Summary]", "").Trim());
             }
             return newParas.ToArray();

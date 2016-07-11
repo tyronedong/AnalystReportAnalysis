@@ -152,7 +152,7 @@ namespace Text
 
         static void SelectAndSaveFulis()
         {
-            if (RandomSelect.ExecuteSelect())
+            if (RandomSelect.ExecuteSelectFuli(300))
                 Console.WriteLine("SelectAndSaveFulis() execute success");
             else
                 Console.WriteLine("SelectAndSaveFulis() execute failed");

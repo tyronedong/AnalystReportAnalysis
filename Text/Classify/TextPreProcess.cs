@@ -12,62 +12,25 @@ namespace Text.Classify
 {
     class TextPreProcess
     {
-        static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
+        //static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
 
-        public static Dictionary<string, int> GetWordCountDic(string sentence, ref WordSegHandler wsH)
-        {   
-            if (!wsH.isValid) { Trace.TraceError("Text.Classify.TextPreProcess.GetWordCountDic() goes wrong"); return null; }
-            wsH.ExecutePartition(sentence);
-            string[] words = wsH.GetNoStopWords();
 
-            Dictionary<string, int> wordCountDic = new Dictionary<string, int>();
-            foreach (var word in words)
-            {
-                //could add a word normalize function in this placce so that numbers could be regarded as one word
-                if (wordCountDic.ContainsKey(word)) { wordCountDic[word]++; }
-                else
-                {
-                    wordCountDic.Add(word, 1);
-                }
-            }
-            return wordCountDic;
-        }
-
-        public static Dictionary<string, int> GetWordCountDic(string sentence)
-        {
-            WordSegHandler wsH = new WordSegHandler();
-            wsH.ExecutePartition(sentence);
-            if (!wsH.isValid) { Trace.TraceError("Text.Classify.TextPreProcess.GetWordCountDic() goes wrong"); return null; }
-            string[] words = wsH.GetNoStopWords();
-
-            Dictionary<string, int> wordCountDic = new Dictionary<string, int>();
-            foreach (var word in words)
-            {
-                //could add a word normalize function in this placce so that numbers could be regarded as one word
-                if (wordCountDic.ContainsKey(word)) { wordCountDic[word]++; }
-                else
-                {
-                    wordCountDic.Add(word, 1);
-                }
-            }
-            return wordCountDic;
-        }
 
         /// <summary>
         /// Get labeled items from sorce training file in the form of class LabeledItem
         /// </summary>
         /// <returns></returns>
-        public static List<LabeledItem> GetLabeledItems(bool saveIntoFile = true)
+        public static List<LabeledItem> GetLabeledItems()
         {
             List<LabeledItem> labeledItems = new List<LabeledItem>();
 
             //get all rough zhengli and fuli
-            string[] zhengliCol = GetTrainDataOfZhengli();
-            string[] fuliCol = GetTrainDataOfFuli();
+            string[] zhengli = GetTrainDataOfZhengli();
+            string[] fuli = GetTrainDataOfFuli();
 
-            //normalize all zhengli and fuli
-            string[] zhengli = NormalizeTrainData(zhengliCol);
-            string[] fuli = NormalizeTrainData(fuliCol);
+            ////normalize all zhengli and fuli
+            //string[] zhengli = NormalizeTrainData(zhengliCol);
+            //string[] fuli = NormalizeTrainData(fuliCol);
 
             //set two global variables
             LabeledItem.numberOfZhengli = zhengli.Length;
@@ -90,29 +53,95 @@ namespace Text.Classify
                     labeledItems.Add(new LabeledItem(-1, item, segResult));
                 }
             }
-            if (saveIntoFile) { FileHandler.SaveLabeledItems(preprocess_result_file, labeledItems); }
+            //if (saveIntoFile) { FileHandler.SaveLabeledItems(preprocess_result_file, labeledItems); }
             return labeledItems;
         }
 
-        static string[] GetTrainDataOfZhengli()
+        /// <summary>
+        /// </summary>
+        /// <returns>Return all zhenglis in the form of a string array</returns>
+        public static string[] GetTrainDataOfZhengli()
         {
-            string path = @"F:\事们\进行中\分析师报告\数据标注\FLI信息提取-样本.xlsx";
-            ExcelHandler exlH = new ExcelHandler(path);
-            string[] zhengliCol = exlH.GetColoum("sheet1", 2);
+            string xlsPath = ConfigurationManager.AppSettings["zhengli_excel_path"];
+            string sheetName = ConfigurationManager.AppSettings["zhengli_excel_sheet"];
+            int whichColumn = Int32.Parse(ConfigurationManager.AppSettings["zhengli_excel_column"]);
+
+            string txtPath = ConfigurationManager.AppSettings["zhengli_txt_path"];
+
+            string[] zhengliExl = null, zhengliTxt = null, zhengliCol, zhengli;
+
+            if (!xlsPath.Equals("not_valid"))
+            {
+                ExcelHandler exlH = new ExcelHandler(xlsPath);
+                zhengliExl = exlH.GetColoum(sheetName, whichColumn);
+            }
+
+            if (!txtPath.Equals("not_valid"))
+            {
+                zhengliTxt = FileHandler.LoadStringArray(txtPath);
+            }
+
+            if (zhengliExl == null && zhengliTxt == null) { Trace.TraceError("Text.Classify.TextPreProcess.GetTrainDataOfZhengli(): no zhengli found"); return null; }
+            else if (zhengliExl != null && zhengliTxt == null)
+            {
+                zhengliCol = zhengliExl;
+            }
+            else if (zhengliTxt != null && zhengliExl == null)
+            {
+                zhengliCol = zhengliTxt;
+            }
+            else
+            {
+                zhengliCol = zhengliExl.Concat(zhengliTxt).ToArray();
+            }
+
+            zhengli = NormalizeTrainData(zhengliCol);
             //exlH.Destroy();
-            return zhengliCol;
+            return zhengli;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Return all fulis in the form of a string array</returns>
         static string[] GetTrainDataOfFuli()
         {
-            string path1 = @"F:\事们\进行中\分析师报告\数据标注\FLI信息提取-样本.xlsx";
-            string path2 = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\random_select_fulis.txt";
-            ExcelHandler exlH = new ExcelHandler(path1);
-            string[] fuliCol_hand = exlH.GetColoum("sheet1", 4);
-            string[] fuliCol_auto = FileHandler.LoadStringArray(path2);
+            string xlsPath = ConfigurationManager.AppSettings["fuli_excel_path"];
+            string sheetName = ConfigurationManager.AppSettings["fuli_excel_sheet"];
+            int whichColumn = Int32.Parse(ConfigurationManager.AppSettings["fuli_excel_column"]);
 
+            string txtPath = ConfigurationManager.AppSettings["fuli_txt_path"];
+
+            string[] fuliExl = null, fuliTxt = null, fuliCol, fuli;
+
+            if (!xlsPath.Equals("not_valid"))
+            {
+                ExcelHandler exlH = new ExcelHandler(xlsPath);
+                fuliExl = exlH.GetColoum(sheetName, whichColumn);
+            }
+
+            if (!txtPath.Equals("not_valid"))
+            {
+                fuliTxt = FileHandler.LoadStringArray(txtPath);
+            }
+
+            if (fuliExl == null && fuliTxt == null) { Trace.TraceError("Text.Classify.TextPreProcess.GetTrainDataOfZhengli(): no zhengli found"); return null; }
+            else if (fuliExl != null && fuliTxt == null)
+            {
+                fuliCol = fuliExl;
+            }
+            else if (fuliTxt != null && fuliExl == null)
+            {
+                fuliCol = fuliTxt;
+            }
+            else
+            {
+                fuliCol = fuliExl.Concat(fuliTxt).ToArray();
+            }
+
+            fuli = NormalizeTrainData(fuliCol);
             //exlH.Destroy();
-            return fuliCol_hand.Concat(fuliCol_auto).ToArray();
+            return fuli;
         }
 
         /// <summary>
@@ -132,6 +161,50 @@ namespace Text.Classify
                 nSamples.Add(sample);
             }
             return nSamples.ToArray();
+        }
+
+        /// <summary>
+        /// Given a sentence, calculate its word count dictionary
+        /// </summary>
+        /// <param name="sentence"></param>
+        /// <returns></returns>
+        public static Dictionary<string, int> GetWordCountDic(string sentence)
+        {
+            WordSegHandler wsH = new WordSegHandler();
+            wsH.ExecutePartition(sentence);
+            if (!wsH.isValid) { Trace.TraceError("Text.Classify.TextPreProcess.GetWordCountDic() goes wrong"); return null; }
+            string[] words = wsH.GetNoStopWords();
+
+            Dictionary<string, int> wordCountDic = new Dictionary<string, int>();
+            foreach (var word in words)
+            {
+                //could add a word normalize function in this placce so that numbers could be regarded as one word
+                if (wordCountDic.ContainsKey(word)) { wordCountDic[word]++; }
+                else
+                {
+                    wordCountDic.Add(word, 1);
+                }
+            }
+            return wordCountDic;
+        }
+
+        public static Dictionary<string, int> GetWordCountDic(string sentence, ref WordSegHandler wsH)
+        {
+            if (!wsH.isValid) { Trace.TraceError("Text.Classify.TextPreProcess.GetWordCountDic() goes wrong"); return null; }
+            wsH.ExecutePartition(sentence);
+            string[] words = wsH.GetNoStopWords();
+
+            Dictionary<string, int> wordCountDic = new Dictionary<string, int>();
+            foreach (var word in words)
+            {
+                //could add a word normalize function in this placce so that numbers could be regarded as one word
+                if (wordCountDic.ContainsKey(word)) { wordCountDic[word]++; }
+                else
+                {
+                    wordCountDic.Add(word, 1);
+                }
+            }
+            return wordCountDic;
         }
     }
 }

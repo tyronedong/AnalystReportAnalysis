@@ -150,6 +150,10 @@ namespace Report.Securities
                         if (!mightBeContent.IsMatch(judgeStr)) { continue; }
                     }
                 }
+                if (isTableDigits(trimedPara))
+                {
+                    continue;
+                }
                 newParas.Add(para);
             }
             return newParas.ToArray();
