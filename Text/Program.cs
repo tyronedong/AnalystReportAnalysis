@@ -20,6 +20,7 @@ namespace Text
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
+            Bootstrap.ExecuteBootstrap(3000);
 
             //List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
             //Test2();
@@ -28,8 +29,8 @@ namespace Text
             //ExtractAndSaveChiFeatures();
             //GenerateLibSVMInputFile();
             //ExecuteTrain();
-            ExecutePredict();
-
+            //ExecutePredict();
+            Console.WriteLine("finished");
             Console.ReadLine();
         }
 
@@ -82,13 +83,15 @@ namespace Text
         static void ExecutePredict()
         {
             //string trainSetFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\trainset.txt";
-            string modelFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\model.txt";
+            string modelFile = ConfigurationManager.AppSettings["model_path"];
+            string featureFile = ConfigurationManager.AppSettings["chi_feature_path"];
             string text = "目前期间费用因上市不久故发生的管理较高，占收入比约在9% -10%10%左右，后续有望降低。";
             Model model = new Model();
             model.LoadModel(modelFile);
 
             //double[] vec = model.Predict(trainSetFile);
-            double v = model.Predict(Feature.GetFeatureVec(text));
+            Feature feat = new Feature(featureFile);
+            double v = model.Predict(feat.GetFeatureVec(text));
             //model.Predict()
             Console.WriteLine("Model predict finished");
         }
@@ -141,14 +144,14 @@ namespace Text
                 Console.WriteLine("GenerateLibSVMInputFile() execute failed");
         }
 
-        static void ExtractAndSaveChiFeatures()
-        {
-            string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
-            if (Feature.ChiFeatureExtract(fileName))
-                Console.WriteLine("ExtractAndSaveChiFeatures() execute success");
-            else
-                Console.WriteLine("ExtractAndSaveChiFeatures() execute failed");
-        }
+        //static void ExtractAndSaveChiFeatures()
+        //{
+        //    string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
+        //    if (Feature.ChiFeatureExtract(fileName))
+        //        Console.WriteLine("ExtractAndSaveChiFeatures() execute success");
+        //    else
+        //        Console.WriteLine("ExtractAndSaveChiFeatures() execute failed");
+        //}
 
         static void SelectAndSaveFulis()
         {

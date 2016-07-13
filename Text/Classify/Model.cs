@@ -7,6 +7,7 @@ using LibSVMsharp;
 using LibSVMsharp.Helpers;
 using LibSVMsharp.Extensions;
 using Text.Handler;
+using Text.Classify.Item;
 
 namespace Text.Classify
 {
@@ -14,11 +15,21 @@ namespace Text.Classify
     {
         public SVMModel model;
         private WordSegHandler wsH;
+        private List<FeatureItem> features;
 
         public Model()
         {
             this.model = null;
             this.wsH = new WordSegHandler();
+            this.features = null;
+        }
+
+        public Model(string featureFilePath)
+        {
+            this.model = null;
+            this.wsH = new WordSegHandler();
+            this.features = Feature.LoadChiFeature(featureFilePath);
+
         }
 
         //public Model(string fileName) { this.model = SVM.LoadModel(fileName); }
@@ -82,7 +93,7 @@ namespace Text.Classify
         /// <returns></returns>
         public double Predict(string sentence)
         {
-            double[] featVector = Feature.GetFeatureVec(sentence, ref wsH);
+            double[] featVector = Feature.GetFeatureVec(sentence, ref wsH, ref features);
             double predictResult = Predict(featVector);
             return predictResult;
         }

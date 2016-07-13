@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
+using System.Diagnostics;
 using Text.Classify.Item;
 
 namespace Text.Classify
@@ -13,21 +14,39 @@ namespace Text.Classify
         static string modelPath = ConfigurationManager.AppSettings["model_path"];
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="howManySampleEachClass"></param>
         /// <returns></returns>
-        static List<LabeledItem> GenerateNewChiFeatureSource(int howManySampleEachClass)
+        static bool GenerateNewChiFeatureSource(int howManySampleEachClass)
         {
+            TextPreProcess tPP = new TextPreProcess(true, false, true, false);
+
             //获取人工标注的excel中的前瞻性语句
-            string[] zhengli = TextPreProcess.GetTrainDataOfZhengli();
-            if (howManySampleEachClass < zhengli.Length) { return null; }
-
+            string[] zhengli = tPP.GetTrainDataOfZhengli();
+            if (howManySampleEachClass < zhengli.Length) 
+            { return false; }
             //通过训练好的分类器选择新的前瞻性语句
-            if (!RandomSelect.ExecuteSelectZhengli(howManySampleEachClass - zhengli.Length, modelPath)) return null;
-            
+            if (!RandomSelect.ExecuteSelectZhengli(howManySampleEachClass - zhengli.Length, modelPath))
+            { return false; }
 
-            return null;
+            //获取人工标注的excel中的非前瞻性语句
+            string[] fuli = tPP.GetTrainDataOfFuli();
+            if (!RandomSelect.ExecuteSelectFuli(howManySampleEachClass - fuli.Length))
+            { return false; }
+            
+            return true;
+        }
+
+        public static bool ExecuteBootstrap(int bootScale)
+        {
+            string featurePath = ConfigurationManager.AppSettings["chi_feature_path"];
+
+            bool b1 = false, b2 = false;
+            if(!GenerateNewChiFeatureSource(bootScale))
+            { Trace.TraceError("Bootstrap.ExecuteBootstrap(int bootScale): GenerateNewChiFeatureSource failed"); return false; }
+            b2 = Feature.ExtractAndStoreChiFeature(featurePath);
+
+            return b2;
         }
     }
 }
