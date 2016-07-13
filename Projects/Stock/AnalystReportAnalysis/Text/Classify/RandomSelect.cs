@@ -42,7 +42,8 @@ namespace Text.Classify
         }
 
         /// <summary>
-        /// 
+        /// 执行逻辑：每次从mongodb中随机选取一个record，提取该record下的所有由model预测的前瞻性语句加入zhengli数组
+        /// 重复直到zhengli达到了足够的数量
         /// </summary>
         /// <param name="selectCount"></param>
         /// <returns></returns>
@@ -87,6 +88,8 @@ namespace Text.Classify
 
         /// <summary>
         /// Select and store fuli strings to file
+        /// 执行逻辑：每次从mongodb中随机选取一个record，再从该record中依启发式规则随机选择一句话加入fuli数组
+        /// 重复直到fuli达到了足够的数量
         /// </summary>
         /// <returns></returns>
         public static bool ExecuteSelectFuli(int selectHowMany)

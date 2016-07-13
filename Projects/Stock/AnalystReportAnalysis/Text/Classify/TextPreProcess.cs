@@ -14,13 +14,21 @@ namespace Text.Classify
     {
         //static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
 
+        bool isZhengliXls = false, isZhengliTxt = false;
+        bool isFuliXls = false, isFuliTxt = false;
 
-
+        public TextPreProcess(bool isZhengliXls, bool isZhengliTxt, bool isFuliXls, bool isFuliTxt)
+        {
+            this.isZhengliXls = isZhengliXls;
+            this.isZhengliTxt = isZhengliTxt;
+            this.isFuliXls = isFuliXls;
+            this.isFuliTxt = isFuliTxt;
+        }
         /// <summary>
         /// Get labeled items from sorce training file in the form of class LabeledItem
         /// </summary>
         /// <returns></returns>
-        public static List<LabeledItem> GetLabeledItems()
+        public List<LabeledItem> GetLabeledItems()
         {
             List<LabeledItem> labeledItems = new List<LabeledItem>();
 
@@ -60,27 +68,34 @@ namespace Text.Classify
         /// <summary>
         /// </summary>
         /// <returns>Return all zhenglis in the form of a string array</returns>
-        public static string[] GetTrainDataOfZhengli()
+        public string[] GetTrainDataOfZhengli()
         {
-            string xlsPath = ConfigurationManager.AppSettings["zhengli_excel_path"];
-            string sheetName = ConfigurationManager.AppSettings["zhengli_excel_sheet"];
-            int whichColumn = Int32.Parse(ConfigurationManager.AppSettings["zhengli_excel_column"]);
-
-            string txtPath = ConfigurationManager.AppSettings["zhengli_txt_path"];
-
+            //excel param
+            string xlsPath;
+            string sheetName; 
+            int whichColumn;
+            //txt param
+            string txtPath;
+            //tiqu param
             string[] zhengliExl = null, zhengliTxt = null, zhengliCol, zhengli;
 
-            if (!xlsPath.Equals("not_valid"))
+            if (isZhengliXls)
             {
+                xlsPath = ConfigurationManager.AppSettings["zhengli_excel_path"];
+                sheetName = ConfigurationManager.AppSettings["zhengli_excel_sheet"];
+                whichColumn = Int32.Parse(ConfigurationManager.AppSettings["zhengli_excel_column"]);
+
                 ExcelHandler exlH = new ExcelHandler(xlsPath);
                 zhengliExl = exlH.GetColoum(sheetName, whichColumn);
             }
-
-            if (!txtPath.Equals("not_valid"))
+            if (isZhengliTxt)
             {
+                txtPath = ConfigurationManager.AppSettings["zhengli_txt_path"];
+
                 zhengliTxt = FileHandler.LoadStringArray(txtPath);
             }
 
+            //merge excel and txt into one array
             if (zhengliExl == null && zhengliTxt == null) { Trace.TraceError("Text.Classify.TextPreProcess.GetTrainDataOfZhengli(): no zhengli found"); return null; }
             else if (zhengliExl != null && zhengliTxt == null)
             {
@@ -104,27 +119,34 @@ namespace Text.Classify
         /// 
         /// </summary>
         /// <returns>Return all fulis in the form of a string array</returns>
-        static string[] GetTrainDataOfFuli()
+        public string[] GetTrainDataOfFuli()
         {
-            string xlsPath = ConfigurationManager.AppSettings["fuli_excel_path"];
-            string sheetName = ConfigurationManager.AppSettings["fuli_excel_sheet"];
-            int whichColumn = Int32.Parse(ConfigurationManager.AppSettings["fuli_excel_column"]);
-
-            string txtPath = ConfigurationManager.AppSettings["fuli_txt_path"];
-
+            //excel param
+            string xlsPath;
+            string sheetName;
+            int whichColumn;
+            //txt param
+            string txtPath;
+            //tiqu param
             string[] fuliExl = null, fuliTxt = null, fuliCol, fuli;
 
-            if (!xlsPath.Equals("not_valid"))
+            if (isFuliXls)
             {
+                xlsPath = ConfigurationManager.AppSettings["fuli_excel_path"];
+                sheetName = ConfigurationManager.AppSettings["fuli_excel_sheet"];
+                whichColumn = Int32.Parse(ConfigurationManager.AppSettings["fuli_excel_column"]);
+
                 ExcelHandler exlH = new ExcelHandler(xlsPath);
                 fuliExl = exlH.GetColoum(sheetName, whichColumn);
             }
-
-            if (!txtPath.Equals("not_valid"))
+            if (isFuliTxt)
             {
+                txtPath = ConfigurationManager.AppSettings["fuli_txt_path"];
+
                 fuliTxt = FileHandler.LoadStringArray(txtPath);
             }
 
+            //merge excel and txt into one array
             if (fuliExl == null && fuliTxt == null) { Trace.TraceError("Text.Classify.TextPreProcess.GetTrainDataOfZhengli(): no zhengli found"); return null; }
             else if (fuliExl != null && fuliTxt == null)
             {
@@ -150,7 +172,7 @@ namespace Text.Classify
         /// </summary>
         /// <param name="samples"></param>
         /// <returns></returns>
-        static string[] NormalizeTrainData(string[] samples)
+        private string[] NormalizeTrainData(string[] samples)
         {
             List<string> nSamples = new List<string>();
             foreach (var sample in samples)
@@ -163,31 +185,39 @@ namespace Text.Classify
             return nSamples.ToArray();
         }
 
+        ///// <summary>
+        ///// Given a sentence, calculate its word count dictionary
+        ///// </summary>
+        ///// <param name="sentence"></param>
+        ///// <returns></returns>
+        //public static Dictionary<string, int> GetWordCountDic(string sentence)
+        //{
+        //    WordSegHandler wsH = new WordSegHandler();
+        //    wsH.ExecutePartition(sentence);
+        //    if (!wsH.isValid) { Trace.TraceError("Text.Classify.TextPreProcess.GetWordCountDic() goes wrong"); return null; }
+        //    string[] words = wsH.GetNoStopWords();
+
+        //    Dictionary<string, int> wordCountDic = new Dictionary<string, int>();
+        //    foreach (var word in words)
+        //    {
+        //        //could add a word normalize function in this placce so that numbers could be regarded as one word
+        //        if (wordCountDic.ContainsKey(word)) { wordCountDic[word]++; }
+        //        else
+        //        {
+        //            wordCountDic.Add(word, 1);
+        //        }
+        //    }
+        //    return wordCountDic;
+        //}
+
         /// <summary>
-        /// Given a sentence, calculate its word count dictionary
+        /// Given a sentence, calculate its word count dictionary. Return null if wsH is unvalid
         /// </summary>
         /// <param name="sentence"></param>
-        /// <returns></returns>
-        public static Dictionary<string, int> GetWordCountDic(string sentence)
-        {
-            WordSegHandler wsH = new WordSegHandler();
-            wsH.ExecutePartition(sentence);
-            if (!wsH.isValid) { Trace.TraceError("Text.Classify.TextPreProcess.GetWordCountDic() goes wrong"); return null; }
-            string[] words = wsH.GetNoStopWords();
-
-            Dictionary<string, int> wordCountDic = new Dictionary<string, int>();
-            foreach (var word in words)
-            {
-                //could add a word normalize function in this placce so that numbers could be regarded as one word
-                if (wordCountDic.ContainsKey(word)) { wordCountDic[word]++; }
-                else
-                {
-                    wordCountDic.Add(word, 1);
-                }
-            }
-            return wordCountDic;
-        }
-
+        /// <param name="wsH"></param>
+        /// <returns>
+        /// 
+        /// </returns>
         public static Dictionary<string, int> GetWordCountDic(string sentence, ref WordSegHandler wsH)
         {
             if (!wsH.isValid) { Trace.TraceError("Text.Classify.TextPreProcess.GetWordCountDic() goes wrong"); return null; }

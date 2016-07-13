@@ -12,13 +12,63 @@ namespace Text.Classify
 {
     class Feature
     {
+        private WordSegHandler wsH = null;
+        private List<FeatureItem> featureItems = null;
+
+        public Feature() { }
+        
+        public Feature(string featureFileName)
+        {
+            //string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
+            wsH = new WordSegHandler();
+            featureItems = LoadChiFeature(featureFileName);
+        }
+
+        /// <summary>
+        /// Given a sentence, return its feature vector. Null if is error.
+        /// </summary>
+        /// <param name="sentence"></param>
+        /// <returns></returns>
+        public double[] GetFeatureVec(string sentence)
+        {
+            if (this.wsH == null || !this.wsH.isValid) 
+            { Trace.TraceError("Feature.GetFeatureVec(string sentence): WordSegHandler init failed"); return null; }
+
+            if(this.featureItems == null)
+            { Trace.TraceError("Feature.GetFeatureVec(string sentence): FeatureItem load failed"); return null; }
+
+            List<double> featVec = new List<double>();
+
+            Dictionary<string, int> wordCountDic = TextPreProcess.GetWordCountDic(sentence, ref this.wsH);
+
+            foreach (var fItem in this.featureItems)
+            {
+                if (wordCountDic.ContainsKey(fItem.featureWord))
+                {
+                    double tfidf = wordCountDic[fItem.featureWord] * fItem.globalWeight;
+                    featVec.Add(tfidf);
+                }
+                else { featVec.Add(0); }
+            }
+
+            return featVec.ToArray();
+        }
+
+        /// <summary>
+        /// 返回和feature数组同样size的数组，对应位置表示该sentence在该feature下的特征值。当该特征不存在时为0
+        /// </summary>
+        /// <param name="sentence"></param>
+        /// <param name="wsH"></param>
+        /// <param name="featureItems"></param>
+        /// <returns></returns>
         public static double[] GetFeatureVec(string sentence, ref WordSegHandler wsH, ref List<FeatureItem> featureItems)
         {
             List<double> featVec = new List<double>();
-            //string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
 
-            //List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
             Dictionary<string, int> wordCountDic = TextPreProcess.GetWordCountDic(sentence, ref wsH);
+
+            if (wordCountDic == null)
+            { Trace.TraceError("Feature.GetFeatureVec(string sentence, ref WordSegHandler wsH, ref List<FeatureItem> featureItems): failed get word count dic"); return null; }
 
             foreach (var fItem in featureItems)
             {
@@ -33,10 +83,7 @@ namespace Text.Classify
             return featVec.ToArray();
         }
 
-        public static List<FeatureItem> LoadChiFeature(string fileName)
-        {
-            return FileHandler.LoadFeatures(fileName);
-        }
+        
 
         /// <summary>
         /// 
@@ -56,22 +103,22 @@ namespace Text.Classify
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="featRatio">Only featRatio percent of words will remain</param>
         /// <param name="minChiValue"></param>
         /// <param name="globalWeightType"></param>
         /// <returns></returns>
-        public static List<FeatureItem> ChiFeatureExtract(double featRatio = 0.4, double minChiValue = 5, string globalWeightType = "idf")
+        private static List<FeatureItem> ChiFeatureExtract(double featRatio = 0.4, double minChiValue = 5, string globalWeightType = "idf")
         {
             //Dictionary<string, double> wordChiValueDic = GetWordChiValueDic("zhengli");
-            Dictionary<string, WordItem> wordItemDic = GetWordItemDic();
-            Dictionary<string, double> wordChiValueDic = GetWordChiValueDic(ref wordItemDic);
-            var dicSort = from objDic in wordChiValueDic orderby objDic.Value descending select objDic;
+            Dictionary<string, WordItem> wordItemDic = GetWordItemDic();//获取辅助变量
+            Dictionary<string, double> wordChiValueDic = GetWordChiValueDic(ref wordItemDic);//计算卡方值
+            var dicSort = from objDic in wordChiValueDic orderby objDic.Value descending select objDic;//按卡方值排序
 
             List<FeatureItem> featureItems = new List<FeatureItem>();
             int countOfFeat = (int)(featRatio * wordChiValueDic.Count);
             int N = LabeledItem.numberOfZhengli + LabeledItem.numberOfFuli;
+            //选择卡方值较大的前k个值
             for (int i = 0; i < countOfFeat; i++)
             {
                 if (dicSort.ElementAt(i).Value < minChiValue) { break; }
@@ -90,13 +137,11 @@ namespace Text.Classify
             return featureItems;
         }
 
-
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="wordItemDic"></param>
         /// <returns></returns>
-        static Dictionary<string, double> GetWordChiValueDic(ref Dictionary<string, WordItem> wordItemDic)
+        private static Dictionary<string, double> GetWordChiValueDic(ref Dictionary<string, WordItem> wordItemDic)
         {
             Dictionary<string, double> wordChiValueDic = new Dictionary<string, double>();
 
@@ -124,6 +169,34 @@ namespace Text.Classify
             }
 
             return wordChiValueDic;
+        }
+
+        /// <summary>
+        /// get assist variable in the process of calculating chi values
+        /// </summary>
+        /// <returns>return the dicitonary which contains all the words exist in the training data.</returns>
+        private static Dictionary<string, WordItem> GetWordItemDic()
+        {
+            Dictionary<string, WordItem> wordItemDic = new Dictionary<string, WordItem>();
+            TextPreProcess tPP = new TextPreProcess(true, true, true, true);//默认加入所有的数据源
+            List<LabeledItem> labeledItems = tPP.GetLabeledItems();
+            //List<LabeledItem> labeledItems = TextPreProcess.GetLabeledItems();
+
+            foreach (var lItem in labeledItems)
+            {
+                foreach (var wordKvp in lItem.wordCountDic)
+                {
+                    if (wordItemDic.ContainsKey(wordKvp.Key))
+                    {
+                        wordItemDic[wordKvp.Key].totalCount++;
+                        if (lItem.label == 1) { wordItemDic[wordKvp.Key].zhengliCount++; }
+                        else if (lItem.label == -1) { wordItemDic[wordKvp.Key].fuliCount++; }
+                    }
+                    else { wordItemDic.Add(wordKvp.Key, new WordItem(wordKvp.Key, (lItem.label == 1))); }
+                }
+            }
+
+            return wordItemDic;
         }
 
         ///// <summary>
@@ -169,30 +242,9 @@ namespace Text.Classify
         //    return wordChiValueDic;
         //}
 
-        /// <summary>
-        /// Each item in the dictionary 
-        /// </summary>
-        /// <returns>return the dicitonary which contains all the words exist in the training data.</returns>
-        static Dictionary<string, WordItem> GetWordItemDic()
+        public static List<FeatureItem> LoadChiFeature(string fileName)
         {
-            Dictionary<string, WordItem> wordItemDic = new Dictionary<string, WordItem>();
-            List<LabeledItem> labeledItems = TextPreProcess.GetLabeledItems();
-
-            foreach (var lItem in labeledItems)
-            {
-                foreach (var wordKvp in lItem.wordCountDic)
-                {
-                    if (wordItemDic.ContainsKey(wordKvp.Key))
-                    {
-                        wordItemDic[wordKvp.Key].totalCount++;
-                        if (lItem.label == 1) { wordItemDic[wordKvp.Key].zhengliCount++; }
-                        else if (lItem.label == -1) { wordItemDic[wordKvp.Key].fuliCount++; }
-                    }
-                    else { wordItemDic.Add(wordKvp.Key, new WordItem(wordKvp.Key, (lItem.label == 1))); }
-                }
-            }
-
-            return wordItemDic;
+            return FileHandler.LoadFeatures(fileName);
         }
     }
 }
