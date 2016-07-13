@@ -26,6 +26,11 @@ namespace Text.Handler
             return true;
         }
 
+        /// <summary>
+        /// return null if error
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public static string[] LoadStringArray(string fileName)
         {
             try { return File.ReadAllLines(fileName); ;}
