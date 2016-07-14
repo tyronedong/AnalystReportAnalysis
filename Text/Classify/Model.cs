@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 using LibSVMsharp;
 using LibSVMsharp.Helpers;
 using LibSVMsharp.Extensions;
@@ -37,6 +38,12 @@ namespace Text.Classify
         public void LoadModel(string fileName)
         {
             this.model = SVM.LoadModel(fileName);
+        }
+
+        public void LoadModel(string modelFile, string featureFile)
+        {
+            this.model = SVM.LoadModel(modelFile);
+            this.features = Feature.LoadChiFeature(featureFile);
         }
 
         public void SaveModel(string fileName)
@@ -106,8 +113,9 @@ namespace Text.Classify
         public string[] GetPositiveCases(string content)
         {
             List<string> positiveCases = new List<string>();
-            content = content.Replace("\n", "。");//ignore all paragraph information
-            string[] sentences = content.Split('。');
+            //content = content.Replace("\n", "。");//ignore all paragraph information
+            //string[] sentences = content.Split('。');
+            string[] sentences = TextPreProcess.SeparateParagraph(content);
 
             foreach (var sentence in sentences)
             {
@@ -135,6 +143,16 @@ namespace Text.Classify
                 else { vector.Add(new SVMNode(idx, featValue)); }
             }
             return vector.ToArray();
+        }
+
+        public static bool GenerateTrainSet(string rootPath)
+        {
+
+            TextPreProcess tPP = new TextPreProcess(true, false, true, false);
+            string[] zhenglis = tPP.GetTrainDataOfZhengli("");
+            string[] fulis = tPP.GetTrainDataOfFuli("");
+
+            return RandomSelect.ExecuteSelectFuli(rootPath, zhenglis.Length - fulis.Length);
         }
     }
 }

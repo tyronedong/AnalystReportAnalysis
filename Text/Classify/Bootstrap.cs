@@ -12,7 +12,8 @@ namespace Text.Classify
     class Bootstrap
     {
         static string modelPath = ConfigurationManager.AppSettings["model_path"];
-
+        static string featurePath = ConfigurationManager.AppSettings["chi_feature_path"];
+        static string resultRootDic = ConfigurationManager.AppSettings["result_file_root_dictionary"];
         /// <summary>
         /// </summary>
         /// <param name="howManySampleEachClass"></param>
@@ -22,16 +23,16 @@ namespace Text.Classify
             TextPreProcess tPP = new TextPreProcess(true, false, true, false);
 
             //获取人工标注的excel中的前瞻性语句
-            string[] zhengli = tPP.GetTrainDataOfZhengli();
+            string[] zhengli = tPP.GetTrainDataOfZhengli("");
             if (howManySampleEachClass < zhengli.Length) 
             { return false; }
             //通过训练好的分类器选择新的前瞻性语句
-            if (!RandomSelect.ExecuteSelectZhengli(howManySampleEachClass - zhengli.Length, modelPath))
+            if (!RandomSelect.ExecuteSelectZhengli(resultRootDic, howManySampleEachClass - zhengli.Length, modelPath, featurePath))
             { return false; }
 
             //获取人工标注的excel中的非前瞻性语句
-            string[] fuli = tPP.GetTrainDataOfFuli();
-            if (!RandomSelect.ExecuteSelectFuli(howManySampleEachClass - fuli.Length))
+            string[] fuli = tPP.GetTrainDataOfFuli("");
+            if (!RandomSelect.ExecuteSelectFuli(resultRootDic, howManySampleEachClass - fuli.Length))
             { return false; }
             
             return true;

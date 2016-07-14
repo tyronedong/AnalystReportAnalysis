@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,8 @@ namespace Text.Classify
     class TextPreProcess
     {
         //static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
+        //static string model_relate_root_dictionary = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
+        //static string 
 
         bool isZhengliXls = false, isZhengliTxt = false;
         bool isFuliXls = false, isFuliTxt = false;
@@ -28,13 +31,13 @@ namespace Text.Classify
         /// Get labeled items from sorce training file in the form of class LabeledItem
         /// </summary>
         /// <returns></returns>
-        public List<LabeledItem> GetLabeledItems()
+        public List<LabeledItem> GetLabeledItems(string rootTxtPath)
         {
             List<LabeledItem> labeledItems = new List<LabeledItem>();
 
             //get all rough zhengli and fuli
-            string[] zhengli = GetTrainDataOfZhengli();
-            string[] fuli = GetTrainDataOfFuli();
+            string[] zhengli = GetTrainDataOfZhengli(rootTxtPath);
+            string[] fuli = GetTrainDataOfFuli(rootTxtPath);
 
             ////normalize all zhengli and fuli
             //string[] zhengli = NormalizeTrainData(zhengliCol);
@@ -66,9 +69,10 @@ namespace Text.Classify
         }
 
         /// <summary>
+        /// Return all zhenglis in the form of a string array
         /// </summary>
-        /// <returns>Return all zhenglis in the form of a string array</returns>
-        public string[] GetTrainDataOfZhengli()
+        /// <returns></returns>
+        public string[] GetTrainDataOfZhengli(string rootTxtPath)
         {
             //excel param
             string xlsPath;
@@ -90,7 +94,7 @@ namespace Text.Classify
             }
             if (isZhengliTxt)
             {
-                txtPath = ConfigurationManager.AppSettings["zhengli_txt_path"];
+                txtPath = Path.Combine(rootTxtPath, ConfigurationManager.AppSettings["zhengli_txt_file"]);
 
                 zhengliTxt = FileHandler.LoadStringArray(txtPath);
             }
@@ -116,10 +120,10 @@ namespace Text.Classify
         }
 
         /// <summary>
-        /// 
+        /// Return all fulis in the form of a string array
         /// </summary>
-        /// <returns>Return all fulis in the form of a string array</returns>
-        public string[] GetTrainDataOfFuli()
+        /// <returns></returns>
+        public string[] GetTrainDataOfFuli(string rootTxtPath)
         {
             //excel param
             string xlsPath;
@@ -141,7 +145,7 @@ namespace Text.Classify
             }
             if (isFuliTxt)
             {
-                txtPath = ConfigurationManager.AppSettings["fuli_txt_path"];
+                txtPath = Path.Combine(rootTxtPath, ConfigurationManager.AppSettings["fuli_txt_file"]);
 
                 fuliTxt = FileHandler.LoadStringArray(txtPath);
             }
@@ -235,6 +239,15 @@ namespace Text.Classify
                 }
             }
             return wordCountDic;
+        }
+
+
+        public static string[] SeparateParagraph(string paragraph)
+        {
+            char[] separator = { '。', '；', '？', '！' };
+            paragraph = paragraph.Replace("\n", "。");
+
+            return paragraph.Split(separator);
         }
     }
 }

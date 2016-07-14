@@ -83,7 +83,39 @@ namespace Text.Classify
             return featVec.ToArray();
         }
 
-        
+        public static bool ModifyChiFeature(string fileName)
+        {
+            string userFeaturePath = ConfigurationManager.AppSettings["user_feature_path"];
+            //string featurePath = ConfigurationManager.AppSettings["chi_feature_path"];
+
+            List<FeatureItem> newFeatures = new List<FeatureItem>();
+            List<FeatureItem> oldFeatures = FileHandler.LoadFeatures(fileName);
+
+            int id = 1;
+            string[] userFeature = FileHandler.LoadStringArray(userFeaturePath);
+            foreach (var userf in userFeature)
+            {
+                bool isContained = false;
+                foreach (var f in oldFeatures)
+                {
+                    if (f.featureWord.Equals(userf))
+                    {
+                        isContained = true;
+                        break;
+                    }
+                }
+
+                if(!isContained)
+                    newFeatures.Add(new FeatureItem(id++, userf, 1.0));
+            }
+
+            foreach (var of in oldFeatures)
+            {
+                newFeatures.Add(new FeatureItem(id++, of.featureWord, of.globalWeight));
+            }
+
+            return FileHandler.SaveFeatures(fileName, newFeatures);
+        }
 
         /// <summary>
         /// 
@@ -93,7 +125,7 @@ namespace Text.Classify
         /// <param name="minChiValue"></param>
         /// <param name="globalWeightType"></param>
         /// <returns></returns>
-        public static bool ExtractAndStoreChiFeature(string fileName, double featRatio = 0.4, double minChiValue = 5, string globalWeightType = "idf")
+        public static bool ExtractAndStoreChiFeature(string fileName, double featRatio = 0.20, double minChiValue = 10, string globalWeightType = "idf")
         {
             List<FeatureItem> featureItems = ChiFeatureExtract(featRatio, minChiValue, globalWeightType);
 
@@ -108,7 +140,7 @@ namespace Text.Classify
         /// <param name="minChiValue"></param>
         /// <param name="globalWeightType"></param>
         /// <returns></returns>
-        private static List<FeatureItem> ChiFeatureExtract(double featRatio = 0.4, double minChiValue = 5, string globalWeightType = "idf")
+        private static List<FeatureItem> ChiFeatureExtract(double featRatio = 0.20, double minChiValue = 5, string globalWeightType = "idf")
         {
             //Dictionary<string, double> wordChiValueDic = GetWordChiValueDic("zhengli");
             Dictionary<string, WordItem> wordItemDic = GetWordItemDic();//获取辅助变量
@@ -177,9 +209,11 @@ namespace Text.Classify
         /// <returns>return the dicitonary which contains all the words exist in the training data.</returns>
         private static Dictionary<string, WordItem> GetWordItemDic()
         {
+            string rootForChi = ConfigurationManager.AppSettings["result_file_root_dictionary"];
+
             Dictionary<string, WordItem> wordItemDic = new Dictionary<string, WordItem>();
             TextPreProcess tPP = new TextPreProcess(true, true, true, true);//默认加入所有的数据源
-            List<LabeledItem> labeledItems = tPP.GetLabeledItems();
+            List<LabeledItem> labeledItems = tPP.GetLabeledItems(rootForChi);
             //List<LabeledItem> labeledItems = TextPreProcess.GetLabeledItems();
 
             foreach (var lItem in labeledItems)

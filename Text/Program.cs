@@ -14,22 +14,29 @@ namespace Text
     class Program
     {
         static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
-
+        static string featurePath = ConfigurationManager.AppSettings["chi_feature_path"];
+        
         static void Main(string[] args)
         {
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            Bootstrap.ExecuteBootstrap(3000);
-
+            //Bootstrap.ExecuteBootstrap(3000);
+            //Feature.ExtractAndStoreChiFeature(featurePath);
             //List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
             //Test2();
-
+            //Feature.ModifyChiFeature(featurePath);
             //SelectAndSaveFulis();
             //ExtractAndSaveChiFeatures();
             //GenerateLibSVMInputFile();
             //ExecuteTrain();
             //ExecutePredict();
+            //string rootDicForModelRelate = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
+            //Model.GenerateTrainSet(rootDicForModelRelate);
+
+            //GenerateLibSVMInputFile();
+            ExecuteTrain();
+
             Console.WriteLine("finished");
             Console.ReadLine();
         }
@@ -98,8 +105,9 @@ namespace Text
 
         static void ExecuteTrain()
         {
-            string trainSetFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\trainset.txt";
-            string modelFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\model.txt";
+            string trainSetFile = ConfigurationManager.AppSettings["train_set_path"];
+            string modelFile = ConfigurationManager.AppSettings["model_path"];
+
             Model model = new Model();
             model.Train(trainSetFile);
 
@@ -109,13 +117,15 @@ namespace Text
 
         static void GenerateLibSVMInputFile()
         {
-            string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
-            string trainSetFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\trainset.txt";
+            string featureFile = ConfigurationManager.AppSettings["chi_feature_path"];
+            string trainSetFile = ConfigurationManager.AppSettings["train_set_path"];
+            string rootDicForModelRelate = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
 
             List<string> trainSet = new List<string>();
 
-            List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
-            List<LabeledItem> lItems = FileHandler.LoadLabeledItems(preprocess_result_file);
+            List<FeatureItem> fItems = Feature.LoadChiFeature(featureFile);
+            TextPreProcess tPP = new TextPreProcess(true, false, true, true);
+            List<LabeledItem> lItems = tPP.GetLabeledItems(rootDicForModelRelate);//FileHandler.LoadLabeledItems(preprocess_result_file);
 
             foreach (var lItem in lItems)
             {
@@ -153,12 +163,12 @@ namespace Text
         //        Console.WriteLine("ExtractAndSaveChiFeatures() execute failed");
         //}
 
-        static void SelectAndSaveFulis()
-        {
-            if (RandomSelect.ExecuteSelectFuli(300))
-                Console.WriteLine("SelectAndSaveFulis() execute success");
-            else
-                Console.WriteLine("SelectAndSaveFulis() execute failed");
-        }
+        //static void SelectAndSaveFulis()
+        //{
+        //    if (RandomSelect.ExecuteSelectFuli(300))
+        //        Console.WriteLine("SelectAndSaveFulis() execute success");
+        //    else
+        //        Console.WriteLine("SelectAndSaveFulis() execute failed");
+        //}
     }
 }

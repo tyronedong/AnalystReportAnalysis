@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Configuration;
 using Report;
 using Text.Classify;
+using Text.Sentiment;
 using Report.Handler;
 using Report.Securities;
 using Report.Outsider;
@@ -21,10 +22,17 @@ namespace Demonstrate
     {
         private string mode = ConfigurationManager.AppSettings["mode"];
 
+        string modelFile = ConfigurationManager.AppSettings["model_path"];
+        string featureFile = ConfigurationManager.AppSettings["chi_feature_path"];
+        string posDicPath = ConfigurationManager.AppSettings["pos_user_dic"];
+        string negDicPath = ConfigurationManager.AppSettings["neg_user_dic"];
+        string notDicPath = ConfigurationManager.AppSettings["not_user_dic"];
+
         private SqlServerHandler sqlSH;
         private WordSegHandler wsH;
         private Model model;
         private List<string> selectedText;
+        private SentiAnalysis sentiA;
 
         public DemoForm()
         {
@@ -33,8 +41,10 @@ namespace Demonstrate
             sqlSH.Init();
             wsH = new WordSegHandler();
             model = new Model();
-            model.LoadModel(@"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\model.txt");
+            model.LoadModel(modelFile, featureFile);
             selectedText = new List<string>();
+            sentiA = new SentiAnalysis();
+            sentiA.LoadSentiDic(posDicPath, negDicPath, notDicPath);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -489,7 +499,12 @@ namespace Demonstrate
                     foreach (var posCase in positiveCases)
                     {
                         i++;
-                        sb.AppendLine(i + "：" + posCase);
+                        double v = sentiA.CalSentiValue(posCase);
+                        string zfz = "";
+                        if (v > 0) { zfz = "正面"; }
+                        else if (v == 0) { zfz = "中性"; }
+                        else { zfz = "负面"; }
+                        sb.AppendLine(i + "：" + posCase + " " + zfz);
                         selectedText.Add(posCase);
                     }
                 }
