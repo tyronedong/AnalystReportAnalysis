@@ -16,7 +16,7 @@ namespace Text.Classify
     {
         static Random ran = new Random();
         //static int selectNumber = 300;
-        static string resultRootDic = ConfigurationManager.AppSettings["result_file_root_dictionary"];
+        //static string resultRootDic = ConfigurationManager.AppSettings["result_file_root_dictionary"];
 
         /// <summary>
         /// Select and store zhengli into file
@@ -24,13 +24,13 @@ namespace Text.Classify
         /// <param name="selectHowMany"></param>
         /// <param name="modelPath"></param>
         /// <returns></returns>
-        public static bool ExecuteSelectZhengli(int selectHowMany, string modelPath)
+        public static bool ExecuteSelectZhengli(string resultRootDic, int selectHowMany, string modelPath, string featurePath)
         {
             //string path = Path.Combine(resultRootDic, "random_select_" + selectHowMany + "_zhengli");
-            string path = Path.Combine(resultRootDic, "random_select_zhengli");
+            string path = Path.Combine(resultRootDic, "random_select_zhengli.txt");
 
             Model model = new Model();
-            model.LoadModel(modelPath);
+            model.LoadModel(modelPath, featurePath);
             
             string[] selectedStrs = SelectStrsZhengli(selectHowMany, ref model);
             if (selectedStrs == null) { Trace.TraceError("Text.Classify.RandomSelect.ExecuteSelectZhengli() goes wrong"); return false; }
@@ -74,8 +74,9 @@ namespace Text.Classify
         static string[] SelectAllInContentZhengli(string content, ref Model model)
         {
             List<string> zhenglis = new List<string>();
-            content = content.Replace("\n", "。");
-            string[] sentences = content.Split('。');
+            //content = content.Replace("\n", "。");
+            //string[] sentences = content.Split('。');
+            string[] sentences = TextPreProcess.SeparateParagraph(content);
 
             foreach (var sentence in sentences)
             {
@@ -92,10 +93,10 @@ namespace Text.Classify
         /// 重复直到fuli达到了足够的数量
         /// </summary>
         /// <returns></returns>
-        public static bool ExecuteSelectFuli(int selectHowMany)
+        public static bool ExecuteSelectFuli(string resultRootDic, int selectHowMany)
         {
             //string path = Path.Combine(resultRootDic, "random_select_" + selectHowMany + "_fuli");
-            string path = Path.Combine(resultRootDic, "random_select_fuli");
+            string path = Path.Combine(resultRootDic, "random_select_fuli.txt");
 
             string[] selectedStrs = SelectStrsFuli(selectHowMany);
             if (selectedStrs == null) { Trace.TraceError("Text.Classify.RandomSelect.ExecuteSelectFuli() goes wrong"); return false; }
@@ -143,8 +144,9 @@ namespace Text.Classify
         /// <returns></returns>
         static string SelectOneFromContentFuli(string content)
         {
-            content = content.Replace("\n", "。");
-            string[] sentences = content.Split('。');
+            //content = content.Replace("\n", "。");
+            //string[] sentences = content.Split('。');
+            string[] sentences = TextPreProcess.SeparateParagraph(content);
 
             int counter = 0; string sent = "";
             while (true)
@@ -165,7 +167,8 @@ namespace Text.Classify
                 if (sent.Contains("将来")) { continue; }
                 if (sent.Contains("未来")) { continue; }
                 if (sent.Contains("有望")) { continue; }
-                
+                if (sent.Contains("可能")) { continue; }
+
                 break;
             }
             return sent;

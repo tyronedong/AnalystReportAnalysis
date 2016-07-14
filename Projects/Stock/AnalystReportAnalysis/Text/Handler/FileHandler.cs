@@ -51,6 +51,11 @@ namespace Text.Handler
             return true;
         }
 
+        /// <summary>
+        /// Load features from chi_feature.txt file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public static List<FeatureItem> LoadFeatures(string fileName)
         {
             List<FeatureItem> featureItems = new List<FeatureItem>();

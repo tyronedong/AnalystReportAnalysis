@@ -8,7 +8,7 @@ using Text.Handler;
 
 namespace Text.Sentiment
 {
-    class SentiAnalysis
+    public class SentiAnalysis
     {
         string[] posWords = null;
         string[] negWords = null;
