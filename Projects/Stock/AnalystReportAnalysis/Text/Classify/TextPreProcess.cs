@@ -13,15 +13,22 @@ namespace Text.Classify
 {
     class TextPreProcess
     {
-        //static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
-        //static string model_relate_root_dictionary = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
-        //static string 
+        string rootSourcePath;
 
         bool isZhengliXls = false, isZhengliTxt = false;
         bool isFuliXls = false, isFuliTxt = false;
 
-        public TextPreProcess(bool isZhengliXls, bool isZhengliTxt, bool isFuliXls, bool isFuliTxt)
+        /// <summary>
+        /// 初始化的时候指定源文件的存放目录，同时通过四个布尔值指定用到目录下的那些文件
+        /// </summary>
+        /// <param name="rootSourcePath"></param>
+        /// <param name="isZhengliXls"></param>
+        /// <param name="isZhengliTxt"></param>
+        /// <param name="isFuliXls"></param>
+        /// <param name="isFuliTxt"></param>
+        public TextPreProcess(string rootSourcePath, bool isZhengliXls, bool isZhengliTxt, bool isFuliXls, bool isFuliTxt)
         {
+            this.rootSourcePath = rootSourcePath;
             this.isZhengliXls = isZhengliXls;
             this.isZhengliTxt = isZhengliTxt;
             this.isFuliXls = isFuliXls;
@@ -31,13 +38,13 @@ namespace Text.Classify
         /// Get labeled items from sorce training file in the form of class LabeledItem
         /// </summary>
         /// <returns></returns>
-        public List<LabeledItem> GetLabeledItems(string rootTxtPath)
+        public List<LabeledItem> GetLabeledItems()
         {
             List<LabeledItem> labeledItems = new List<LabeledItem>();
 
             //get all rough zhengli and fuli
-            string[] zhengli = GetTrainDataOfZhengli(rootTxtPath);
-            string[] fuli = GetTrainDataOfFuli(rootTxtPath);
+            string[] zhengli = GetTrainDataOfZhengli();
+            string[] fuli = GetTrainDataOfFuli();
 
             ////normalize all zhengli and fuli
             //string[] zhengli = NormalizeTrainData(zhengliCol);
@@ -72,7 +79,7 @@ namespace Text.Classify
         /// Return all zhenglis in the form of a string array
         /// </summary>
         /// <returns></returns>
-        public string[] GetTrainDataOfZhengli(string rootTxtPath)
+        public string[] GetTrainDataOfZhengli()
         {
             //excel param
             string xlsPath;
@@ -85,7 +92,7 @@ namespace Text.Classify
 
             if (isZhengliXls)
             {
-                xlsPath = ConfigurationManager.AppSettings["zhengli_excel_path"];
+                xlsPath = Path.Combine(rootSourcePath, ConfigurationManager.AppSettings["zhengli_excel_filename"]);
                 sheetName = ConfigurationManager.AppSettings["zhengli_excel_sheet"];
                 whichColumn = Int32.Parse(ConfigurationManager.AppSettings["zhengli_excel_column"]);
 
@@ -94,7 +101,7 @@ namespace Text.Classify
             }
             if (isZhengliTxt)
             {
-                txtPath = Path.Combine(rootTxtPath, ConfigurationManager.AppSettings["zhengli_txt_file"]);
+                txtPath = Path.Combine(rootSourcePath, ConfigurationManager.AppSettings["zhengli_txt_filename"]);
 
                 zhengliTxt = FileHandler.LoadStringArray(txtPath);
             }
@@ -123,7 +130,7 @@ namespace Text.Classify
         /// Return all fulis in the form of a string array
         /// </summary>
         /// <returns></returns>
-        public string[] GetTrainDataOfFuli(string rootTxtPath)
+        public string[] GetTrainDataOfFuli()
         {
             //excel param
             string xlsPath;
@@ -136,7 +143,7 @@ namespace Text.Classify
 
             if (isFuliXls)
             {
-                xlsPath = ConfigurationManager.AppSettings["fuli_excel_path"];
+                xlsPath = Path.Combine(rootSourcePath, ConfigurationManager.AppSettings["fuli_excel_filename"]);
                 sheetName = ConfigurationManager.AppSettings["fuli_excel_sheet"];
                 whichColumn = Int32.Parse(ConfigurationManager.AppSettings["fuli_excel_column"]);
 
@@ -145,7 +152,7 @@ namespace Text.Classify
             }
             if (isFuliTxt)
             {
-                txtPath = Path.Combine(rootTxtPath, ConfigurationManager.AppSettings["fuli_txt_file"]);
+                txtPath = Path.Combine(rootSourcePath, ConfigurationManager.AppSettings["fuli_txt_filename"]);
 
                 fuliTxt = FileHandler.LoadStringArray(txtPath);
             }
