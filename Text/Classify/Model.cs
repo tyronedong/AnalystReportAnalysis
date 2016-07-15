@@ -25,9 +25,9 @@ namespace Text.Classify
             this.features = null;
         }
 
-        public Model(string featureFilePath)
+        public Model(string modelFile, string featureFilePath)
         {
-            this.model = null;
+            LoadModel(modelFile);
             this.wsH = new WordSegHandler();
             this.features = Feature.LoadChiFeature(featureFilePath);
 
@@ -147,10 +147,11 @@ namespace Text.Classify
 
         public static bool GenerateTrainSet(string rootPath)
         {
+            string rootSourcePath = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
 
-            TextPreProcess tPP = new TextPreProcess(true, false, true, false);
-            string[] zhenglis = tPP.GetTrainDataOfZhengli("");
-            string[] fulis = tPP.GetTrainDataOfFuli("");
+            TextPreProcess tPP = new TextPreProcess(rootSourcePath, true, false, true, false);
+            string[] zhenglis = tPP.GetTrainDataOfZhengli();
+            string[] fulis = tPP.GetTrainDataOfFuli();
 
             return RandomSelect.ExecuteSelectFuli(rootPath, zhenglis.Length - fulis.Length);
         }

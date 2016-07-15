@@ -209,11 +209,11 @@ namespace Text.Classify
         /// <returns>return the dicitonary which contains all the words exist in the training data.</returns>
         private static Dictionary<string, WordItem> GetWordItemDic()
         {
-            string rootForChi = ConfigurationManager.AppSettings["result_file_root_dictionary"];
+            string rootForChi = ConfigurationManager.AppSettings["feature_relate_root_dictionary"];
 
             Dictionary<string, WordItem> wordItemDic = new Dictionary<string, WordItem>();
-            TextPreProcess tPP = new TextPreProcess(true, true, true, true);//默认加入所有的数据源
-            List<LabeledItem> labeledItems = tPP.GetLabeledItems(rootForChi);
+            TextPreProcess tPP = new TextPreProcess(rootForChi, true, true, true, true);//默认加入所有的数据源
+            List<LabeledItem> labeledItems = tPP.GetLabeledItems();
             //List<LabeledItem> labeledItems = TextPreProcess.GetLabeledItems();
 
             foreach (var lItem in labeledItems)

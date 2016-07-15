@@ -11,28 +11,35 @@ namespace Text.Classify
 {
     class Bootstrap
     {
+        static string rootFeaturePath = ConfigurationManager.AppSettings["feature_relate_root_dictionary"];
+        static string rootModelPath = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
+
         static string modelPath = ConfigurationManager.AppSettings["model_path"];
-        static string featurePath = ConfigurationManager.AppSettings["chi_feature_path"];
-        static string resultRootDic = ConfigurationManager.AppSettings["result_file_root_dictionary"];
+        static string featurePath = ConfigurationManager.AppSettings["chi_feature_filename"];
+        //static string resultRootDic = ConfigurationManager.AppSettings["result_file_root_dictionary"];
+
+
+
+
         /// <summary>
         /// </summary>
         /// <param name="howManySampleEachClass"></param>
         /// <returns></returns>
         static bool GenerateNewChiFeatureSource(int howManySampleEachClass)
         {
-            TextPreProcess tPP = new TextPreProcess(true, false, true, false);
+            TextPreProcess tPP = new TextPreProcess(rootModelPath, true, false, true, false);
 
             //获取人工标注的excel中的前瞻性语句
-            string[] zhengli = tPP.GetTrainDataOfZhengli("");
+            string[] zhengli = tPP.GetTrainDataOfZhengli();
             if (howManySampleEachClass < zhengli.Length) 
             { return false; }
             //通过训练好的分类器选择新的前瞻性语句
-            if (!RandomSelect.ExecuteSelectZhengli(resultRootDic, howManySampleEachClass - zhengli.Length, modelPath, featurePath))
+            if (!RandomSelect.ExecuteSelectZhengli(rootFeaturePath, howManySampleEachClass - zhengli.Length, modelPath, featurePath))
             { return false; }
 
             //获取人工标注的excel中的非前瞻性语句
-            string[] fuli = tPP.GetTrainDataOfFuli("");
-            if (!RandomSelect.ExecuteSelectFuli(resultRootDic, howManySampleEachClass - fuli.Length))
+            string[] fuli = tPP.GetTrainDataOfFuli();
+            if (!RandomSelect.ExecuteSelectFuli(rootFeaturePath, howManySampleEachClass - fuli.Length))
             { return false; }
             
             return true;

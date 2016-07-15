@@ -15,19 +15,16 @@ namespace Text.Classify
     class RandomSelect
     {
         static Random ran = new Random();
-        //static int selectNumber = 300;
-        //static string resultRootDic = ConfigurationManager.AppSettings["result_file_root_dictionary"];
 
         /// <summary>
-        /// Select and store zhengli into file
+        /// 选择指定
         /// </summary>
         /// <param name="selectHowMany"></param>
         /// <param name="modelPath"></param>
         /// <returns></returns>
-        public static bool ExecuteSelectZhengli(string resultRootDic, int selectHowMany, string modelPath, string featurePath)
+        public static bool ExecuteSelectZhengli(string resultSaveRootDic, int selectHowMany, string modelPath, string featurePath)
         {
-            //string path = Path.Combine(resultRootDic, "random_select_" + selectHowMany + "_zhengli");
-            string path = Path.Combine(resultRootDic, "random_select_zhengli.txt");
+            string path = Path.Combine(resultSaveRootDic, ConfigurationManager.AppSettings["zhengli_excel_filename"]);
 
             Model model = new Model();
             model.LoadModel(modelPath, featurePath);
@@ -93,10 +90,10 @@ namespace Text.Classify
         /// 重复直到fuli达到了足够的数量
         /// </summary>
         /// <returns></returns>
-        public static bool ExecuteSelectFuli(string resultRootDic, int selectHowMany)
+        public static bool ExecuteSelectFuli(string resultSaveRootDic, int selectHowMany)
         {
             //string path = Path.Combine(resultRootDic, "random_select_" + selectHowMany + "_fuli");
-            string path = Path.Combine(resultRootDic, "random_select_fuli.txt");
+            string path = Path.Combine(resultSaveRootDic, ConfigurationManager.AppSettings["fuli_txt_filename"]);
 
             string[] selectedStrs = SelectStrsFuli(selectHowMany);
             if (selectedStrs == null) { Trace.TraceError("Text.Classify.RandomSelect.ExecuteSelectFuli() goes wrong"); return false; }

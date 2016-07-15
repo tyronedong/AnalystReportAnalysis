@@ -124,8 +124,8 @@ namespace Text
             List<string> trainSet = new List<string>();
 
             List<FeatureItem> fItems = Feature.LoadChiFeature(featureFile);
-            TextPreProcess tPP = new TextPreProcess(true, false, true, true);
-            List<LabeledItem> lItems = tPP.GetLabeledItems(rootDicForModelRelate);//FileHandler.LoadLabeledItems(preprocess_result_file);
+            TextPreProcess tPP = new TextPreProcess(rootDicForModelRelate, true, false, true, true);
+            List<LabeledItem> lItems = tPP.GetLabeledItems();//FileHandler.LoadLabeledItems(preprocess_result_file);
 
             foreach (var lItem in lItems)
             {
