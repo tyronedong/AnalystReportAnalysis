@@ -27,7 +27,7 @@ namespace Text.Classify
         /// <returns></returns>
         static bool GenerateNewChiFeatureSource(int howManySampleEachClass)
         {
-            TextPreProcess tPP = new TextPreProcess(rootModelPath, true, false, true, false);
+            TextPreProcess tPP = new TextPreProcess("FLI", rootModelPath, true, false, true, false);
 
             //获取人工标注的excel中的前瞻性语句
             string[] zhengli = tPP.GetTrainDataOfZhengli();
@@ -39,7 +39,7 @@ namespace Text.Classify
 
             //获取人工标注的excel中的非前瞻性语句
             string[] fuli = tPP.GetTrainDataOfFuli();
-            if (!RandomSelect.ExecuteSelectFuli(rootFeaturePath, howManySampleEachClass - fuli.Length))
+            if (!RandomSelect.ExecuteSelectFuli("FLI", rootFeaturePath, howManySampleEachClass - fuli.Length))
             { return false; }
             
             return true;
@@ -52,7 +52,7 @@ namespace Text.Classify
             bool b1 = false, b2 = false;
             if(!GenerateNewChiFeatureSource(bootScale))
             { Trace.TraceError("Bootstrap.ExecuteBootstrap(int bootScale): GenerateNewChiFeatureSource failed"); return false; }
-            b2 = Feature.ExtractAndStoreChiFeature(featurePath);
+            b2 = Feature.ExtractAndStoreChiFeature("FLI", featurePath);
 
             return b2;
         }

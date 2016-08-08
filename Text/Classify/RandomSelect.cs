@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Diagnostics;
 using System.Configuration;
+using System.Text.RegularExpressions;
 using Text.Handler;
 using Text.Outsider;
 
@@ -85,19 +86,19 @@ namespace Text.Classify
         }
 
         /// <summary>
+        /// 还需指定工作模式
         /// Select and store fuli strings to file
         /// 执行逻辑：每次从mongodb中随机选取一个record，再从该record中依启发式规则随机选择一句话加入fuli数组
         /// 重复直到fuli达到了足够的数量
         /// </summary>
         /// <returns></returns>
-        public static bool ExecuteSelectFuli(string resultSaveRootDic, int selectHowMany)
+        public static bool ExecuteSelectFuli(string type, string resultSaveRootDic, int selectHowMany)
         {
             //string path = Path.Combine(resultRootDic, "random_select_" + selectHowMany + "_fuli");
             string path = Path.Combine(resultSaveRootDic, ConfigurationManager.AppSettings["fuli_txt_filename"]);
 
-            string[] selectedStrs = SelectStrsFuli(selectHowMany);
+            string[] selectedStrs = SelectStrsFuli(type, selectHowMany);
             if (selectedStrs == null) { Trace.TraceError("Text.Classify.RandomSelect.ExecuteSelectFuli() goes wrong"); return false; }
-
             if (FileHandler.SaveStringArray(path, selectedStrs))
                 return true;
             else
@@ -108,7 +109,7 @@ namespace Text.Classify
         /// Select selectNumber strings, each string is selected from one record of mongodb
         /// </summary>
         /// <returns></returns>
-        static string[] SelectStrsFuli(int selectCount)
+        static string[] SelectStrsFuli(string type, int selectCount)
         {
             List<string> selectedStrs = new List<string>();
 
@@ -125,7 +126,7 @@ namespace Text.Classify
                 if (anaReport == null)
                 { Trace.TraceError("Text.Classify.RandomSelect.SelectStrsFuli() goes wrong in " + counter + "th with rank " + rank); continue; }
 
-                string str = SelectOneFromContentFuli(anaReport.Content);
+                string str = SelectOneFromContentFuli(type, anaReport.Content);
                 if (string.IsNullOrWhiteSpace(str))
                 { continue; }
                 else
@@ -139,34 +140,50 @@ namespace Text.Classify
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        static string SelectOneFromContentFuli(string content)
+        static string SelectOneFromContentFuli(string type, string content)
         {
+            string sent = "";
             //content = content.Replace("\n", "。");
             //string[] sentences = content.Split('。');
-            string[] sentences = TextPreProcess.SeparateParagraph(content);
-
-            int counter = 0; string sent = "";
-            while (true)
+            if (type.Equals("FLI"))
             {
-                counter++;
-                if (counter >= 10) { break; }
+                Regex likeButNotZhengli1 = new Regex(@"(每股收益|EPS|盈利预测|盈余预测)");
+                Regex likeButNotZhengli2 = new Regex(@"((符合|未达|接近|超出|低于)(我们(的?))?预期|按预期完成|与预期一致)");
 
-                int whichOne = RandomNumber(0, sentences.Length - 1);
-                sent = sentences[whichOne];
+                string[] sentences = TextPreProcess.SeparateParagraph(content);
 
-                if (string.IsNullOrEmpty(sent)) { continue; }
-                if (sent.Contains("预测")) { continue; }
-                if (sent.Contains("预期")) { continue; }
-                if (sent.Contains("预告")) { continue; }
-                if (sent.Contains("预示")) { continue; }
-                if (sent.Contains("预计")) { continue; }
-                if (sent.Contains("估计")) { continue; }
-                if (sent.Contains("将来")) { continue; }
-                if (sent.Contains("未来")) { continue; }
-                if (sent.Contains("有望")) { continue; }
-                if (sent.Contains("可能")) { continue; }
+                int counter = 0;
+                while (true)
+                {
+                    counter++;
+                    if (counter >= 10) { break; }
 
-                break;
+                    int whichOne = RandomNumber(0, sentences.Length - 1);
+                    sent = sentences[whichOne];
+
+                    if (string.IsNullOrEmpty(sent)) { continue; }
+                    if (likeButNotZhengli1.IsMatch(sent)) { return sent; }//像正例的负例
+                    if (likeButNotZhengli2.IsMatch(sent)) { return sent; }//像正例的负例
+                    if (sent.Contains("预测")) { continue; }
+                    if (sent.Contains("预期")) { continue; }
+                    if (sent.Contains("预告")) { continue; }
+                    if (sent.Contains("预示")) { continue; }
+                    if (sent.Contains("预计")) { continue; }
+                    if (sent.Contains("估计")) { continue; }
+                    if (sent.Contains("将来")) { continue; }
+                    if (sent.Contains("未来")) { continue; }
+                    if (sent.Contains("有望")) { continue; }
+                    if (sent.Contains("可能")) { continue; }
+
+                    break;
+                }
+            }
+            else
+            {
+                string[] sentences = TextPreProcess.SeparateParagraph(content);
+
+                int num = ran.Next(sentences.Length - 1);
+                sent = sentences[num];
             }
             return sent;
         }

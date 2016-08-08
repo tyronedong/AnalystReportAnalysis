@@ -406,6 +406,8 @@ namespace Report
         {
             anaReport._id = pdFileName;
             anaReport.ReportTitle = reportTitle;
+            //if (string.IsNullOrEmpty(anaReport.ReportTitle))
+            //{ anaReport.ReportTitle = reportTitle; }
             anaReport.PDFileName = pdFileName;
             anaReport.Stockjobber = jobber;
             anaReport.Date = time;

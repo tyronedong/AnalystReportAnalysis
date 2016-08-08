@@ -13,12 +13,13 @@ namespace Text.Classify
 {
     class TextPreProcess
     {
-        string rootSourcePath;
+        string type, rootSourcePath;
 
         bool isZhengliXls = false, isZhengliTxt = false;
         bool isFuliXls = false, isFuliTxt = false;
 
         /// <summary>
+        /// 初始化的时候指定源文件的类型：“FLI”、“INNOV”
         /// 初始化的时候指定源文件的存放目录，同时通过四个布尔值指定用到目录下的那些文件
         /// </summary>
         /// <param name="rootSourcePath"></param>
@@ -26,8 +27,9 @@ namespace Text.Classify
         /// <param name="isZhengliTxt"></param>
         /// <param name="isFuliXls"></param>
         /// <param name="isFuliTxt"></param>
-        public TextPreProcess(string rootSourcePath, bool isZhengliXls, bool isZhengliTxt, bool isFuliXls, bool isFuliTxt)
+        public TextPreProcess(string type, string rootSourcePath, bool isZhengliXls, bool isZhengliTxt, bool isFuliXls, bool isFuliTxt)
         {
+            this.type = type;
             this.rootSourcePath = rootSourcePath;
             this.isZhengliXls = isZhengliXls;
             this.isZhengliTxt = isZhengliTxt;
@@ -35,6 +37,7 @@ namespace Text.Classify
             this.isFuliTxt = isFuliTxt;
         }
         /// <summary>
+        /// 根据不同的type，采用不同的数据获取方式
         /// Get labeled items from sorce training file in the form of class LabeledItem
         /// </summary>
         /// <returns></returns>
@@ -42,22 +45,42 @@ namespace Text.Classify
         {
             List<LabeledItem> labeledItems = new List<LabeledItem>();
 
-            //get all rough zhengli and fuli
-            string[] zhengli = GetTrainDataOfZhengli();
-            string[] fuli = GetTrainDataOfFuli();
-
-            ////normalize all zhengli and fuli
-            //string[] zhengli = NormalizeTrainData(zhengliCol);
-            //string[] fuli = NormalizeTrainData(fuliCol);
-
-            //set two global variables
-            LabeledItem.numberOfZhengli = zhengli.Length;
-            LabeledItem.numberOfFuli = fuli.Length;
-
             WordSegHandler wsH = new WordSegHandler();
             if (!wsH.isValid) { Trace.TraceError("Text.Program.GenerateTrainDataFile() goes wrong"); return null; }
-            else
+            if (type.Equals("FLIEMO"))
             {
+                //read excel
+                ExcelHandler exlH = new ExcelHandler(Path.Combine(rootSourcePath, ConfigurationManager.AppSettings["zhengfuli_excel_emo_filename"]));
+
+                string[] textExl = null, toneExl = null;
+
+                textExl = exlH.GetColoum("sheet1", 3);
+                toneExl = exlH.GetColoum("sheet1", 4);
+
+                int len = textExl.Length;
+                for (int i = 1; i < len; i++)
+                {
+                    if (string.IsNullOrEmpty(toneExl[i]))
+                        continue;
+                    wsH.ExecutePartition(textExl[i]);
+                    string[] segResult = wsH.GetNoStopWords();
+                    labeledItems.Add(new LabeledItem(Int32.Parse(toneExl[i]), textExl[i], segResult));
+                }
+            }
+            if (type.Equals("FLI"))
+            {
+                //get all rough zhengli and fuli
+                string[] zhengli = GetTrainDataOfZhengli();
+                string[] fuli = GetTrainDataOfFuli();
+
+                ////normalize all zhengli and fuli
+                //string[] zhengli = NormalizeTrainData(zhengliCol);
+                //string[] fuli = NormalizeTrainData(fuliCol);
+
+                //set two global variables
+                LabeledItem.numberOfZhengli = zhengli.Length;
+                LabeledItem.numberOfFuli = fuli.Length;
+
                 foreach (var item in zhengli)
                 {
                     wsH.ExecutePartition(item);
@@ -68,11 +91,101 @@ namespace Text.Classify
                 {
                     wsH.ExecutePartition(item);
                     string[] segResult = wsH.GetNoStopWords();
-                    labeledItems.Add(new LabeledItem(-1, item, segResult));
+                    labeledItems.Add(new LabeledItem(0, item, segResult));
+                }
+            }
+            else if (type.Equals("INNOV"))
+            {
+                var tdic = GetTrainDataOfInnov();
+                foreach (var kvp in tdic)
+                {
+                    foreach (var curStr in kvp.Value)
+                    {
+                        wsH.ExecutePartition(curStr);
+                        string[] segResult = wsH.GetNoStopWords();
+                        labeledItems.Add(new LabeledItem(kvp.Key, curStr, segResult));
+                    }
                 }
             }
             //if (saveIntoFile) { FileHandler.SaveLabeledItems(preprocess_result_file, labeledItems); }
             return labeledItems;
+        }
+
+        /// <summary>
+        /// 返回一个dic，键值是类别，value是相应类别下的字符串数组
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<int, List<string>> GetTrainDataOfInnov()
+        {
+            //tiqu param
+            //string[] zhengliExl = null, zhengliTxt = null, zhengliCol, zhengli;
+            //string[] fuliExl = null, fuliTxt = null, fuliCol, fuli;
+            //txt param
+            //string txtPath;
+
+            //define data structure
+            Dictionary<int, List<string>> trainData = new Dictionary<int, List<string>>();
+            List<string> nonInnov = new List<string>();
+            List<string> class1 = new List<string>();
+            List<string> class2 = new List<string>();
+            List<string> class3 = new List<string>();
+            List<string> class4 = new List<string>();
+
+            //excel param
+            string xlsPath, sheetName;
+            int textColumn, nonInnovColumn, innovClassColumn;
+
+            xlsPath = Path.Combine(rootSourcePath, ConfigurationManager.AppSettings["zhengfuli_excel_filename"]);
+            sheetName = ConfigurationManager.AppSettings["zhengfuli_excel_sheet"];
+            textColumn = Int32.Parse(ConfigurationManager.AppSettings["zhengfuli_excel_text"]);
+            nonInnovColumn = Int32.Parse(ConfigurationManager.AppSettings["zhengfuli_excel_noninnov"]);
+            innovClassColumn = Int32.Parse(ConfigurationManager.AppSettings["zhengfuli_excel_innovclass"]);
+
+            //read excel
+            ExcelHandler exlH = new ExcelHandler(xlsPath);
+
+            //zhengli and fuli
+            //from excel
+            if (isFuliXls)
+            {
+                string[] textExl = null, nonInnovExl = null, innovTypeExl = null;
+
+                textExl = exlH.GetColoum(sheetName, textColumn);
+                nonInnovExl = exlH.GetColoum(sheetName, nonInnovColumn);
+                innovTypeExl = exlH.GetColoum(sheetName, innovClassColumn);
+
+                int length = textExl.Length;
+                for (int i = 0; i < length; i++)
+                {
+                    if (string.IsNullOrEmpty(nonInnovExl[i]) && string.IsNullOrEmpty(innovTypeExl[i]))
+                    { continue; }
+                    else if (nonInnovExl[i] != "0")
+                    { nonInnov.Add(textExl[i]); }
+                    else if (innovTypeExl[i] == "1")
+                    { class1.Add(textExl[i]); }
+                    else if (innovTypeExl[i] == "2")
+                    { class2.Add(textExl[i]); }
+                    else if (innovTypeExl[i] == "3")
+                    { class3.Add(textExl[i]); }
+                    else if (innovTypeExl[i] == "4")
+                    { class4.Add(textExl[i]); }
+                }
+            }
+            //from txt
+            string txtPath = Path.Combine(rootSourcePath, ConfigurationManager.AppSettings["fuli_txt_filename"]);
+            string[] fuliTxt = FileHandler.LoadStringArray(txtPath);
+
+            foreach(var fuli in fuliTxt)
+            { nonInnov.Add(fuli); }
+
+            //end work
+            trainData.Add(0, nonInnov);
+            trainData.Add(1, class1);
+            trainData.Add(2, class2);
+            trainData.Add(3, class3);
+            trainData.Add(4, class4);
+
+            return trainData;
         }
 
         /// <summary>
