@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,8 +14,8 @@ namespace Text
 {
     class Program
     {
-        static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
-        static string featurePath = ConfigurationManager.AppSettings["chi_feature_path"];
+        //static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
+        static string featureRootPath = ConfigurationManager.AppSettings["feature_relate_root_dictionary"];
         
         static void Main(string[] args)
         {
@@ -35,7 +36,13 @@ namespace Text
             //Model.GenerateTrainSet(rootDicForModelRelate);
 
             //GenerateLibSVMInputFile();
+            //ExecuteTrain();
+
+            //RandomSelect.ExecuteSelectFuli("INNOV", featureRootPath, 300);
+            //GenerateChiFeatureWord("FLIEMO");
+            //GenerateLibSVMInputFile("FLIEMO");
             ExecuteTrain();
+            //Feature.ExtractAndStoreChiFeature("FLIEMO", featureRootPath);
 
             Console.WriteLine("finished");
             Console.ReadLine();
@@ -92,7 +99,7 @@ namespace Text
             //string trainSetFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\trainset.txt";
             string modelFile = ConfigurationManager.AppSettings["model_path"];
             string featureFile = ConfigurationManager.AppSettings["chi_feature_path"];
-            string text = "目前期间费用因上市不久故发生的管理较高，占收入比约在9% -10%10%左右，后续有望降低。";
+            string text = "目前期间费用因上市不久故发生的管理较高，占收入比约在9% -10%左右，后续有望降低。";
             Model model = new Model();
             model.LoadModel(modelFile);
 
@@ -115,21 +122,40 @@ namespace Text
             Console.WriteLine("Model train finished");
         }
 
-        static void GenerateLibSVMInputFile()
+        static void GenerateChiFeatureWord(string type)
         {
-            string featureFile = ConfigurationManager.AppSettings["chi_feature_path"];
+            bool tOrf = false;
+
+            if (type.Equals("FLIEMO"))
+            {
+                tOrf = Feature.ExtractAndStoreChiFeature(type, Path.Combine(featureRootPath, "chi_feature.txt"));
+            }
+            else if (type.Equals("FLI"))
+            {
+
+            }
+            else if(type.Equals("INNOV"))
+            {
+                tOrf = Feature.ExtractAndStoreChiFeature(type, Path.Combine(featureRootPath, "chi_feature.txt"));
+            }
+        }
+
+        static void GenerateLibSVMInputFile(string type)
+        {
+            string featureFile = Path.Combine(ConfigurationManager.AppSettings["feature_relate_root_dictionary"], ConfigurationManager.AppSettings["chi_feature_filename"]);
             string trainSetFile = ConfigurationManager.AppSettings["train_set_path"];
             string rootDicForModelRelate = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
 
             List<string> trainSet = new List<string>();
 
             List<FeatureItem> fItems = Feature.LoadChiFeature(featureFile);
-            TextPreProcess tPP = new TextPreProcess(rootDicForModelRelate, true, false, true, true);
+            TextPreProcess tPP = new TextPreProcess(type, rootDicForModelRelate, true, false, true, true);
             List<LabeledItem> lItems = tPP.GetLabeledItems();//FileHandler.LoadLabeledItems(preprocess_result_file);
 
             foreach (var lItem in lItems)
             {
                 StringBuilder sb = new StringBuilder();
+                //sb.Append((lItem.label == 0) ? 0 : 1);
                 sb.Append(lItem.label);
                 sb.Append(' ');
                 int idx = 1;

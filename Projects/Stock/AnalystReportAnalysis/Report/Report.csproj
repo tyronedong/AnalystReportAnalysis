@@ -67,6 +67,7 @@
     <Compile Include="Handler\Parser.cs" />
     <Compile Include="Handler\SqlServerHandler.cs" />
     <Compile Include="Handler\TraceHandler.cs" />
+    <Compile Include="Output\Executor.cs" />
     <Compile Include="Outsider\WordSegHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

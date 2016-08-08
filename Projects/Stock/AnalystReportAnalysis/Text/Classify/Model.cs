@@ -149,11 +149,11 @@ namespace Text.Classify
         {
             string rootSourcePath = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
 
-            TextPreProcess tPP = new TextPreProcess(rootSourcePath, true, false, true, false);
+            TextPreProcess tPP = new TextPreProcess("FLI", rootSourcePath, true, false, true, false);
             string[] zhenglis = tPP.GetTrainDataOfZhengli();
             string[] fulis = tPP.GetTrainDataOfFuli();
 
-            return RandomSelect.ExecuteSelectFuli(rootPath, zhenglis.Length - fulis.Length);
+            return RandomSelect.ExecuteSelectFuli("FLI", rootPath, zhenglis.Length - fulis.Length);
         }
     }
 }

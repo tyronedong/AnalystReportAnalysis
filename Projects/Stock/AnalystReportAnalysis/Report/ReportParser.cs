@@ -157,8 +157,13 @@ namespace Report
 
         public virtual AnalystReport executeExtract_withdb()
         {
+
             extractStockInfo();
             extractContent();
+
+            extractCountInfo();//added
+            extractReportInfo();//added;
+
             return anaReport;
         }
 
@@ -173,6 +178,87 @@ namespace Report
             extractAnalysts();
             
             return anaReport;
+        }
+
+        /// <summary>
+        /// extract report title and type information
+        /// must be executed after function extractStockInfo
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool extractReportInfo()
+        {
+            Regex chinese = new Regex("[\u4e00-\u9fa5]+");
+            Regex nonsense = new Regex(@"^(\d* *)?(敬)?(各项声明|请阅读|请仔细阅读|请务必阅读|请通过合法途径|本(研究)?报告|本公司|市场有风险，投资需谨慎|证监会审核华创证券投资咨询业务资格批文号：证监|此份報告由群益證券)");//added
+            Regex stockNameAndCode = new Regex(@"[\u4e00-\u9fa5]+ *[(（]? *\d{6}(\.[a-zA-Z]+)?[)）]?\D");//匹配“泸州老窖（000568）”六位数加一个非数字
+
+            foreach(var line in lines)
+            {
+                string trimedLine = line.Trim();
+
+                if(string.IsNullOrEmpty(trimedLine))
+                { continue; }
+                if(!chinese.IsMatch(trimedLine))
+                { continue; }
+                if (nonsense.IsMatch(trimedLine))//每篇报告开头都有的没有意义的话
+                { continue; }
+                if (trimedLine.Contains("报告") && trimedLine.Length <= 6)//非标题，但是含有报告，通常说明了本报告的类型
+                { continue; }
+                if(trimedLine.Contains("评级")&& trimedLine.Length <=4)
+                { continue; }
+                if (trimedLine.Equals(anaReport.StockName))
+                { continue; }
+                if (stockNameAndCode.IsMatch(trimedLine))
+                { continue; }
+
+                anaReport.ReportTitle = trimedLine;
+                break;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// This function is executed after report content was extracted.
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool extractCountInfo()
+        {
+            //Regex picOrTabHead = new Regex(@"^(图|表|图表) *\d{1,2}");
+            Regex value = new Regex(@"\d+(\.\d+)?");
+
+            //get picCount and tableCount 
+            foreach (var line in lines)
+            {
+                string trimedLine = line.Trim();
+                
+                if(trimedLine.StartsWith("图"))
+                { anaReport.picCount++; continue; }
+                if(trimedLine.StartsWith("表"))
+                { anaReport.tableCount++; continue; }
+            }
+
+            //get total value count
+            foreach (var nLine in noABCLines)
+            {
+                if(value.IsMatch(nLine))
+                { anaReport.valueCountOutContent += value.Matches(nLine).Count; }
+            }
+
+            //get value count in content
+            if (string.IsNullOrEmpty(anaReport.Content))
+            {
+                return false;
+            }
+            else
+            {
+                if(value.IsMatch(anaReport.Content))
+                { anaReport.valueCountInContent += value.Matches(anaReport.Content).Count; }
+            }
+
+            //get value count out content
+            anaReport.valueCountOutContent -= anaReport.valueCountInContent;
+
+            return true;
         }
 
         public virtual bool extractStockInfo()
