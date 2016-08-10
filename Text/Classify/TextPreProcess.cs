@@ -97,7 +97,7 @@ namespace Text.Classify
                 { zhengliExl = exlH.GetColoum("sheet1", 3); }
                 if(isZhengliTxt)
                 {
-                    string txtPath = Path.Combine(rootSourcePath, "random_select_zhengli.txt");
+                    string txtPath = Path.Combine(rootSourcePath, "./FLI/random_select_zhengli.txt");
                     zhengliTxt = FileHandler.LoadStringArray(txtPath);
                 }
 
@@ -105,7 +105,7 @@ namespace Text.Classify
                 { fuliExl = exlH.GetColoum("sheet1", 6); }
                 if (isFuliTxt)
                 {
-                    string txtPath = Path.Combine(rootSourcePath, "random_select_fuli.txt");
+                    string txtPath = Path.Combine(rootSourcePath, "./FLI/random_select_fuli.txt");
                     fuliTxt = FileHandler.LoadStringArray(txtPath);
                 }
 
