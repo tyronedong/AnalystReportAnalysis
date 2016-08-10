@@ -144,165 +144,167 @@ namespace Text.Classify
         {
             //Dictionary<string, double> wordChiValueDic = GetWordChiValueDic("zhengli");
             string rootForChi = ConfigurationManager.AppSettings["feature_relate_root_dictionary"];
+            string dataFilePath = ConfigurationManager.AppSettings[""];
 
             List<FeatureItem> featureItems = new List<FeatureItem>();
 
             TextPreProcess tPP = new TextPreProcess(type, rootForChi, true, true, true, true);//默认加入所有的数据源
-            List<LabeledItem> labeledItems = tPP.GetLabeledItems();
-
-            if (type.Equals("FLIEMO"))
+            //this is temp
+            //List<LabeledItem> labeledItems = tPP.GetLabeledItems("");
+            var trainData = tPP.GetTrainData(type, dataFilePath);
+            List<LabeledItem> labeledItems = tPP.GetLabeledItems(ref trainData);
+            foreach(var curKey in trainData.Keys)
             {
-                TextPreProcess tPP2 = new TextPreProcess(type, rootForChi, true, false, false, false);//默认加入所有的数据源
-                List<LabeledItem> labeledItems2 = tPP.GetLabeledItems();
-                foreach (var item in labeledItems)
-                {
-                    if (item.label == 1)
-                        LabeledItem.numberOfZhengli++;
-                    else
-                        LabeledItem.numberOfFuli++;
-                }
-                Dictionary<string, WordItem> wordItemDic = GetWordItemDic(type, rootForChi, ref labeledItems2);//获取辅助变量
+                if (curKey == 0 || curKey == -1)//负例不再单独计算
+                { continue; }
+
+                Dictionary<string, WordItem> wordItemDic = GetWordItemDic(ref labeledItems, curKey);//获取单词正负例文档频数统计和正负例文档数统计
                 Dictionary<string, double> wordChiValueDic = GetWordChiValueDic(ref wordItemDic);//计算卡方值
                 var dicSort = from objDic in wordChiValueDic orderby objDic.Value descending select objDic;//按卡方值排序
 
-                int countOfFeat = (int)(featRatio * wordChiValueDic.Count);
-                int N = LabeledItem.numberOfZhengli + LabeledItem.numberOfFuli;
-                //选择卡方值较大的前k个值
-                for (int i = 0; i < countOfFeat; i++)
-                {
-                    if (dicSort.ElementAt(i).Value < minChiValue) { break; }
-                    FeatureItem featureItem = new FeatureItem();
-                    featureItem.id = i + 1;
-                    featureItem.featureWord = dicSort.ElementAt(i).Key;
-                    if (globalWeightType.Equals("idf"))
-                    {
-                        WordItem wordItem = wordItemDic[featureItem.featureWord];
-                        featureItem.globalWeight = Math.Log10(N * 1.0 / (wordItem.zhengliCount + wordItem.fuliCount + 1));
-                    }
-                    featureItems.Add(featureItem);
-                }
+                int countOfFeat = (int)(featRatio*)
             }
-            else if (type.Equals("FLI"))
-            {
-                Dictionary<string, WordItem> wordItemDic = GetWordItemDic(type, rootForChi, ref labeledItems);//获取辅助变量
-                Dictionary<string, double> wordChiValueDic = GetWordChiValueDic(ref wordItemDic);//计算卡方值
-                var dicSort = from objDic in wordChiValueDic orderby objDic.Value descending select objDic;//按卡方值排序
+            
+            //if (type.Equals("FLI"))
+            //{
+            //    Dictionary<string, WordItem> wordItemDic = GetWordItemDic(ref labeledItems, type, rootForChi);//获取辅助变量
+            //    Dictionary<string, double> wordChiValueDic = GetWordChiValueDic(ref wordItemDic);//计算卡方值
+            //    var dicSort = from objDic in wordChiValueDic orderby objDic.Value descending select objDic;//按卡方值排序
 
-                int countOfFeat = (int)(featRatio * wordChiValueDic.Count);
-                int N = LabeledItem.numberOfZhengli + LabeledItem.numberOfFuli;
-                //选择卡方值较大的前k个值
-                for (int i = 0; i < countOfFeat; i++)
-                {
-                    if (dicSort.ElementAt(i).Value < minChiValue) { break; }
-                    FeatureItem featureItem = new FeatureItem();
-                    featureItem.id = i + 1;
-                    featureItem.featureWord = dicSort.ElementAt(i).Key;
-                    if (globalWeightType.Equals("idf"))
-                    {
-                        WordItem wordItem = wordItemDic[featureItem.featureWord];
-                        featureItem.globalWeight = Math.Log10(N * 1.0 / (wordItem.zhengliCount + wordItem.fuliCount + 1));
-                    }
-                    featureItems.Add(featureItem);
-                }
-            }
-            else if (type.Equals("INNOV"))
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    Dictionary<string, WordItem> wordItemDic = GetWordItemDic(type, rootForChi, ref labeledItems, i);//获取辅助变量
-                    foreach (var item in labeledItems)
-                    {
-                        if (item.label == i)
-                            LabeledItem.numberOfZhengli++;
-                        else
-                            LabeledItem.numberOfFuli++;
-                    }
-                    Dictionary<string, double> wordChiValueDic = GetWordChiValueDic(ref wordItemDic);//计算卡方值
-                    var dicSort = from objDic in wordChiValueDic orderby objDic.Value descending select objDic;//按卡方值排序
+            //    int countOfFeat = (int)(featRatio * wordChiValueDic.Count);
+            //    int N = LabeledItem.numberOfZhengli + LabeledItem.numberOfFuli;
+            //    //选择卡方值较大的前k个值
+            //    for (int i = 0; i < countOfFeat; i++)
+            //    {
+            //        if (dicSort.ElementAt(i).Value < minChiValue) { break; }
+            //        FeatureItem featureItem = new FeatureItem();
+            //        featureItem.id = i + 1;
+            //        featureItem.featureWord = dicSort.ElementAt(i).Key;
+            //        if (globalWeightType.Equals("idf"))
+            //        {
+            //            WordItem wordItem = wordItemDic[featureItem.featureWord];
+            //            featureItem.globalWeight = Math.Log10(N * 1.0 / (wordItem.zhengliCount + wordItem.fuliCount + 1));
+            //        }
+            //        featureItems.Add(featureItem);
+            //    }
+            //}
+            //else if (type.Equals("FLIEMO"))
+            //{
+            //    TextPreProcess tPP2 = new TextPreProcess(type, rootForChi, true, false, false, false);//默认加入所有的数据源
+            //    //this is temp
+            //    List<LabeledItem> labeledItems2 = tPP.GetLabeledItems("");
+            //    foreach (var item in labeledItems)
+            //    {
+            //        if (item.label == 1)
+            //            LabeledItem.numberOfZhengli++;
+            //        else
+            //            LabeledItem.numberOfFuli++;
+            //    }
+            //    Dictionary<string, WordItem> wordItemDic = GetWordItemDic( ref labeledItems2,type, rootForChi);//获取辅助变量
+            //    Dictionary<string, double> wordChiValueDic = GetWordChiValueDic(ref wordItemDic);//计算卡方值
+            //    var dicSort = from objDic in wordChiValueDic orderby objDic.Value descending select objDic;//按卡方值排序
 
-                    //int countOfFeat = (int)(featRatio * wordChiValueDic.Count);
-                    int countOfFeat = 30;
-                    int N = LabeledItem.numberOfZhengli + LabeledItem.numberOfFuli;
-                    //选择卡方值较大的前k个值
-                    for (int j = 0; j < countOfFeat; j++)
-                    {
-                        if (dicSort.ElementAt(i).Value < minChiValue) { break; }
-                        FeatureItem featureItem = new FeatureItem();
-                        featureItem.id = 30 * i + j + 1;
-                        featureItem.featureWord = dicSort.ElementAt(j).Key;
-                        if (globalWeightType.Equals("idf"))
-                        {
-                            WordItem wordItem = wordItemDic[featureItem.featureWord];
-                            featureItem.globalWeight = Math.Log10(N * 1.0 / (wordItem.zhengliCount + wordItem.fuliCount + 1));
-                        }
-                        featureItems.Add(featureItem);
-                    }
-                }
-            }
+            //    int countOfFeat = (int)(featRatio * wordChiValueDic.Count);
+            //    int N = LabeledItem.numberOfZhengli + LabeledItem.numberOfFuli;
+            //    //选择卡方值较大的前k个值
+            //    for (int i = 0; i < countOfFeat; i++)
+            //    {
+            //        if (dicSort.ElementAt(i).Value < minChiValue) { break; }
+            //        FeatureItem featureItem = new FeatureItem();
+            //        featureItem.id = i + 1;
+            //        featureItem.featureWord = dicSort.ElementAt(i).Key;
+            //        if (globalWeightType.Equals("idf"))
+            //        {
+            //            WordItem wordItem = wordItemDic[featureItem.featureWord];
+            //            featureItem.globalWeight = Math.Log10(N * 1.0 / (wordItem.zhengliCount + wordItem.fuliCount + 1));
+            //        }
+            //        featureItems.Add(featureItem);
+            //    }
+            //}
+            //else if (type.Equals("INNOVTYPE"))
+            //{
+
+            //}
+            //else if (type.Equals("INNOVSTAGE"))
+            //{
+            //    for (int i = 0; i < 5; i++)
+            //    {
+            //        Dictionary<string, WordItem> wordItemDic = GetWordItemDic(ref labeledItems, type, rootForChi, i);//获取辅助变量
+            //        foreach (var item in labeledItems)
+            //        {
+            //            if (item.label == i)
+            //                LabeledItem.numberOfZhengli++;
+            //            else
+            //                LabeledItem.numberOfFuli++;
+            //        }
+            //        Dictionary<string, double> wordChiValueDic = GetWordChiValueDic(ref wordItemDic);//计算卡方值
+            //        var dicSort = from objDic in wordChiValueDic orderby objDic.Value descending select objDic;//按卡方值排序
+
+            //        //int countOfFeat = (int)(featRatio * wordChiValueDic.Count);
+            //        int countOfFeat = 30;
+            //        int N = LabeledItem.numberOfZhengli + LabeledItem.numberOfFuli;
+            //        //选择卡方值较大的前k个值
+            //        for (int j = 0; j < countOfFeat; j++)
+            //        {
+            //            if (dicSort.ElementAt(i).Value < minChiValue) { break; }
+            //            FeatureItem featureItem = new FeatureItem();
+            //            featureItem.id = 30 * i + j + 1;
+            //            featureItem.featureWord = dicSort.ElementAt(j).Key;
+            //            if (globalWeightType.Equals("idf"))
+            //            {
+            //                WordItem wordItem = wordItemDic[featureItem.featureWord];
+            //                featureItem.globalWeight = Math.Log10(N * 1.0 / (wordItem.zhengliCount + wordItem.fuliCount + 1));
+            //            }
+            //            featureItems.Add(featureItem);
+            //        }
+            //    }
+            //}
+            //else if (type.Equals("INNOVEMO"))
+            //{
+
+            //}
+            //else if (type.Equals("NONINNOVTYPE"))
+            //{
+
+            //}
 
             //if (FileHandler.SaveFeatures(fileName, featureItems)) return true;
             return featureItems;
         }
 
         /// <summary>
-        /// get assist variable in the process of calculating chi values
+        /// 1、get assist variable in the process of calculating chi values。
+        /// 2、统计正负例文档数。
+        /// 注释：labeledItems中出现过的每一个单词均对应WordItem中的一项。
+        /// WordItem中的每一项均需要统计该单词在本类（由whichClass指定）中出现过几次（文档次数，而非词频），在其他类中出现过几次。
         /// </summary>
-        /// <returns>return the dicitonary which contains all the words exist in the training data.</returns>
-        private static Dictionary<string, WordItem> GetWordItemDic(string type, string rootForChi, ref List<LabeledItem> labeledItems, int whichClass = 0)
+        /// <param name="labeledItems"></param>
+        /// <param name="whichClass">多类问题中，指定当前的某一类为正例，其余类作为负例</param>
+        /// <returns></returns>
+        private static Dictionary<string, WordItem> GetWordItemDic(ref List<LabeledItem> labeledItems, int whichClass = 0)
         {
-            //string rootForChi = ConfigurationManager.AppSettings["feature_relate_root_dictionary"];
             Dictionary<string, WordItem> wordItemDic = new Dictionary<string, WordItem>();
-            //TextPreProcess tPP = new TextPreProcess(type, rootForChi, true, true, true, true);//默认加入所有的数据源
-            //List<LabeledItem> labeledItems = tPP.GetLabeledItems();
-            if (type.Equals("FLIEMO")) 
+
+            LabeledItem.numberOfZhengli = 0;//置零
+            LabeledItem.numberOfFuli = 0;
+
+            foreach (var labelItem in labeledItems)//统计单词正负例文档频数
             {
-                foreach (var lItem in labeledItems)
+                if(labelItem.label == whichClass)
+                { LabeledItem.numberOfZhengli++; }//统计正例的文档数
+                else { LabeledItem.numberOfFuli++; }//统计负例的文档数
+
+                foreach (var wordKvp in labelItem.wordCountDic)
                 {
-                    foreach (var wordKvp in lItem.wordCountDic)
+                    if (wordItemDic.ContainsKey(wordKvp.Key))
                     {
-                        if (wordItemDic.ContainsKey(wordKvp.Key))
-                        {
-                            wordItemDic[wordKvp.Key].totalCount++;
-                            if (lItem.label == 1) { wordItemDic[wordKvp.Key].zhengliCount++; }
-                            else  { wordItemDic[wordKvp.Key].fuliCount++; }
-                        }
-                        else { wordItemDic.Add(wordKvp.Key, new WordItem(wordKvp.Key, (lItem.label == 1))); }
+                        wordItemDic[wordKvp.Key].totalCount++;
+                        if (labelItem.label == whichClass) { wordItemDic[wordKvp.Key].zhengliCount++; }
+                        else { wordItemDic[wordKvp.Key].fuliCount++; }
                     }
+                    else { wordItemDic.Add(wordKvp.Key, new WordItem(wordKvp.Key, (labelItem.label == whichClass))); }//label和whichClass相同则表示当前是正例反之则是负例
                 }
             }
-            else if (type.Equals("FLI"))
-            {
-                foreach (var lItem in labeledItems)
-                {
-                    foreach (var wordKvp in lItem.wordCountDic)
-                    {
-                        if (wordItemDic.ContainsKey(wordKvp.Key))
-                        {
-                            wordItemDic[wordKvp.Key].totalCount++;
-                            if (lItem.label == 1) { wordItemDic[wordKvp.Key].zhengliCount++; }
-                            else if (lItem.label == 0 || lItem.label == -1) { wordItemDic[wordKvp.Key].fuliCount++; }
-                        }
-                        else { wordItemDic.Add(wordKvp.Key, new WordItem(wordKvp.Key, (lItem.label == 1))); }
-                    }
-                }
-            }
-            else if (type.Equals("INNOV"))
-            {
-                foreach (var lItem in labeledItems)
-                {
-                    foreach (var wordKvp in lItem.wordCountDic)
-                    {
-                        if (wordItemDic.ContainsKey(wordKvp.Key))
-                        {
-                            wordItemDic[wordKvp.Key].totalCount++;
-                            if (lItem.label == whichClass) { wordItemDic[wordKvp.Key].zhengliCount++; }
-                            else { wordItemDic[wordKvp.Key].fuliCount++; }
-                        }
-                        else { wordItemDic.Add(wordKvp.Key, new WordItem(wordKvp.Key, (lItem.label == whichClass))); }
-                    }
-                }
-            }
-            else { Console.WriteLine("wrong type"); }
 
             return wordItemDic;
         }
@@ -341,6 +343,76 @@ namespace Text.Classify
             return wordChiValueDic;
         }
 
+        //private static Dictionary<string, WordItem> GetWordItemDic(ref List<LabeledItem> labeledItems, int whichClass = 0)
+        //{
+        //    Dictionary<string, WordItem> wordItemDic = new Dictionary<string, WordItem>();
+
+        //    foreach (var labelItem in labeledItems)
+        //    {
+        //        foreach (var wordKvp in labelItem.wordCountDic)
+        //        {
+        //            if (wordItemDic.ContainsKey(wordKvp.Key))
+        //            {
+        //                wordItemDic[wordKvp.Key].totalCount++;
+        //                if (labelItem.label == whichClass) { wordItemDic[wordKvp.Key].zhengliCount++; }
+        //                else { wordItemDic[wordKvp.Key].fuliCount++; }
+        //            }
+        //            else { wordItemDic.Add(wordKvp.Key, new WordItem(wordKvp.Key, (labelItem.label == whichClass))); }//label和whichClass相同则表示当前是正例反之则是负例
+        //        }
+        //    }
+
+        //    //if (type.Equals("FLIEMO"))
+        //    //{
+        //    //    foreach (var lItem in labeledItems)
+        //    //    {
+        //    //        foreach (var wordKvp in lItem.wordCountDic)
+        //    //        {
+        //    //            if (wordItemDic.ContainsKey(wordKvp.Key))
+        //    //            {
+        //    //                wordItemDic[wordKvp.Key].totalCount++;
+        //    //                if (lItem.label == 1) { wordItemDic[wordKvp.Key].zhengliCount++; }
+        //    //                else { wordItemDic[wordKvp.Key].fuliCount++; }
+        //    //            }
+        //    //            else { wordItemDic.Add(wordKvp.Key, new WordItem(wordKvp.Key, (lItem.label == 1))); }
+        //    //        }
+        //    //    }
+        //    //}
+        //    //else if (type.Equals("FLI"))
+        //    //{
+        //    //    foreach (var lItem in labeledItems)
+        //    //    {
+        //    //        foreach (var wordKvp in lItem.wordCountDic)
+        //    //        {
+        //    //            if (wordItemDic.ContainsKey(wordKvp.Key))
+        //    //            {
+        //    //                wordItemDic[wordKvp.Key].totalCount++;
+        //    //                if (lItem.label == 1) { wordItemDic[wordKvp.Key].zhengliCount++; }
+        //    //                else if (lItem.label == 0 || lItem.label == -1) { wordItemDic[wordKvp.Key].fuliCount++; }
+        //    //            }
+        //    //            else { wordItemDic.Add(wordKvp.Key, new WordItem(wordKvp.Key, (lItem.label == 1))); }
+        //    //        }
+        //    //    }
+        //    //}
+        //    //else if (type.Equals("INNOV"))
+        //    //{
+        //    //    foreach (var lItem in labeledItems)
+        //    //    {
+        //    //        foreach (var wordKvp in lItem.wordCountDic)
+        //    //        {
+        //    //            if (wordItemDic.ContainsKey(wordKvp.Key))
+        //    //            {
+        //    //                wordItemDic[wordKvp.Key].totalCount++;
+        //    //                if (lItem.label == whichClass) { wordItemDic[wordKvp.Key].zhengliCount++; }
+        //    //                else { wordItemDic[wordKvp.Key].fuliCount++; }
+        //    //            }
+        //    //            else { wordItemDic.Add(wordKvp.Key, new WordItem(wordKvp.Key, (lItem.label == whichClass))); }
+        //    //        }
+        //    //    }
+        //    //}
+        //    //else { Console.WriteLine("wrong type"); }
+
+        //    return wordItemDic;
+        //}
         ///// <summary>
         ///// In fact, the calculation result of zhengli and fuli equals
         ///// </summary>

@@ -58,7 +58,29 @@ namespace Text.Classify
             return labeledItems;
         }
 
-        private Dictionary<int, List<string>> GetTrainData(string type, string dataFilePath)
+        /// <summary>
+        /// 根据不同的type，采用不同的数据获取方式
+        /// Get labeled items from sorce training file in the form of class LabeledItem
+        /// </summary>
+        /// <returns></returns>
+        public List<LabeledItem> GetLabeledItems(ref Dictionary<int, List<string>> trainData)
+        {
+            List<LabeledItem> labeledItems = new List<LabeledItem>();
+
+            //read excel
+            //Dictionary<int, List<string>> trainData = GetTrainData(this.type, dataFilePath);
+
+            //convert to LabeledItem
+            foreach (var labelStrsPair in trainData)
+            {
+                foreach (var curStr in labelStrsPair.Value)
+                { labeledItems.Add(new LabeledItem(labelStrsPair.Key, curStr)); }
+            }
+
+            return labeledItems;
+        }
+
+        public Dictionary<int, List<string>> GetTrainData(string type, string dataFilePath)
         {
             Dictionary<int, List<string>> trainData = new Dictionary<int, List<string>>();
 
