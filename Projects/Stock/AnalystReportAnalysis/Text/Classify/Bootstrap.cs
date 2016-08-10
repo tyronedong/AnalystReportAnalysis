@@ -21,40 +21,40 @@ namespace Text.Classify
 
 
 
-        /// <summary>
-        /// </summary>
-        /// <param name="howManySampleEachClass"></param>
-        /// <returns></returns>
-        static bool GenerateNewChiFeatureSource(int howManySampleEachClass)
-        {
-            TextPreProcess tPP = new TextPreProcess("FLI", rootModelPath, true, false, true, false);
+        ///// <summary>
+        ///// </summary>
+        ///// <param name="howManySampleEachClass"></param>
+        ///// <returns></returns>
+        //static bool GenerateNewChiFeatureSource(int howManySampleEachClass)
+        //{
+        //    TextPreProcess tPP = new TextPreProcess("FLI", rootModelPath, true, false, true, false);
 
-            //获取人工标注的excel中的前瞻性语句
-            string[] zhengli = tPP.GetTrainDataOfZhengli();
-            if (howManySampleEachClass < zhengli.Length) 
-            { return false; }
-            //通过训练好的分类器选择新的前瞻性语句
-            if (!RandomSelect.ExecuteSelectZhengli(rootFeaturePath, howManySampleEachClass - zhengli.Length, modelPath, featurePath))
-            { return false; }
+        //    //获取人工标注的excel中的前瞻性语句
+        //    string[] zhengli = tPP.GetTrainDataOfZhengli();
+        //    if (howManySampleEachClass < zhengli.Length) 
+        //    { return false; }
+        //    //通过训练好的分类器选择新的前瞻性语句
+        //    if (!RandomSelect.ExecuteSelectZhengli(rootFeaturePath, howManySampleEachClass - zhengli.Length, modelPath, featurePath))
+        //    { return false; }
 
-            //获取人工标注的excel中的非前瞻性语句
-            string[] fuli = tPP.GetTrainDataOfFuli();
-            if (!RandomSelect.ExecuteSelectFuli("FLI", rootFeaturePath, howManySampleEachClass - fuli.Length))
-            { return false; }
+        //    //获取人工标注的excel中的非前瞻性语句
+        //    string[] fuli = tPP.GetTrainDataOfFuli();
+        //    if (!RandomSelect.ExecuteSelectFuli("FLI", rootFeaturePath, howManySampleEachClass - fuli.Length))
+        //    { return false; }
             
-            return true;
-        }
+        //    return true;
+        //}
 
-        public static bool ExecuteBootstrap(int bootScale)
-        {
-            string featurePath = ConfigurationManager.AppSettings["chi_feature_path"];
+        //public static bool ExecuteBootstrap(int bootScale)
+        //{
+        //    string featurePath = ConfigurationManager.AppSettings["chi_feature_path"];
 
-            bool b1 = false, b2 = false;
-            if(!GenerateNewChiFeatureSource(bootScale))
-            { Trace.TraceError("Bootstrap.ExecuteBootstrap(int bootScale): GenerateNewChiFeatureSource failed"); return false; }
-            b2 = Feature.ExtractAndStoreChiFeature("FLI", featurePath);
+        //    bool b1 = false, b2 = false;
+        //    if(!GenerateNewChiFeatureSource(bootScale))
+        //    { Trace.TraceError("Bootstrap.ExecuteBootstrap(int bootScale): GenerateNewChiFeatureSource failed"); return false; }
+        //    b2 = Feature.ExtractAndStoreChiFeature("FLI", featurePath);
 
-            return b2;
-        }
+        //    return b2;
+        //}
     }
 }

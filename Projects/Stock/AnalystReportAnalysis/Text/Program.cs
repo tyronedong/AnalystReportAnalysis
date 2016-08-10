@@ -41,8 +41,12 @@ namespace Text
             //RandomSelect.ExecuteSelectFuli("INNOV", featureRootPath, 300);
             //GenerateChiFeatureWord("FLIEMO");
             //GenerateLibSVMInputFile("FLIEMO");
-            ExecuteTrain();
+            //ExecuteTrain();
             //Feature.ExtractAndStoreChiFeature("FLIEMO", featureRootPath);
+
+            //Feature.ExtractAndStoreChiFeature("FLIEMO");
+            //GenerateLibSVMInputFile("FLIEMO");
+            ExecuteTrain("FLIEMO");
 
             Console.WriteLine("finished");
             Console.ReadLine();
@@ -110,10 +114,32 @@ namespace Text
             Console.WriteLine("Model predict finished");
         }
 
-        static void ExecuteTrain()
+        static void ExecuteTrain(string type)
         {
-            string trainSetFile = ConfigurationManager.AppSettings["train_set_path"];
-            string modelFile = ConfigurationManager.AppSettings["model_path"];
+            string appSetRoot, appSetFile;
+            if (type.Equals("FLI") || type.Equals("FLIEMO"))
+            {
+                appSetRoot = "excel_foresight_root_dictionary";
+                appSetFile = "excel_foresight_filename";
+            }
+            else if (type.Equals("INNOVTYPE") || type.Equals("INNOVSTAGE") || type.Equals("INNOVEMO") || type.Equals("NONINNOVTYPE"))
+            {
+                appSetRoot = "excel_innovation_root_dictionary";
+                appSetFile = "excel_innovation_filename";
+            }
+            else
+            {
+                Trace.TraceError("error");
+                return;
+            }
+
+            string rootDic = ConfigurationManager.AppSettings[appSetRoot];
+            string dataFilePath = ConfigurationManager.AppSettings[appSetFile];
+
+            string tempT = Path.Combine(type, "train_set.txt");
+            string trainSetFile = Path.Combine(rootDic, tempT);
+            string tempM = Path.Combine(type, "model.txt");
+            string modelFile = Path.Combine(rootDic, tempM);
 
             Model model = new Model();
             model.Train(trainSetFile);
@@ -128,7 +154,7 @@ namespace Text
 
             if (type.Equals("FLIEMO"))
             {
-                tOrf = Feature.ExtractAndStoreChiFeature(type, Path.Combine(featureRootPath, "chi_feature.txt"));
+                tOrf = Feature.ExtractAndStoreChiFeature(type);
             }
             else if (type.Equals("FLI"))
             {
@@ -136,21 +162,43 @@ namespace Text
             }
             else if(type.Equals("INNOV"))
             {
-                tOrf = Feature.ExtractAndStoreChiFeature(type, Path.Combine(featureRootPath, "chi_feature.txt"));
+                tOrf = Feature.ExtractAndStoreChiFeature(type);
             }
         }
 
         static void GenerateLibSVMInputFile(string type)
         {
-            string featureFile = Path.Combine(ConfigurationManager.AppSettings["feature_relate_root_dictionary"], ConfigurationManager.AppSettings["chi_feature_filename"]);
-            string trainSetFile = ConfigurationManager.AppSettings["train_set_path"];
-            string rootDicForModelRelate = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
+            string appSetRoot, appSetFile;
+            if(type.Equals("FLI")||type.Equals("FLIEMO"))
+            {
+                appSetRoot = "excel_foresight_root_dictionary";
+                appSetFile = "excel_foresight_filename";
+            }
+            else if(type.Equals("INNOVTYPE")||type.Equals("INNOVSTAGE")||type.Equals("INNOVEMO")||type.Equals("NONINNOVTYPE"))
+            {
+                appSetRoot = "excel_innovation_root_dictionary";
+                appSetFile = "excel_innovation_filename";
+            }
+            else
+            {
+                Trace.TraceError("error");
+                return;
+            }
+
+            string rootDic = ConfigurationManager.AppSettings[appSetRoot];
+            string dataFilePath = ConfigurationManager.AppSettings[appSetFile];
+
+            string tempF = Path.Combine(type, "chi_feature.txt");
+            string featureFile = Path.Combine(rootDic, tempF);
+            string tempT = Path.Combine(type, "train_set.txt");
+            string trainSetFile = Path.Combine(rootDic, tempT);
+            
 
             List<string> trainSet = new List<string>();
 
             List<FeatureItem> fItems = Feature.LoadChiFeature(featureFile);
-            TextPreProcess tPP = new TextPreProcess(type, rootDicForModelRelate, true, false, true, true);
-            List<LabeledItem> lItems = tPP.GetLabeledItems();//FileHandler.LoadLabeledItems(preprocess_result_file);
+            TextPreProcess tPP = new TextPreProcess(type, rootDic, true, false, true, true);
+            List<LabeledItem> lItems = tPP.GetLabeledItems(dataFilePath);//FileHandler.LoadLabeledItems(preprocess_result_file);
 
             foreach (var lItem in lItems)
             {
