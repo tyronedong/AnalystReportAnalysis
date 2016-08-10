@@ -125,13 +125,56 @@ namespace Text.Classify
         /// <param name="minChiValue">define the min value of chi-value by which to decide weather is chi-feature</param>
         /// <param name="globalWeightType">define the type of 'global weight', default as 'tf-idf'</param>
         /// <returns></returns>
-        public static bool ExtractAndStoreChiFeature(string type, string saveFileName, double featRatio = 0.20, double minChiValue = 10, string globalWeightType = "idf")
+        public static bool ExtractAndStoreChiFeature(string type, string saveFileRelaName, double featRatio = 0.20, double minChiValue = 10, string globalWeightType = "idf")
         {
+            string rootForChi, dataFilePath;
+
+            if (type.Equals("FLI") || type.Equals("FLIEMO"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+                dataFilePath = ConfigurationManager.AppSettings["excel_foresight_filename"];//"FLI-信息提取-样本（20160720）.xlsx";
+            }
+            else if (type.Equals("INNOVTYPE") || type.Equals("INNOVSTAGE") || type.Equals("INNOVEMO") || type.Equals("NONINNOVTYPE"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+                dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];// "INNOV-信息提取.xlsx";
+            }
+            else
+            {
+                Trace.TraceError("Feature.ChiFeatureExtract():type error");
+                return false;
+            }
+
             List<FeatureItem> featureItems = ChiFeatureExtract(type, featRatio, minChiValue, globalWeightType);
 
-            if (FileHandler.SaveFeatures(saveFileName, featureItems)) return true;
+            if (FileHandler.SaveFeatures(saveFileRelaName, featureItems)) return true;
 
             return false;
+        }
+
+        private static string GetChiFeatureStorePath(string type)
+        {
+            string rootForChi, dataFilePath;
+
+            if (type.Equals("FLI") )
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+                dataFilePath = "./FLI/chi_feature.txt";//"FLI-信息提取-样本（20160720）.xlsx";
+            }
+            else if (type.Equals("FLIEMO"))
+            {
+
+            }
+            else if (type.Equals("INNOVTYPE") || type.Equals("INNOVSTAGE") || type.Equals("INNOVEMO") || type.Equals("NONINNOVTYPE"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+                dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];// "INNOV-信息提取.xlsx";
+            }
+            else
+            {
+                Trace.TraceError("Feature.ChiFeatureExtract():type error");
+                return "";
+            }
         }
 
         /// <summary>
@@ -142,16 +185,18 @@ namespace Text.Classify
         /// <returns></returns>
         private static List<FeatureItem> ChiFeatureExtract(string type, double featRatio = 0.10, double minChiValue = 5, string globalWeightType = "idf")
         {
-            string rootForChi = ConfigurationManager.AppSettings["feature_relate_root_dictionary"];
-            string dataFilePath;// = ConfigurationManager.AppSettings[""];
+            string rootForChi;// = ConfigurationManager.AppSettings["feature_relate_root_dictionary"];
+            string dataFilePath;
 
             if (type.Equals("FLI")||type.Equals("FLIEMO"))
             {
-                dataFilePath = "FLI-信息提取-样本（20160720）.xlsx";
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+                dataFilePath = ConfigurationManager.AppSettings["excel_foresight_filename"];//"FLI-信息提取-样本（20160720）.xlsx";
             }
             else if(type.Equals("INNOVTYPE")||type.Equals("INNOVSTAGE")||type.Equals("INNOVEMO")||type.Equals("NONINNOVTYPE"))
             {
-                dataFilePath = "INNOV-信息提取.xlsx";
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+                dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];// "INNOV-信息提取.xlsx";
             }
             else
             {
