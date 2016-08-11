@@ -46,92 +46,95 @@ namespace Text
 
             //Feature.ExtractAndStoreChiFeature("FLIEMO");
             //GenerateLibSVMInputFile("FLIEMO");
-            ExecuteTrain("FLIEMO");
+            //ExecuteTrain("FLIEMO");
+            Process("FLIEMO");
 
             Console.WriteLine("finished");
             Console.ReadLine();
         }
 
-        static void Test()
+        //static void Test()
+        //{
+        //    Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
+        //    Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
+
+        //    string path = @"F:\事们\进行中\分析师报告\数据标注\FLI信息提取-样本.xlsx";
+        //    ExcelHandler exlH = new ExcelHandler(path);
+        //    string[] zhenglis = exlH.GetColoum("sheet1", 2);
+
+        //    Dictionary<string, int> dic = new Dictionary<string, int>();
+        //    WordSegHandler wsH = new WordSegHandler();
+        //    if (!wsH.isValid) { Console.WriteLine("init failed"); }
+        //    else
+        //    {
+        //        foreach (var zhengli in zhenglis)
+        //        {
+        //            if (zhengli == null || string.IsNullOrEmpty(zhengli.Trim())) { continue; }
+        //            wsH.ExecutePartition(zhengli);
+        //            string[] result = wsH.GetAll();
+        //            //string[] noStopWords = wsH.GetNoStopWords();
+        //            //List<string> words = new List<string>(noStopWords);
+        //            foreach (var word in result)
+        //            {
+        //                if (dic.ContainsKey(word))
+        //                {
+        //                    dic[word]++;
+        //                }
+        //                else
+        //                {
+        //                    dic.Add(word, 1);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    var dicSort = from objDic in dic orderby objDic.Value descending select objDic;
+
+        //    foreach (var line in dicSort)
+        //    {
+        //        Trace.TraceInformation(line.Key + ":" + line.Value);
+        //    }
+
+        //    //SVM.Train.ExecuteTrain();
+
+        //    Console.ReadLine();
+        //}
+
+        static void ExecutePredict(string type)
         {
-            Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
-            Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
+            string appSetRoot = null, appSetFile = null;
+            if (!SetAppConfigName(ref appSetRoot, ref appSetFile, type))
+            { return; }
 
-            string path = @"F:\事们\进行中\分析师报告\数据标注\FLI信息提取-样本.xlsx";
-            ExcelHandler exlH = new ExcelHandler(path);
-            string[] zhenglis = exlH.GetColoum("sheet1", 2);
+            string rootDic = ConfigurationManager.AppSettings[appSetRoot];
+            string dataFilePath = ConfigurationManager.AppSettings[appSetFile];
 
-            Dictionary<string, int> dic = new Dictionary<string, int>();
-            WordSegHandler wsH = new WordSegHandler();
-            if (!wsH.isValid) { Console.WriteLine("init failed"); }
-            else
-            {
-                foreach (var zhengli in zhenglis)
-                {
-                    if (zhengli == null || string.IsNullOrEmpty(zhengli.Trim())) { continue; }
-                    wsH.ExecutePartition(zhengli);
-                    string[] result = wsH.GetAll();
-                    //string[] noStopWords = wsH.GetNoStopWords();
-                    //List<string> words = new List<string>(noStopWords);
-                    foreach (var word in result)
-                    {
-                        if (dic.ContainsKey(word))
-                        {
-                            dic[word]++;
-                        }
-                        else
-                        {
-                            dic.Add(word, 1);
-                        }
-                    }
-                }
-            }
-            var dicSort = from objDic in dic orderby objDic.Value descending select objDic;
+            string tempM = Path.Combine(type, "model.txt");
+            string modelFile = Path.Combine(rootDic, tempM);
+            string tempF = Path.Combine(type, "chi_feature.txt");
+            string featureFile = Path.Combine(rootDic, tempF);
 
-            foreach (var line in dicSort)
-            {
-                Trace.TraceInformation(line.Key + ":" + line.Value);
-            }
-
-            //SVM.Train.ExecuteTrain();
-
-            Console.ReadLine();
-        }
-
-        static void ExecutePredict()
-        {
-            //string trainSetFile = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\trainset.txt";
-            string modelFile = ConfigurationManager.AppSettings["model_path"];
-            string featureFile = ConfigurationManager.AppSettings["chi_feature_path"];
-            string text = "目前期间费用因上市不久故发生的管理较高，占收入比约在9% -10%左右，后续有望降低。";
             Model model = new Model();
             model.LoadModel(modelFile);
 
             //double[] vec = model.Predict(trainSetFile);
             Feature feat = new Feature(featureFile);
-            double v = model.Predict(feat.GetFeatureVec(text));
-            //model.Predict()
-            Console.WriteLine("Model predict finished");
+            string text = "start";
+            Console.WriteLine("Enter the text you want to predict. Enter 'q' for quit.");
+            while (text != "q")
+            {
+                text = Console.ReadLine();
+                double v = model.Predict(feat.GetFeatureVec(text));
+                Console.WriteLine("Model predict result is: " + v);
+            }
+            Console.WriteLine("Process finished");
+            Console.ReadLine();
         }
 
         static void ExecuteTrain(string type)
         {
-            string appSetRoot, appSetFile;
-            if (type.Equals("FLI") || type.Equals("FLIEMO"))
-            {
-                appSetRoot = "excel_foresight_root_dictionary";
-                appSetFile = "excel_foresight_filename";
-            }
-            else if (type.Equals("INNOVTYPE") || type.Equals("INNOVSTAGE") || type.Equals("INNOVEMO") || type.Equals("NONINNOVTYPE"))
-            {
-                appSetRoot = "excel_innovation_root_dictionary";
-                appSetFile = "excel_innovation_filename";
-            }
-            else
-            {
-                Trace.TraceError("error");
-                return;
-            }
+            string appSetRoot = null, appSetFile = null;
+            if (!SetAppConfigName(ref appSetRoot, ref appSetFile, type))
+            { return; }
 
             string rootDic = ConfigurationManager.AppSettings[appSetRoot];
             string dataFilePath = ConfigurationManager.AppSettings[appSetFile];
@@ -148,42 +151,11 @@ namespace Text
             Console.WriteLine("Model train finished");
         }
 
-        static void GenerateChiFeatureWord(string type)
-        {
-            bool tOrf = false;
-
-            if (type.Equals("FLIEMO"))
-            {
-                tOrf = Feature.ExtractAndStoreChiFeature(type);
-            }
-            else if (type.Equals("FLI"))
-            {
-
-            }
-            else if(type.Equals("INNOV"))
-            {
-                tOrf = Feature.ExtractAndStoreChiFeature(type);
-            }
-        }
-
         static void GenerateLibSVMInputFile(string type)
         {
-            string appSetRoot, appSetFile;
-            if(type.Equals("FLI")||type.Equals("FLIEMO"))
-            {
-                appSetRoot = "excel_foresight_root_dictionary";
-                appSetFile = "excel_foresight_filename";
-            }
-            else if(type.Equals("INNOVTYPE")||type.Equals("INNOVSTAGE")||type.Equals("INNOVEMO")||type.Equals("NONINNOVTYPE"))
-            {
-                appSetRoot = "excel_innovation_root_dictionary";
-                appSetFile = "excel_innovation_filename";
-            }
-            else
-            {
-                Trace.TraceError("error");
-                return;
-            }
+            string appSetRoot = null, appSetFile = null;
+            if(!SetAppConfigName(ref appSetRoot, ref appSetFile, type))
+            { return; }
 
             string rootDic = ConfigurationManager.AppSettings[appSetRoot];
             string dataFilePath = ConfigurationManager.AppSettings[appSetFile];
@@ -193,7 +165,6 @@ namespace Text
             string tempT = Path.Combine(type, "train_set.txt");
             string trainSetFile = Path.Combine(rootDic, tempT);
             
-
             List<string> trainSet = new List<string>();
 
             List<FeatureItem> fItems = Feature.LoadChiFeature(featureFile);
@@ -228,6 +199,43 @@ namespace Text
                 Console.WriteLine("GenerateLibSVMInputFile() execute failed");
         }
 
+        static void GenerateChiFeatureFile(string type)
+        {
+            if (Feature.ExtractAndStoreChiFeature(type))
+                Console.WriteLine("GenerateChiFeatureFile() execute success");
+            else
+                Console.WriteLine("GenerateChiFeatureFile() execute failed");
+        }
+
+        static void Process(string type)
+        {
+            GenerateChiFeatureFile(type);
+            GenerateLibSVMInputFile(type);
+            ExecuteTrain(type);
+            Console.WriteLine("Process finished");
+        }
+
+        static bool SetAppConfigName(ref string appSetRoot, ref string appSetFile, string type)
+        {
+            if (type.Equals("FLI") || type.Equals("FLIEMO"))
+            {
+                appSetRoot = "excel_foresight_root_dictionary";
+                appSetFile = "excel_foresight_filename";
+            }
+            else if (type.Equals("INNOVTYPE") || type.Equals("INNOVSTAGE") || type.Equals("INNOVEMO") || type.Equals("NONINNOVTYPE"))
+            {
+                appSetRoot = "excel_innovation_root_dictionary";
+                appSetFile = "excel_innovation_filename";
+            }
+            else
+            {
+                Trace.TraceError("Program.SetAppConfigName():type error");
+                return false;
+            }
+            return true;
+        }
+
+        
         //static void ExtractAndSaveChiFeatures()
         //{
         //    string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
