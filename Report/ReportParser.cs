@@ -83,7 +83,6 @@ namespace Report
         //        isValid = false;
         //    }
         //}
-
         //public ReportParser(string pdfPath, string stockjobber)
         //{
         //    anaReport = new AnalystReport();
@@ -108,7 +107,7 @@ namespace Report
         /// null if wrong
         /// empty if not found
         /// </returns>
-        public static string getStockjobber(string pdfPath)
+        public static string findBrokerage(string pdfPath)
         {
             string SecurityNameDicPath = ConfigurationManager.AppSettings["SecNameDic_Path"];
             string[] securityNames = loadSecurityNames(SecurityNameDicPath);
@@ -219,46 +218,68 @@ namespace Report
 
         /// <summary>
         /// This function is executed after report content was extracted.
+        /// 计算一篇研报中图表（图和表）的数量
         /// </summary>
         /// <returns></returns>
-        public virtual bool extractCountInfo()
+        public virtual void extractCountInfo()
         {
-            //Regex picOrTabHead = new Regex(@"^(图|表|图表) *\d{1,2}");
-            Regex value = new Regex(@"\d+(\.\d+)?");
+            extractPicTableCount();
+            extractValueCount();
+        }
+
+        public virtual void extractPicTableCount()
+        {
+            Regex pidHead = new Regex(@"^图");
+            Regex picTail = new Regex(@"(趋势|走势|表现)图?[:：]?$");
 
             //get picCount and tableCount 
             foreach (var line in lines)
             {
                 string trimedLine = line.Trim();
-                
-                if(trimedLine.StartsWith("图"))
+
+                if(trimedLine.StartsWith("图表"))
+                {
+                    
+                }
+
+                if (trimedLine.StartsWith("图") || trimedLine.EndsWith("图"))
                 { anaReport.picCount++; continue; }
-                if(trimedLine.StartsWith("表"))
+                if (trimedLine.StartsWith("表") || trimedLine.EndsWith("表"))
                 { anaReport.tableCount++; continue; }
+                
+                if(picTail.IsMatch(trimedLine))
+                { anaReport.picCount++; continue; }
             }
+
+            return;
+        }
+
+        public virtual void extractValueCount()
+        {
+            Regex value = new Regex(@"\d+(\.\d+)?");
 
             //get total value count
             foreach (var nLine in noABCLines)
             {
-                if(value.IsMatch(nLine))
+                if (value.IsMatch(nLine))
                 { anaReport.valueCountOutContent += value.Matches(nLine).Count; }
             }
 
             //get value count in content
             if (string.IsNullOrEmpty(anaReport.Content))
             {
-                return false;
+                return;
             }
             else
             {
-                if(value.IsMatch(anaReport.Content))
+                if (value.IsMatch(anaReport.Content))
                 { anaReport.valueCountInContent += value.Matches(anaReport.Content).Count; }
             }
 
             //get value count out content
             anaReport.valueCountOutContent -= anaReport.valueCountInContent;
-
-            return true;
+            
+            return;
         }
 
         public virtual bool extractStockInfo()
@@ -305,7 +326,7 @@ namespace Report
         public virtual bool extractStockOtherInfo()
         {
             //extract stock price, stock rating and stock rating change
-            Regex stockRRC = new Regex(@"(看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避) *(([\(（][\u4e00-\u9fa5]{2,4}[\)）])|(/[\u4e00-\u9fa5]{2,4}))");//推荐(维持)||推荐/维持
+            Regex stockRRC = new Regex(@"(看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避) *(([\(（][\u4e00-\u9fa5]{2,4}[\)）])|(/ *[\u4e00-\u9fa5]{2,4}))");//推荐(维持)||推荐/维持
             Regex stockR = new Regex(@"看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|谨慎推荐|推荐|回避");
 
             bool hasRRCMatched = false;
@@ -686,6 +707,9 @@ namespace Report
         /// <returns></returns>
         public virtual string[] removeAnyButContentInLines(string[] lines)
         {
+            double perCounter = 0;
+            double perPerLine = 1.0 / lines.Length;
+
             Regex InvestRatingStatement = new Regex("(^投资评级(的)?(说明|定义))|(投资评级(的)?(说明|定义)?[:：]?$)|(评级(标准|说明|定义)[:：]?$)");
             Regex Statements = new Regex("^(((证券)?分析师(申明|声明|承诺))|((重要|特别)(声|申)明)|(免责(条款|声明|申明))|(法律(声|申)明)|(独立性(声|申)明)|(披露(声|申)明)|(信息披露)|(要求披露))[:：]?$");
             Regex FirmIntro = new Regex("公司简介[:：]?$");
@@ -696,6 +720,14 @@ namespace Report
             List<string> newLines = new List<string>();
             foreach (var line in lines)
             {
+                //add this regulation to aviod the loss of main content
+                if (perCounter <= 0.30)
+                {
+                    newLines.Add(line);
+                    perCounter += perPerLine;
+                    continue;
+                }
+
                 string trimedLine = line.Trim();
                 if (InvestRatingStatement.IsMatch(trimedLine))
                 {
@@ -718,6 +750,7 @@ namespace Report
                     break;
                 }
                 newLines.Add(line);
+                perCounter += perPerLine;
             }
             return newLines.ToArray();
         }
@@ -773,6 +806,8 @@ namespace Report
                 {
                     continue;
                 }
+                if (trimedPara.StartsWith("本人") && trimedPara.Contains("在此申明"))
+                { continue; }
                 if (trimedPara.Contains("数据来源："))
                 {
                     if (trimedPara.StartsWith("数据来源：")) { continue; }
@@ -817,8 +852,12 @@ namespace Report
         public bool isTableDigits(string para)
         {
             //judge if most is digit
-            Regex digi = new Regex(@"[0-9a-zA-Z% .,]{15,}");
-            return digi.IsMatch(para);
+            Regex digiPat = new Regex(@"[0-9a-zA-Z% .,]{15,}");
+
+            Regex digit = new Regex(@"[0-9a-zA-Z% .,]");
+            double dPer = digit.Matches(para).Count * 1.0 / (para.Length + 1);
+
+            return digiPat.IsMatch(para) && (dPer > 0.6);
             //int digiCount = 0;
             //foreach (var c in para)
             //{
@@ -892,6 +931,23 @@ namespace Report
                     continue;
                 }
                 curPara += line;
+            }
+            //some report not end paragraph with ' ', 
+            //so use '。' to handle these cases
+            if(paragraphs.Count==0)
+            {
+                curPara = "";
+                foreach (var line in lines)
+                {
+                    if (line.EndsWith("。"))
+                    {
+                        curPara += line;
+                        paragraphs.Add(curPara);
+                        curPara = "";
+                        continue;
+                    }
+                    curPara += line;
+                }
             }
             return paragraphs.ToArray();
         }

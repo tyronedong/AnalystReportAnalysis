@@ -14,6 +14,8 @@ using System.Threading;
 using Report.Handler;
 using Report.Securities;
 using Report.Outsider;
+using org.apache.pdfbox.pdmodel;
+using org.apache.pdfbox.pdmodel.graphics.xobject;
 
 namespace Report
 {
@@ -38,19 +40,63 @@ namespace Report
 
         static bool Some()
         {
-            //string path = @"C:\Users\Administrator\Desktop\陈琦《新GRE核心词汇考法精析》（再要你命3000）破解合成打印版.pdf";
-
-            //ReportParser rp = new ReportParser(path);
-            //string txt = rp.loadPDFText();
-            //string path = @"F:\事们\进行中\分析师报告\分析师研报\分析师报告按证券分\中金\20070420-中金公司-丽珠集团：2007年1季度业绩回顾：经营性每股收益0.19元，同比增长152%，好于预期，审慎推荐.pdf";
-            //string txt = ReportParser.loadPDFText(path);
             string path = @"D:\人民大学\分析师报告\2010\2010-6-8\01E0192C-12D7-4035-A0E4-85B1F73A3AB7.PDF";
-            string path2 = @"F:\事们\进行中\分析师报告\分析师研报\分析师报告\000513\20130826-银河证券-丽珠集团-000513-业绩基本符合预期，新品贡献度有望提升.pdf";
+            string path2 = @"F:\things\running\分析师报告\分析师研报\分析师报告\000513\20130826-银河证券-丽珠集团-000513-业绩基本符合预期，新品贡献度有望提升.pdf";
+            string path3 = @"F:\things\running\分析师报告\分析师研报\分析师报告\002317\20091211-大通证券-众生药业-002317-上市定价报告.pdf";
+            string path4 = @"D:\人民大学\分析师报告\2012\2012-1-13\AFC4A9CD-AFB9-42B2-8C0D-0985892BF915.PDF";
+            string imgSavePath = @"F:\things\running\分析师报告\";
 
-            string t = ReportParser.loadPDFText(path);
-            ReportParser rp = new ZhongJinSecurities(path);
-            WordSegHandler wsH = new WordSegHandler();
-            var r = rp.executeExtract_nodb(ref wsH);
+            PDDocument document = PDDocument.load(path4);
+            //PDDocumentInformation info = document.getDocumentInformation();
+
+            //var title = info.getTitle();
+            //var sub = info.getSubject();
+            //var au = info.getAuthor();
+            //var key = info.getKeywords();
+            //var t = info.getTrapped();
+
+            /** 文档页面信息 **/
+            PDDocumentCatalog cata = document.getDocumentCatalog();
+            java.util.List pages = cata.getAllPages();
+            int count = 1;
+            for (int i = 0; i < pages.size(); i++)
+            {
+                PDPage page = (PDPage)pages.get(i);
+                if (page != null)
+                {
+                    //PDResources res = page.findResources();
+                    PDResources res = page.getResources();
+                    //获取页面图片信息  
+                    java.util.Map imgs = res.getImages();
+                    if (imgs != null)
+                    {
+                        var keySet = imgs.keySet();
+                        var it = keySet.iterator();
+                        while (it.hasNext())
+                        {
+                            string key = it.next().ToString();
+                            PDXObjectImage img = (PDXObjectImage)imgs.get(key);
+                            try
+                            {
+                                img.write2file(imgSavePath + count);
+                            }
+                            catch (Exception e)
+                            {
+                                count++;
+                                continue;
+                            }
+                            count++;
+                        }
+                    }
+                }
+            }  
+
+            //Console.WriteLine(info.toString());
+
+            //string t = ReportParser.loadPDFText(path);
+            //ReportParser rp = new ZhongJinSecurities(path);
+            //WordSegHandler wsH = new WordSegHandler();
+            //var r = rp.executeExtract_nodb(ref wsH);
 
 
             //string format1 = "yyyy年MM月dd日";

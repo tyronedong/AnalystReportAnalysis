@@ -12,7 +12,8 @@ namespace Report
         public string ReportTitle { get; set; }//added
         public string ReportType { set; get; }//added
 
-        public string Stockjobber { get; set; }
+        //public string Stockjobber { get; set; }
+        public string Brokerage { get; set; }
         public DateTime Date { get; set; }
         public string PDFileName { get; set; }
         
