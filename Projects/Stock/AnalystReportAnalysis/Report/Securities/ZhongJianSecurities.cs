@@ -116,32 +116,38 @@ namespace Report.Securities
                 }
                 if (trimedPara.Contains("数据来源："))
                 {
-                    if (trimedPara.StartsWith("数据来源：")) { continue; }
+                    if (trimedPara.StartsWith("数据来源：")) 
+                    { continue; }
                     else
                     {
                         string shuju = noteShuju.Match(trimedPara).Value;
                         string judgeStr = trimedPara.Replace(shuju, "");
-                        if (!mightBeContent.IsMatch(judgeStr)) { continue; }
+                        if (!mightBeContent.IsMatch(judgeStr)) 
+                        { continue; }
                     }
                 }
                 if (trimedPara.Contains("资料来源："))
                 {
-                    if (trimedPara.StartsWith("资料来源：")) { continue; }
+                    if (trimedPara.StartsWith("资料来源：")) 
+                    { continue; }
                     else
                     {
                         string ziliao = noteZiliao.Match(trimedPara).Value;
                         string judgeStr = trimedPara.Replace(ziliao, "");
-                        if (!mightBeContent.IsMatch(judgeStr)) { continue; }
+                        if (!mightBeContent.IsMatch(judgeStr)) 
+                        { continue; }
                     }
                 }
                 if (trimedPara.Contains("注："))
                 {
-                    if (trimedPara.StartsWith("注：")) { continue; }
+                    if (trimedPara.StartsWith("注：")) 
+                    { continue; }
                     else
                     {
                         string zhu = noteZhu.Match(trimedPara).Value;
                         string judgeStr = trimedPara.Replace(zhu, "");
-                        if (!mightBeContent.IsMatch(judgeStr)) { continue; }
+                        if (!mightBeContent.IsMatch(judgeStr)) 
+                        { continue; }
                     }
                 }
                 if (isTableDigits(trimedPara))

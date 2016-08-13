@@ -13,10 +13,7 @@ using Text.Classify.Item;
 namespace Text
 {
     class Program
-    {
-        //static string preprocess_result_file = ConfigurationManager.AppSettings["preprocess_result_file"];
-        static string featureRootPath = ConfigurationManager.AppSettings["feature_relate_root_dictionary"];
-        
+    {   
         static void Main(string[] args)
         {
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
