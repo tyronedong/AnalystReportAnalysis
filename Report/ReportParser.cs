@@ -229,26 +229,33 @@ namespace Report
 
         public virtual void extractPicTableCount()
         {
-            Regex pidHead = new Regex(@"^图");
+            Regex picHead = new Regex(@"^图");
             Regex picTail = new Regex(@"(趋势|走势|表现)图?[:：]?$");
+
+            Regex tableHead = new Regex(@"^表");
+            Regex tableTail = new Regex(@"表$");
 
             //get picCount and tableCount 
             foreach (var line in lines)
             {
                 string trimedLine = line.Trim();
 
-                if(trimedLine.StartsWith("图表"))
+                if (trimedLine.StartsWith("图表"))//处理图表
                 {
-                    
+                    if (picTail.IsMatch(trimedLine))
+                    { anaReport.picCount++; }
+                    else { anaReport.tableCount++; }
+                    continue;
                 }
 
-                if (trimedLine.StartsWith("图") || trimedLine.EndsWith("图"))
+                if (picHead.IsMatch(trimedLine))
                 { anaReport.picCount++; continue; }
-                if (trimedLine.StartsWith("表") || trimedLine.EndsWith("表"))
+                if (tableHead.IsMatch(trimedLine))
                 { anaReport.tableCount++; continue; }
-                
-                if(picTail.IsMatch(trimedLine))
+                if (picTail.IsMatch(trimedLine))
                 { anaReport.picCount++; continue; }
+                if (tableTail.IsMatch(trimedLine))
+                { anaReport.tableCount++; }
             }
 
             return;
