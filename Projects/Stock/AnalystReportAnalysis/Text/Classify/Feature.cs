@@ -84,13 +84,15 @@ namespace Text.Classify
             return featVec.ToArray();
         }
 
-        public static bool ModifyChiFeature(string fileName)
+        public static bool ModifyAndSaveChiFeature(string type)
         {
-            string userFeaturePath = ConfigurationManager.AppSettings["user_feature_path"];
-            //string featurePath = ConfigurationManager.AppSettings["chi_feature_path"];
+            string userFeaturePath = GetUserFeaturePath(type);
+            string chiFeaturePath = GetChiFeatureStorePath(type);
+            if (userFeaturePath == null || chiFeaturePath == null)
+                return false;
 
             List<FeatureItem> newFeatures = new List<FeatureItem>();
-            List<FeatureItem> oldFeatures = FileHandler.LoadFeatures(fileName);
+            List<FeatureItem> oldFeatures = FileHandler.LoadFeatures(chiFeaturePath);
 
             int id = 1;
             string[] userFeature = FileHandler.LoadStringArray(userFeaturePath);
@@ -115,7 +117,7 @@ namespace Text.Classify
                 newFeatures.Add(new FeatureItem(id++, of.featureWord, of.globalWeight));
             }
 
-            return FileHandler.SaveFeatures(fileName, newFeatures);
+            return FileHandler.SaveFeatures(chiFeaturePath, newFeatures);
         }
 
         /// <summary>
@@ -176,7 +178,50 @@ namespace Text.Classify
             }
             else
             {
-                Trace.TraceError("Feature.ChiFeatureExtract():type error");
+                Trace.TraceError("Feature.GetChiFeatureStorePath():type error");
+                return null;
+            }
+
+            return Path.Combine(rootForChi, dataFilePath);
+        }
+
+        private static string GetUserFeaturePath(string type)
+        {
+            string rootForChi, dataFilePath;
+
+            if (type.Equals("FLI"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+                dataFilePath = "./FLI/user_feature.txt";
+            }
+            else if (type.Equals("FLIEMO"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+                dataFilePath = "./FLIEMO/user_feature.txt";
+            }
+            else if (type.Equals("INNOVTYPE"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+                dataFilePath = "./INNOVTYPE/user_feature.txt";
+            }
+            else if (type.Equals("INNOVSTAGE"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+                dataFilePath = "./INNOVSTAGE/user_feature.txt";
+            }
+            else if (type.Equals("INNOVEMO"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+                dataFilePath = "./INNOVEMO/user_feature.txt";
+            }
+            else if (type.Equals("NONINNOVTYPE"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+                dataFilePath = "./NONINNOVTYPE/user_feature.txt";
+            }
+            else
+            {
+                Trace.TraceError("Feature.GetUserFeaturePath():type error");
                 return null;
             }
 
@@ -218,6 +263,7 @@ namespace Text.Classify
             List<LabeledItem> labeledItems = tPP.GetLabeledItems(ref trainData);
 
             int keyCounter = 0;
+            int echoReducer = 0;//用来去除重复的词
             foreach(var curKey in trainData.Keys)
             {
                 if (curKey == 0 || curKey == -1)//负例不再单独计算
@@ -232,10 +278,15 @@ namespace Text.Classify
                 //选择卡方值较大的前k个值
                 for (int i = 0; i < countOfFeat; i++)
                 {
+                    string word = dicSort.ElementAt(i).Key;
+
+                    if(ContainsFeatureWord(ref featureItems, word))
+                    { echoReducer++; continue; }
+
                     //if (dicSort.ElementAt(i).Value < minChiValue) { break; }
                     FeatureItem featureItem = new FeatureItem();
-                    featureItem.id = countOfFeat * keyCounter + i + 1;
-                    featureItem.featureWord = dicSort.ElementAt(i).Key;
+                    featureItem.id = countOfFeat * keyCounter + i + 1 - echoReducer;
+                    featureItem.featureWord = word;
                     if (globalWeightType.Equals("idf"))
                     {
                         WordItem wordItem = wordItemDic[featureItem.featureWord];
@@ -248,6 +299,22 @@ namespace Text.Classify
 
             //if (FileHandler.SaveFeatures(fileName, featureItems)) return true;
             return featureItems;
+        }
+
+        /// <summary>
+        /// 判断某个特征词是否已存在
+        /// </summary>
+        /// <param name="featureItems"></param>
+        /// <param name="featureWord"></param>
+        /// <returns></returns>
+        private static bool ContainsFeatureWord(ref List<FeatureItem> featureItems, string featureWord)
+        {
+            foreach(var featureItem in featureItems)
+            {
+                if (featureWord.Equals(featureItem.featureWord))
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>

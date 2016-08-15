@@ -44,7 +44,7 @@ namespace Text
             //Feature.ExtractAndStoreChiFeature("FLIEMO");
             //GenerateLibSVMInputFile("FLIEMO");
             //ExecuteTrain("FLIEMO");
-            Process("FLIEMO");
+            Process3("FLIEMO");
 
             Console.WriteLine("finished");
             Console.ReadLine();
@@ -204,12 +204,26 @@ namespace Text
                 Console.WriteLine("GenerateChiFeatureFile() execute failed");
         }
 
-        static void Process(string type)
+        static void Process1(string type)
         {
             GenerateChiFeatureFile(type);
             GenerateLibSVMInputFile(type);
             ExecuteTrain(type);
-            Console.WriteLine("Process finished");
+            Console.WriteLine("Process1 finished");
+        }
+
+        static void Process2(string type)
+        {
+            Feature.ModifyAndSaveChiFeature(type);
+            GenerateLibSVMInputFile(type);
+            ExecuteTrain(type);
+            Console.WriteLine("Process2 finished");
+        }
+
+        static void Process3(string type)
+        {
+            ExecuteTrain(type);
+            Console.WriteLine("Process3 finished");
         }
 
         static bool SetAppConfigName(ref string appSetRoot, ref string appSetFile, string type)
@@ -232,7 +246,6 @@ namespace Text
             return true;
         }
 
-        
         //static void ExtractAndSaveChiFeatures()
         //{
         //    string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";
