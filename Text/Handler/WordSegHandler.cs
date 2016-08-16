@@ -142,6 +142,10 @@ namespace Text.Handler
                 string userDictPath = @".\NLPIR\userdict.txt";
                 //int k = NLPIR_ImportUserDict(userDictPath);
 
+                NLPIR_AddUserWord("较大");
+                NLPIR_AddUserWord("较小");
+                NLPIR_AddUserWord("企稳");
+                NLPIR_AddUserWord("可期");
                 NLPIR_AddUserWord("看好");
                 NLPIR_AddUserWord("极速");
                 NLPIR_AddUserWord("爆发性");
@@ -150,10 +154,15 @@ namespace Text.Handler
                 NLPIR_AddUserWord("负债率");
                 NLPIR_AddUserWord("完不成");
                 NLPIR_AddUserWord("扣非");
+                NLPIR_AddUserWord("高景气");
                 NLPIR_AddUserWord("中高端");
                 NLPIR_AddUserWord("爆发期");
+                NLPIR_AddUserWord("将好于");
                 NLPIR_AddUserWord("超预期");
                 NLPIR_AddUserWord("稳中有增");
+                NLPIR_AddUserWord("新增收入");
+                NLPIR_AddUserWord("新增利润");
+                NLPIR_AddUserWord("新增市场");
 
                 Console.WriteLine("Import " + 5 + " user dict items");
 
