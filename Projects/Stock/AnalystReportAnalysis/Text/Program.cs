@@ -9,6 +9,7 @@ using System.Configuration;
 using Text.Handler;
 using Text.Classify;
 using Text.Classify.Item;
+using Text.Sentiment;
 
 namespace Text
 {
@@ -19,37 +20,39 @@ namespace Text
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            //Bootstrap.ExecuteBootstrap(3000);
-            //Feature.ExtractAndStoreChiFeature(featurePath);
-            //List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
-            //Test2();
-            //Feature.ModifyChiFeature(featurePath);
-            //SelectAndSaveFulis();
-            //ExtractAndSaveChiFeatures();
-            //GenerateLibSVMInputFile();
-            //ExecuteTrain();
-            //ExecutePredict();
-            //string rootDicForModelRelate = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
-            //Model.GenerateTrainSet(rootDicForModelRelate);
-
-            //GenerateLibSVMInputFile();
-            //ExecuteTrain();
-
-            //RandomSelect.ExecuteSelectFuli("INNOV", featureRootPath, 300);
-            //GenerateChiFeatureWord("FLIEMO");
-            //GenerateLibSVMInputFile("FLIEMO");
-            //ExecuteTrain();
-            //Feature.ExtractAndStoreChiFeature("FLIEMO", featureRootPath);
-
-            //Feature.ExtractAndStoreChiFeature("FLIEMO");
-            //GenerateLibSVMInputFile("FLIEMO");
-            //ExecuteTrain("FLIEMO");
-            Process3("FLIEMO");
+            //Process3("FLIEMO");
+            CalPrecision();
+            //TestWordSeg("小米公司和超预期稳中有增爆炸性的极速折让不景气的负债率和资产负债率的微信公众平台和锂电池需求将于明后年进入高速增长期，进而拉动六氟磷酸锂的需求出现爆发性增长，如符合预期，未来几年需求复合增长率在35%左右。");
 
             Console.WriteLine("finished");
             Console.ReadLine();
         }
 
+        //Bootstrap.ExecuteBootstrap(3000);
+        //Feature.ExtractAndStoreChiFeature(featurePath);
+        //List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
+        //Test2();
+        //Feature.ModifyChiFeature(featurePath);
+        //SelectAndSaveFulis();
+        //ExtractAndSaveChiFeatures();
+        //GenerateLibSVMInputFile();
+        //ExecuteTrain();
+        //ExecutePredict();
+        //string rootDicForModelRelate = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
+        //Model.GenerateTrainSet(rootDicForModelRelate);
+
+        //GenerateLibSVMInputFile();
+        //ExecuteTrain();
+
+        //RandomSelect.ExecuteSelectFuli("INNOV", featureRootPath, 300);
+        //GenerateChiFeatureWord("FLIEMO");
+        //GenerateLibSVMInputFile("FLIEMO");
+        //ExecuteTrain();
+        //Feature.ExtractAndStoreChiFeature("FLIEMO", featureRootPath);
+
+        //Feature.ExtractAndStoreChiFeature("FLIEMO");
+        //GenerateLibSVMInputFile("FLIEMO");
+        //ExecuteTrain("FLIEMO");
         //static void Test()
         //{
         //    Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
@@ -246,6 +249,61 @@ namespace Text
             return true;
         }
 
+        static void CalPrecision()
+        {
+            SentiAnalysis sa = new SentiAnalysis();
+            if (!sa.isValid)
+            {
+                Console.WriteLine("Program.CalPrecision(): error");
+                return;
+            }
+
+            string rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+            string dataFilePath = ConfigurationManager.AppSettings["excel_foresight_filename"];//"FLI-信息提取-样本（20160720）.xlsx";
+
+            TextPreProcess tPP = new TextPreProcess("FLIEMO", rootForChi, true, true, true, true);
+            var data = tPP.GetTrainData("FLIEMO", dataFilePath);
+
+            List<string> wrong = new List<string>();
+            double[] totalCount = new double[3];
+            double[] accCount = new double[3];
+            foreach(var dataItem in data)
+            {
+                totalCount[dataItem.Key - 1] += dataItem.Value.Count();
+                foreach(var sentence in dataItem.Value)
+                {
+                    double val = sa.CalSentiValue(sentence);
+                    if (val > 0 && dataItem.Key == 3)
+                        accCount[dataItem.Key - 1]++;
+                    else if (val == 0 && dataItem.Key == 2)
+                        accCount[dataItem.Key - 1]++;
+                    else if (val < 0 && dataItem.Key == 1)
+                        accCount[dataItem.Key - 1]++;
+                    else if (dataItem.Key == 2)
+                        wrong.Add(sentence);
+                }
+            }
+
+            FileHandler.SaveStringArray(@"D:\workingwc\Stock\AnalystReportAnalysis\Text\Sentiment\class2_wrong.txt", wrong.ToArray());
+
+            Console.WriteLine("class 1 accuracy is " + (accCount[0] / totalCount[0]));
+            Console.WriteLine("class 2 accuracy is " + (accCount[1] / totalCount[1]));
+            Console.WriteLine("class 3 accuracy is " + (accCount[2] / totalCount[2]));
+            Console.WriteLine("total accuracy is " + ((accCount[0] + accCount[1] + accCount[2]) / (totalCount[0] + totalCount[1] + totalCount[2])));
+        }
+
+        static void TestWordSeg(string sentence)
+        {
+            WordSegHandler wsH = new WordSegHandler();
+            if (!wsH.isValid)
+                Console.WriteLine("wrong!");
+
+            wsH.ExecutePartition(sentence);
+            string[] noSW = wsH.GetNoStopWords();
+            foreach (var word in noSW)
+                Console.Write(word + " ");
+            Console.WriteLine();
+        }
         //static void ExtractAndSaveChiFeatures()
         //{
         //    string fileName = @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\selected_chi_features_with_random_select_fulis.txt";

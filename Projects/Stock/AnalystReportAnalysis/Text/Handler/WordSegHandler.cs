@@ -140,9 +140,22 @@ namespace Text.Handler
             else 
             {
                 string userDictPath = @".\NLPIR\userdict.txt";
-                int k = NLPIR_ImportUserDict(userDictPath);
+                //int k = NLPIR_ImportUserDict(userDictPath);
 
-                Console.WriteLine("Import " + k + " user dict items");
+                NLPIR_AddUserWord("看好");
+                NLPIR_AddUserWord("极速");
+                NLPIR_AddUserWord("爆发性");
+                NLPIR_AddUserWord("走弱");
+                NLPIR_AddUserWord("折让");
+                NLPIR_AddUserWord("负债率");
+                NLPIR_AddUserWord("完不成");
+                NLPIR_AddUserWord("扣非");
+                NLPIR_AddUserWord("中高端");
+                NLPIR_AddUserWord("爆发期");
+                NLPIR_AddUserWord("超预期");
+                NLPIR_AddUserWord("稳中有增");
+
+                Console.WriteLine("Import " + 5 + " user dict items");
 
                 isValid = true; 
             }
@@ -191,7 +204,7 @@ namespace Text.Handler
                 { continue; }
                 if(kvp.Key.StartsWith("u"))
                 { continue; }
-                if(kvp.Key.StartsWith("m"))
+                if(kvp.Key.Equals("m"))//“一些”是数量词mq
                 { continue; }
                 //Console.ReadLine();
                 noStopWords.Add(kvp.Value);
