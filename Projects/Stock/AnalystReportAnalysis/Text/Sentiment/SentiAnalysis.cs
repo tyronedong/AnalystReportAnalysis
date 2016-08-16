@@ -90,7 +90,11 @@ namespace Text.Sentiment
         public double CalSentiValue(string sentence)
         {
             Regex cost = new Regex(@"成本");
-            Regex profit = new Regex(@"毛利率|净利率|利润");
+            Regex profit = new Regex(@"毛利率|净利率|利润|增速");
+
+            Regex goodSpace = new Regex(@"(提升|上升|拓展|成长|市值|业务|盈利|发展|市场|行业|对接)空间");
+            Regex spaceBig = new Regex(@"无限|巨大|较大|大|广阔|打开");
+            Regex spaceSmall = new Regex(@"有限|较小|小");
 
             if (wsH == null || !wsH.isValid)
             { Trace.TraceError("SentiAnalysis.JudgeSenti:  WordSegHandler not valid"); return double.NaN; }
@@ -155,12 +159,22 @@ namespace Text.Sentiment
                     }
 
                     //扫描到“降低”、“下降”，需要具体区分是什么主体
-                    if (word.Equals("降低") || word.Equals("下降") || word.Equals("拉低"))
+                    if (word.Equals("降低") || word.Equals("下降"))
                     {
                         if (cost.IsMatch(group))
                         { baseVals.Add(1); break; }
                         if (profit.IsMatch(group))
                         { baseVals.Add(-1); break; }
+                    }
+                    if(word.Contains("空间"))
+                    {
+                        if(goodSpace.IsMatch(group))
+                        {
+                            if(spaceBig.IsMatch(group))
+                            { baseVals.Add(1); break; }
+                            if(spaceSmall.IsMatch(group))
+                            { baseVals.Add(-1); break; }
+                        }
                     }
                 }
 
