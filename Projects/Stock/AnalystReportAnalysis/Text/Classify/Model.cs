@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using LibSVMsharp;
 using LibSVMsharp.Helpers;
 using LibSVMsharp.Extensions;
@@ -114,6 +115,66 @@ namespace Text.Classify
             double[] featVector = Feature.GetFeatureVec(sentence, ref wsH, ref features);
             double predictResult = Predict(featVector);
             return predictResult;
+        }
+
+        public double AdvancedPredict(string type, string sentence)
+        {
+            if(type.Equals("FLI"))
+            {
+                if(isNotFLI(sentence))
+                { return -1; }
+            }
+
+            double[] featVector = Feature.GetFeatureVec(sentence, ref wsH, ref features);
+            double predictResult = Predict(featVector);
+
+            return predictResult;
+        }
+
+        private bool isNotFLI(string sentence)
+        {
+            Regex likeButNotZhengli1 = new Regex(@"(每股收益|EPS|盈利预测|盈余预测)");
+            Regex likeButNotZhengli2 = new Regex(@"((符合|未达|接近|超出|低于)(我们(的?))?预期|按预期完成|与预期一致)");
+
+            if (likeButNotZhengli1.IsMatch(sentence)) //规则一
+            {
+                //string tempSen = sentence;
+                //foreach (Match match in likeButNotZhengli1.Matches(sentence))
+                //{ tempSen = tempSen.Replace(match.Value, ""); }
+                return true;
+            }
+            if (likeButNotZhengli2.IsMatch(sentence))//规则二
+            {
+                string tempSen = sentence;
+                foreach (Match match in likeButNotZhengli2.Matches(sentence))
+                { tempSen = tempSen.Replace(match.Value, ""); }
+                if (Predict(tempSen) == -1)
+                    return true;
+            }
+
+            if (sentence.Contains("将"))//规则三
+            {
+                var segResult = this.wsH.GetSegmentation(sentence);
+                bool hasJiangScanned = false;
+                foreach (var partWordPair in segResult)
+                {
+                    if (hasJiangScanned)//上一个词是将
+                    {
+                        if (partWordPair.Key.StartsWith("n") || partWordPair.Key.StartsWith("m"))//“将”后面跟着名词或数词，则“将”不作为前瞻性的判定词
+                        {
+                            if (Predict(sentence.Replace("将", "")) == -1)//去除“将”后被判定为非前瞻性，则确实为非前瞻性
+                                return true;
+                        }
+                        hasJiangScanned = false;
+                    }
+
+                    if(partWordPair.Value.Equals("将"))
+                    { hasJiangScanned = true; }
+                }
+            }
+
+            //三个规则都无法判定是负例，则返回false
+            return false;
         }
 
         /// <summary>
