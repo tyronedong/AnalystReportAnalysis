@@ -142,6 +142,7 @@ namespace Text.Handler
                 string userDictPath = @".\NLPIR\userdict.txt";
                 //int k = NLPIR_ImportUserDict(userDictPath);
 
+                //情感分析所用词
                 NLPIR_AddUserWord("较大");
                 NLPIR_AddUserWord("较小");
                 NLPIR_AddUserWord("企稳");
@@ -163,6 +164,11 @@ namespace Text.Handler
                 NLPIR_AddUserWord("新增收入");
                 NLPIR_AddUserWord("新增利润");
                 NLPIR_AddUserWord("新增市场");
+
+                //前瞻性判断所用词
+                NLPIR_AddUserWord("每股收益");
+                NLPIR_AddUserWord("盈利预测");
+                NLPIR_AddUserWord("盈余预测");
 
                 Console.WriteLine("Import " + 5 + " user dict items");
 

@@ -92,10 +92,10 @@ namespace Text.Classify
         /// 重复直到fuli达到了足够的数量
         /// </summary>
         /// <returns></returns>
-        public static bool ExecuteSelectFuli(string type, string resultSaveRootDic, int selectHowMany)
+        public static bool ExecuteSelectFuli(string type, int selectHowMany, string resultSaveRootDic, string fileName)
         {
             //string path = Path.Combine(resultRootDic, "random_select_" + selectHowMany + "_fuli");
-            string path = Path.Combine(resultSaveRootDic, ConfigurationManager.AppSettings["fuli_txt_filename"]);
+            string path = Path.Combine(resultSaveRootDic, fileName);
 
             string[] selectedStrs = SelectStrsFuli(type, selectHowMany);
             if (selectedStrs == null) { Trace.TraceError("Text.Classify.RandomSelect.ExecuteSelectFuli() goes wrong"); return false; }
@@ -153,10 +153,11 @@ namespace Text.Classify
                 string[] sentences = TextPreProcess.SeparateParagraph(content);
 
                 int counter = 0;
-                while (true)
+                while (true)//每次循环都尝试随机从content中提取一句话，然后判断这句话符不符合要求
                 {
                     counter++;
-                    if (counter >= 10) { break; }
+                    if (counter >= 10) 
+                    { break; }//一个content最多尝试10次
 
                     int whichOne = RandomNumber(0, sentences.Length - 1);
                     sent = sentences[whichOne];
@@ -173,7 +174,11 @@ namespace Text.Classify
                     if (sent.Contains("将来")) { continue; }
                     if (sent.Contains("未来")) { continue; }
                     if (sent.Contains("有望")) { continue; }
+                    if (sent.Contains("可望")) { continue; }
+                    if (sent.Contains("可期")) { continue; }
                     if (sent.Contains("可能")) { continue; }
+                    if (sent.Contains("看好")) { continue;}
+                    if (sent.Contains("将好于")) { continue; }
 
                     break;
                 }

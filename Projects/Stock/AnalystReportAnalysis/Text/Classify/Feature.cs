@@ -258,7 +258,7 @@ namespace Text.Classify
             List<FeatureItem> featureItems = new List<FeatureItem>();
 
             //read train data file 
-            TextPreProcess tPP = new TextPreProcess(type, rootForChi, true, true, true, true);//默认加入所有的数据源
+            TextPreProcess tPP = new TextPreProcess(type, rootForChi, true, false, true, true);//默认加入除random正例外的所有数据源
             var trainData = tPP.GetTrainData(type, dataFilePath);
             List<LabeledItem> labeledItems = tPP.GetLabeledItems(ref trainData);
 

@@ -20,8 +20,10 @@ namespace Text
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            //Process3("FLIEMO");
-            CalPrecision();
+            //Process0();
+            //Process1("FLI");
+            CalFLIPrecision();
+            //CalPrecision();
             //TestWordSeg("预计下半年养殖饲料高景气不变，公司产品量价齐升相信广告业务的毛利率回归正常水平是完全可期的，年底广告资源到期后重新的谈判签约值得关注。小米公司和超预期稳中有增爆炸性的极速折让不景气的负债率和资产负债率的微信公众平台和锂电池需求将于明后年进入高速增长期，进而拉动六氟磷酸锂的需求出现爆发性增长，如符合预期，未来几年需求复合增长率在35%左右。");
 
             Console.WriteLine("finished");
@@ -207,6 +209,11 @@ namespace Text
                 Console.WriteLine("GenerateChiFeatureFile() execute failed");
         }
 
+        static void Process0()
+        {
+            RandomSelect.ExecuteSelectFuli("FLI", 271, @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\foresight\FLI", "random_select_fuli.txt");
+        }
+
         static void Process1(string type)
         {
             GenerateChiFeatureFile(type);
@@ -249,7 +256,7 @@ namespace Text
             return true;
         }
 
-        static void CalPrecision()
+        static void CalFLIEMOPrecision()
         {
             SentiAnalysis sa = new SentiAnalysis();
             if (!sa.isValid)
@@ -261,7 +268,7 @@ namespace Text
             string rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
             string dataFilePath = ConfigurationManager.AppSettings["excel_foresight_filename"];//"FLI-信息提取-样本（20160720）.xlsx";
 
-            TextPreProcess tPP = new TextPreProcess("FLIEMO", rootForChi, true, true, true, true);
+            TextPreProcess tPP = new TextPreProcess("FLIEMO", rootForChi, true, false, true, true);
             var data = tPP.GetTrainData("FLIEMO", dataFilePath);
 
             List<string> wrong = new List<string>();
@@ -290,6 +297,42 @@ namespace Text
             Console.WriteLine("class 2 accuracy is " + (accCount[1] / totalCount[1]));
             Console.WriteLine("class 3 accuracy is " + (accCount[2] / totalCount[2]));
             Console.WriteLine("total accuracy is " + ((accCount[0] + accCount[1] + accCount[2]) / (totalCount[0] + totalCount[1] + totalCount[2])));
+        }
+
+        static void CalFLIPrecision()
+        {
+            Model model = new Model("FLI");
+
+            string rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+            string dataFilePath = ConfigurationManager.AppSettings["excel_foresight_filename"];//"FLI-信息提取-样本（20160720）.xlsx";
+
+            TextPreProcess tPP = new TextPreProcess("FLI", rootForChi, true, false, true, false);
+            var data = tPP.GetTrainData("FLI", dataFilePath);
+
+            List<string> wrong = new List<string>();
+            double[] totalCount = new double[2];
+            double[] accCount = new double[2];
+            foreach (var dataItem in data)
+            {
+                totalCount[dataItem.Key <= 0 ? 0 : dataItem.Key] += dataItem.Value.Count();//key equals -1 or 1
+                foreach (var sentence in dataItem.Value)
+                {
+                    double val = model.Predict(sentence);
+
+                    if (val ==1 && dataItem.Key == 1)
+                        accCount[1]++;
+                    else if (val == -1 && dataItem.Key == -1)
+                        accCount[0]++;
+                    else if (dataItem.Key == 1)
+                        wrong.Add(sentence);
+                }
+            }
+
+            FileHandler.SaveStringArray(@"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\foresight\FLI\class1_wrong.txt", wrong.ToArray());
+
+            Console.WriteLine("class -1 accuracy is " + (accCount[0] / totalCount[0]));
+            Console.WriteLine("class 1 accuracy is " + (accCount[1] / totalCount[1]));
+            Console.WriteLine("total accuracy is " + ((accCount[0] + accCount[1]) / (totalCount[0] + totalCount[1])));
         }
 
         static void TestWordSeg(string sentence)

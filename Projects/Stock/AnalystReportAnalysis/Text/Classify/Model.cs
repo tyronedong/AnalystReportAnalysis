@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
+using System.Diagnostics;
 using LibSVMsharp;
 using LibSVMsharp.Helpers;
 using LibSVMsharp.Extensions;
@@ -25,12 +27,21 @@ namespace Text.Classify
             this.features = null;
         }
 
-        public Model(string modelFile, string featureFilePath)
+        public Model(string type)
         {
-            LoadModel(modelFile);
+            string modelPath = GetPath(type, "model.txt");
+            string featurePath = GetPath(type, "chi_feature.txt");
+
+            LoadModel(modelPath);
+            this.wsH = new WordSegHandler();
+            this.features = Feature.LoadChiFeature(featurePath);
+        }
+
+        public Model(string modelPath, string featureFilePath)
+        {
+            LoadModel(modelPath);
             this.wsH = new WordSegHandler();
             this.features = Feature.LoadChiFeature(featureFilePath);
-
         }
 
         //public Model(string fileName) { this.model = SVM.LoadModel(fileName); }
@@ -143,6 +154,43 @@ namespace Text.Classify
                 else { vector.Add(new SVMNode(idx, featValue)); }
             }
             return vector.ToArray();
+        }
+
+        private static string GetPath(string type, string fileName)
+        {
+            string rootForChi;
+
+            if (type.Equals("FLI"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+            }
+            else if (type.Equals("FLIEMO"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+            }
+            else if (type.Equals("INNOVTYPE"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            }
+            else if (type.Equals("INNOVSTAGE"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            }
+            else if (type.Equals("INNOVEMO"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            }
+            else if (type.Equals("NONINNOVTYPE"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            }
+            else
+            {
+                Trace.TraceError("Model.GetPath():type error");
+                return null;
+            }
+
+            return Path.Combine(rootForChi, Path.Combine(type, fileName));
         }
 
         //public static bool GenerateTrainSet(string rootPath)
