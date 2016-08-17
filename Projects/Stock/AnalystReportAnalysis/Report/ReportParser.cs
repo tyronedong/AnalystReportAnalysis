@@ -186,23 +186,28 @@ namespace Report
         /// <returns></returns>
         public virtual bool extractReportInfo()
         {
+            return extractTitle() && extractType();
+        }
+
+        private virtual bool extractTitle()
+        {
             Regex chinese = new Regex("[\u4e00-\u9fa5]+");
             Regex nonsense = new Regex(@"^(\d* *)?(敬)?(各项声明|请阅读|请仔细阅读|请务必阅读|请通过合法途径|本(研究)?报告|本公司|市场有风险，投资需谨慎|证监会审核华创证券投资咨询业务资格批文号：证监|此份報告由群益證券)");//added
             Regex stockNameAndCode = new Regex(@"[\u4e00-\u9fa5]+ *[(（]? *\d{6}(\.[a-zA-Z]+)?[)）]?\D");//匹配“泸州老窖（000568）”六位数加一个非数字
 
-            foreach(var line in lines)
+            foreach (var line in lines)
             {
                 string trimedLine = line.Trim();
 
-                if(string.IsNullOrEmpty(trimedLine))
+                if (string.IsNullOrEmpty(trimedLine))
                 { continue; }
-                if(!chinese.IsMatch(trimedLine))
+                if (!chinese.IsMatch(trimedLine))
                 { continue; }
                 if (nonsense.IsMatch(trimedLine))//每篇报告开头都有的没有意义的话
                 { continue; }
                 if (trimedLine.Contains("报告") && trimedLine.Length <= 6)//非标题，但是含有报告，通常说明了本报告的类型
                 { continue; }
-                if(trimedLine.Contains("评级")&& trimedLine.Length <=4)
+                if (trimedLine.Contains("评级") && trimedLine.Length <= 4)
                 { continue; }
                 if (trimedLine.Equals(anaReport.StockName))
                 { continue; }
@@ -214,6 +219,17 @@ namespace Report
             }
 
             return true;
+        }
+
+        private virtual bool extractType()
+        {
+            Regex class1 = new Regex(@"");
+
+            foreach(var line in lines)
+            {
+
+            }
+            return false;
         }
 
         /// <summary>
