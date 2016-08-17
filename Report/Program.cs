@@ -352,7 +352,7 @@ namespace Report
                                         if (false)
                                         {
                                             curAnReport = reportParser.executeExtract_nodb(ref wsH);
-                                            curAnReport.Stockjobber = securitiesName;
+                                            curAnReport.Brokerage = securitiesName;
                                         }
                                         
                                         reportParser.CloseAll();
@@ -455,7 +455,7 @@ namespace Report
             //if (string.IsNullOrEmpty(anaReport.ReportTitle))
             //{ anaReport.ReportTitle = reportTitle; }
             anaReport.PDFileName = pdFileName;
-            anaReport.Stockjobber = jobber;
+            anaReport.Brokerage = jobber;
             anaReport.Date = time;
             anaReport.Analysts = sqlSH.GetAnalysts(person1, person2, person3);
             if (anaReport.StockName == null && reportTitle.Contains("："))

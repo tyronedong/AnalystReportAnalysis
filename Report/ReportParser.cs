@@ -186,10 +186,10 @@ namespace Report
         /// <returns></returns>
         public virtual bool extractReportInfo()
         {
-            return extractTitle() && extractType();
+            return extractReportTitle() && extractReportType();
         }
 
-        private virtual bool extractTitle()
+        public virtual bool extractReportTitle()
         {
             Regex chinese = new Regex("[\u4e00-\u9fa5]+");
             Regex nonsense = new Regex(@"^(\d* *)?(敬)?(各项声明|请阅读|请仔细阅读|请务必阅读|请通过合法途径|本(研究)?报告|本公司|市场有风险，投资需谨慎|证监会审核华创证券投资咨询业务资格批文号：证监|此份報告由群益證券)");//added
@@ -221,14 +221,31 @@ namespace Report
             return true;
         }
 
-        private virtual bool extractType()
+        public virtual bool extractReportType()
         {
-            Regex class1 = new Regex(@"");
+            Regex isContent = new Regex("[\u4e00-\u9fa5a][，。；]");
 
+            Regex type1 = new Regex(@"(年报|季报|业绩点评|公告|事件点评|事项点评|业绩回顾|点评报告|事件|事项)");//点评报告有问题
+            Regex type2 = new Regex(@"深度报告|深度研究|深度跟踪|调研报告|调研简报|公司研究报告|公司动态|公司更新报告|评级调整|公司快报|动态跟踪|调整预测");
+            Regex type3 = new Regex(@"新股");
+
+            int breakCounter = 0;
             foreach(var line in lines)
             {
+                if (isContent.IsMatch(line))
+                { breakCounter++; }
 
+                if (breakCounter > 5)
+                { anaReport.ReportType = "常规报告"; return true; }
+
+                if(type1.IsMatch(line))
+                { anaReport.ReportType = "特殊事项点评"; return true; }
+                //if(type2.IsMatch(line))
+                //{ anaReport.ReportType = "常规报告"; return true; }
+                if(type3.IsMatch(line))
+                { anaReport.ReportType = "新股分析"; return true; }
             }
+
             return false;
         }
 
@@ -246,7 +263,7 @@ namespace Report
         public virtual void extractPicTableCount()
         {
             Regex picHead = new Regex(@"^图");
-            Regex picTail = new Regex(@"(趋势|走势|表现)图?[:：]?$");
+            Regex picTail = new Regex(@"(趋势|走势|表现|变化|对比)图?[:：]?$");
 
             Regex tableHead = new Regex(@"^表");
             Regex tableTail = new Regex(@"表$");
@@ -258,7 +275,7 @@ namespace Report
 
                 if (trimedLine.StartsWith("图表"))//处理图表
                 {
-                    if (picTail.IsMatch(trimedLine))
+                    if (picTail.IsMatch(trimedLine))//只要不是图，就是表
                     { anaReport.picCount++; }
                     else { anaReport.tableCount++; }
                     continue;
