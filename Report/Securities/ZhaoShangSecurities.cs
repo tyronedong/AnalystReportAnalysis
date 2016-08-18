@@ -22,6 +22,7 @@ namespace Report.Securities
                 {
                     pdfText = loadPDFText();
                     lines = pdfText.Split('\n');
+                    noABCLines = removeAnyButContentInLines(lines);
                     noOtherLines = removeOtherInLines(lines);
                     mergedParas = mergeToParagraph(noOtherLines);
                     advancedMergedParas = removeOtherInParas(mergedParas);

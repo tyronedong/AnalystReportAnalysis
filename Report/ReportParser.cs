@@ -298,6 +298,8 @@ namespace Report
         {
             Regex value = new Regex(@"\d+(\.\d+)?");
 
+            //if(noABCLines == null)
+            //{ Trace.TraceError("noABCLine is null"); }
             //get total value count
             foreach (var nLine in noABCLines)
             {
