@@ -143,6 +143,16 @@ namespace Text.Classify
                 if (!ConvertToDic(ref trainData, ref textExl, ref toneExl))//转化数据成trainData
                 { return null; }
             }
+            else if(type.Equals("FLIIND"))
+            {
+                string[] textExl = exlH.GetColoum("sheet1", 3);//文本
+                string[] indExl = exlH.GetColoum("sheet1", 5);//对应文本的情感标注
+
+                if (!ConvertToDic(ref trainData, ref textExl, ref indExl))//转化数据成trainData
+                { return null; }
+
+                //trainData[0].RemoveRange(trainData[1].Count, (trainData[0].Count - trainData[1].Count));
+            }
             else if(type.Equals("INNOVTYPE"))
             {
                 string[] textExl = exlH.GetColoum("sheet1", 2);//文本
@@ -182,6 +192,13 @@ namespace Text.Classify
             return trainData;
         }
 
+        /// <summary>
+        /// 输入一列数据和一列lable，输出相应的dictionary
+        /// </summary>
+        /// <param name="trainDataDic"></param>
+        /// <param name="textColumn"></param>
+        /// <param name="labelColumn"></param>
+        /// <returns></returns>
         private bool ConvertToDic(ref Dictionary<int, List<string>> trainDataDic, ref string[] textColumn, ref string[] labelColumn)
         {
             if (textColumn.Length != labelColumn.Length)
@@ -542,7 +559,7 @@ namespace Text.Classify
         public static string[] SeparateParagraph(string paragraph)
         {
             char[] separator = { '。', '；', '？', '！' };
-            paragraph = paragraph.Replace("\n", "。");
+            paragraph = paragraph.Replace("\n", "。");//替换成‘。'有问题吧
 
             return paragraph.Split(separator);
         }

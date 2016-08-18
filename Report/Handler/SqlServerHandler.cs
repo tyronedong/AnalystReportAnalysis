@@ -17,8 +17,12 @@ namespace Report.Handler
 
         private SqlConnection sqlCnn;
 
+        private DataTable insertTable;
+
+        private SqlDataAdapter sqlAdapter_assist;
         private SqlDataAdapter sqlAdapter;
         private SqlDataAdapter sqlAdapter2;
+        private SqlCommand sqlReportCmd_assist;
         private SqlCommand sqlReportCmd;//for batch process
         private SqlCommand sqlReportCmd2;//for select one process
         private DataTable dataTable;
@@ -37,6 +41,8 @@ namespace Report.Handler
         private static string storedProcName_Report = "[dbo].[selectTopN]";
         private static string storedProcName_Report2 = "[dbo].[selectByGUID]";
         private static string numOnceSelect = "100";
+
+        private static string storedProcName_assistReport = "[dbo].[selectTopN_assist] ";
 
         public SqlServerHandler()
         {
@@ -57,17 +63,27 @@ namespace Report.Handler
                 sqlReportCmd.Parameters.Add(param_num_once_select_cmd);
                 sqlReportCmd.Parameters.Add(param_id_min_cmd);
                 sqlReportCmd.CommandTimeout = 60;
+                
+                sqlReportCmd_assist = new SqlCommand(storedProcName_assistReport, sqlCnn);
+                sqlReportCmd_assist.CommandType = CommandType.StoredProcedure;
+                sqlReportCmd_assist.Parameters.Add(param_num_once_select_cmd);
+                sqlReportCmd_assist.Parameters.Add(param_id_min_cmd);
+                sqlReportCmd_assist.CommandTimeout = 60;
+
                 sqlReportCmd2 = new SqlCommand(storedProcName_Report2, sqlCnn);
                 sqlReportCmd2.CommandType = CommandType.StoredProcedure;
                 sqlReportCmd2.Parameters.Add(param_id_cmd2);
                 sqlReportCmd2.CommandTimeout = 60;
+                
                 sqlAdapter = new SqlDataAdapter(sqlReportCmd);
+                sqlAdapter_assist = new SqlDataAdapter(sqlReportCmd_assist);
                 sqlAdapter2 = new SqlDataAdapter(sqlReportCmd2);
+                
                 dataTable = new DataTable();       
 
                 sqlCnn.Open();
                 LoadPersonTable();
-                isValid = true;
+                isValid = InitInsertTable();
             }
             catch (Exception e)
             {
@@ -138,6 +154,30 @@ namespace Report.Handler
             return dataTable;
         }
 
+        public DataTable GetAssistTableById(string curId)
+        {
+            dataTable.Clear();
+
+            if (ModifyCMDById(curId))
+            {
+                try
+                {
+                    sqlAdapter_assist.Fill(dataTable);
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError("SqlServerHandler.GetAssistTableById(string curId): " + e.Message);
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+
+            return dataTable;
+        }
+
         public bool ModifyCMD2ById(string curId)
         {
             try
@@ -201,6 +241,191 @@ namespace Report.Handler
                 }
             }
             return analysts;
+        }
+
+        public bool ExecuteInsertTable()
+        {
+            bool isSuccuss;
+            try
+            {
+                //SqlConnection SqlConnectionObj = GetSQLConnection();
+                SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlCnn, SqlBulkCopyOptions.TableLock | SqlBulkCopyOptions.FireTriggers | SqlBulkCopyOptions.UseInternalTransaction, null);
+                bulkCopy.DestinationTableName = "[JRTZ_ANA].[dbo].[FLI]";
+                bulkCopy.WriteToServer(insertTable);
+                isSuccuss = true;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError(ex.ToString());
+                isSuccuss = false;
+            }
+            return isSuccuss;
+        }
+
+        public void AddRowToInsertTable(FLIInfo fliInfo)
+        {
+            DataRow row = insertTable.NewRow();
+
+            row["GUID"] = fliInfo.guid;
+            row["STOCKCD"] = fliInfo.stockcd;
+            row["RPTDATE"] = fliInfo.rptdate;
+            row["TYPECD"] = fliInfo.typecd;
+            row["GRAPH"] = fliInfo.graph;
+            row["FLT"] = fliInfo.flt;
+            row["FLT_TONE"] = fliInfo.flt_tone;
+            row["TOTS"] = fliInfo.tots;
+            row["POSS"] = fliInfo.poss;
+            row["NEGS"] = fliInfo.negs;
+            row["TOTFLS"] = fliInfo.totfls;
+            row["POSFLS"] = fliInfo.posfls;
+            row["NEGFLS"] = fliInfo.negfls;
+            row["TOTFLS_IND"] = fliInfo.totfls_ind;
+            row["TOTFLS_FIRM"] = fliInfo.totfls_firm;
+            row["TOTNFLS"] = fliInfo.totnfls;
+            row["POSNFLS"] = fliInfo.posnfls;
+            row["NEGNFLS"] = fliInfo.negnfls;
+
+            insertTable.Rows.Add(row);
+
+            return;
+        }
+
+        public void ClearInsertTable()
+        {
+            insertTable.Rows.Clear();
+        }
+
+        public bool InitInsertTable()
+        {
+            // Create new DataTable and DataSource objects.
+            insertTable = new DataTable();
+
+            // Declare DataColumn and DataRow variables.
+            DataColumn column;
+
+            try
+            {
+                // Create new DataColumn, set DataType, ColumnName and add to DataTable.    
+                column = new DataColumn();
+                column.DataType = System.Type.GetType("System.String");
+                column.ColumnName = "GUID";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.String");
+                column.ColumnName = "STOCKCD";
+                insertTable.Columns.Add(column);
+
+                // Create third column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.DateTime");
+                column.ColumnName = "RPTDATE";
+                insertTable.Columns.Add(column);
+
+                // Create fourth column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.String");
+                column.ColumnName = "TYPECD";
+                insertTable.Columns.Add(column);
+
+                // Create fifth column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "GRAPH";
+                insertTable.Columns.Add(column);
+
+                // Create sixth column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Boolean");
+                column.ColumnName = "FLT";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Boolean");
+                column.ColumnName = "FLT_TONE";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "TOTS";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "POSS";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NEGS";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "TOTFLS";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "POSFLS";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NEGFLS";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "TOTFLS_IND";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "TOTFLS_FIRM";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "TOTNFLS";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "POSNFLS";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NEGNFLS";
+                insertTable.Columns.Add(column);
+
+                // Create second column.
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Boolean");
+                column.ColumnName = "ISVALID";
+                insertTable.Columns.Add(column);
+
+                return true;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Insert table init error");
+                return false;
+            }
         }
     }
 

@@ -74,6 +74,28 @@ namespace Report
         public string Email { get; set; }
     }
 
+    public class FLIInfo
+    {
+        public string guid { get; set; }
+        public string stockcd { get; set; }
+        public DateTime rptdate { get; set; }
+        public string typecd { get; set; }
+        public int graph { get; set; }
+        public bool flt { get; set; }
+        public bool flt_tone { get; set; }
+        public int tots { get; set; }
+        public int poss { get; set; }
+        public int negs { get; set; }
+        public int totfls { get; set; }
+        public int posfls { get; set; }
+        public int negfls { get; set; }
+        public int totfls_ind { get; set; }
+        public int totfls_firm { get; set; }
+        public int totnfls { get; set; }
+        public int posnfls { get; set; }
+        public int negnfls { get; set; }
+        public bool isvalid { get; set; }
+    }
     //class Linkman
     //{
     //    public string Name { get; set; }

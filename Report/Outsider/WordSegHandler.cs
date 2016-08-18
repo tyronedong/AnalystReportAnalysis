@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Diagnostics;
 using System.Configuration;
+using Report.Handler;
 
 namespace Report.Outsider
 {
@@ -68,8 +69,9 @@ namespace Report.Outsider
         public bool isValid = false;
         private List<KeyValuePair<string, string>> partitionResult;
 
-        const string path = @".\NLPIR\NLPIR.dll";
-
+        //const string NLPIR_path = ConfigurationManager.AppSettings["NLPIR_Path"];
+        const string path = @".\NLPIR\NLPIR.dll";//设定dll的路径
+        //const string path = Path.Combine(NLPIR_path, "NLPIR.dll");//设定dll的路径
         //对函数进行申明
         [DllImport(path, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, EntryPoint = "NLPIR_Init")]
         public static extern bool NLPIR_Init(String sInitDirPath, int encoding, String sLicenseCode);
@@ -137,15 +139,58 @@ namespace Report.Outsider
                 System.Console.WriteLine("Init ICTCLAS failed!");
                 isValid = false;
             }
-            else 
+            else
             {
-                string userDictPath = @".\NLPIR\userdict.txt";
-                //string userDictPath = Path.Combine(NLPIR_path, "userdict.txt");
+                string userDictPath = @".\NLPIR\userdict.txt";//从userdict中批量导入，有词性
                 int k = NLPIR_ImportUserDict(userDictPath);
-
                 Console.WriteLine("Import " + k + " user dict items");
 
-                isValid = true; 
+                string userWordPath = @".\NLPIR\userword.txt";//从userword中逐个导入，无词性
+                string[] userWords = FileHandler.LoadStringArray(userWordPath);
+                if (userWords == null)
+                {
+                    System.Console.WriteLine("user dictionary import failed!");
+                }
+                else
+                {
+                    int count = 0;
+                    foreach (var word in userWords)
+                    {
+                        NLPIR_AddUserWord(word);
+                        count++;
+                    }
+                    Console.WriteLine("Import " + count + " user word items");
+                }
+
+                ////情感分析所用词
+                //NLPIR_AddUserWord("较大");
+                //NLPIR_AddUserWord("较小");
+                //NLPIR_AddUserWord("企稳");
+                //NLPIR_AddUserWord("可期");
+                //NLPIR_AddUserWord("看好");
+                //NLPIR_AddUserWord("极速");
+                //NLPIR_AddUserWord("爆发性");
+                //NLPIR_AddUserWord("走弱");
+                //NLPIR_AddUserWord("折让");
+                //NLPIR_AddUserWord("负债率");
+                //NLPIR_AddUserWord("完不成");
+                //NLPIR_AddUserWord("扣非");
+                //NLPIR_AddUserWord("高景气");
+                //NLPIR_AddUserWord("中高端");
+                //NLPIR_AddUserWord("爆发期");
+                //NLPIR_AddUserWord("将好于");
+                //NLPIR_AddUserWord("超预期");
+                //NLPIR_AddUserWord("稳中有增");
+                //NLPIR_AddUserWord("新增收入");
+                //NLPIR_AddUserWord("新增利润");
+                //NLPIR_AddUserWord("新增市场");
+
+                ////前瞻性判断所用词
+                //NLPIR_AddUserWord("每股收益");
+                //NLPIR_AddUserWord("盈利预测");
+                //NLPIR_AddUserWord("盈余预测");
+
+                isValid = true;
             }
         }
 
@@ -185,7 +230,7 @@ namespace Report.Outsider
             }
             catch (Exception e)
             {
-                Trace.TraceError("Report.Outsider.WordSegHandler.ExecutePartition(string text): " + e.Message);   
+                Trace.TraceError("Text.Handler.WordSegHandler.ExecutePartition(string text): " + e.Message);
                 return false;
             }
         }
@@ -195,11 +240,11 @@ namespace Report.Outsider
             List<string> noStopWords = new List<string>();
             foreach (var kvp in partitionResult)
             {
-                if (kvp.Key.StartsWith("w")) 
+                if (kvp.Key.StartsWith("w"))
                 { continue; }
-                if(kvp.Key.StartsWith("u"))
+                if (kvp.Key.StartsWith("u"))
                 { continue; }
-                if(kvp.Key.StartsWith("m"))
+                if (kvp.Key.Equals("m"))//“一些”是数量词mq
                 { continue; }
                 //Console.ReadLine();
                 noStopWords.Add(kvp.Value);

@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace Report.Handler
 {
-    class CurIdHandler
+    public class CurIdHandler
     {
         //need a setting like <add key="CurIdRootPath" value="D:\\IdDict\\{0}.txt"/>
         // and a initial string

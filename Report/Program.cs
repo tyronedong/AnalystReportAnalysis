@@ -346,7 +346,7 @@ namespace Report
                                         if (true)
                                         {
                                             curAnReport = reportParser.executeExtract_withdb();
-                                            SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, person1, person2, person3);
+                                            SetExistedInfo(ref curAnReport, ref sqlSH, id, reportName, securitiesName, time, null, person1, person2, person3);
                                         }
 
                                         if (false)
@@ -448,7 +448,7 @@ namespace Report
         /// <param name="person1"></param>
         /// <param name="person2"></param>
         /// <param name="person3"></param>
-        public static void SetExistedInfo(ref AnalystReport anaReport, ref SqlServerHandler sqlSH, string pdFileName, string reportTitle, string jobber, DateTime time, string person1, string person2, string person3)
+        public static void SetExistedInfo(ref AnalystReport anaReport, ref SqlServerHandler sqlSH, string pdFileName, string reportTitle, string jobber, DateTime time, string stockCode, string person1, string person2, string person3)
         {
             anaReport._id = pdFileName;
             anaReport.ReportTitle = reportTitle;
@@ -457,6 +457,8 @@ namespace Report
             anaReport.PDFileName = pdFileName;
             anaReport.Brokerage = jobber;
             anaReport.Date = time;
+            if (stockCode != null)
+                anaReport.StockCode = stockCode;
             anaReport.Analysts = sqlSH.GetAnalysts(person1, person2, person3);
             if (anaReport.StockName == null && reportTitle.Contains("："))
                 anaReport.StockName = reportTitle.Split('：')[0];
