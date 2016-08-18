@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Diagnostics;
 using System.Configuration;
 
 namespace Text.Handler
@@ -139,38 +140,54 @@ namespace Text.Handler
             }
             else 
             {
-                string userDictPath = @".\NLPIR\userdict.txt";
-                //int k = NLPIR_ImportUserDict(userDictPath);
+                string userDictPath = @".\NLPIR\userdict.txt";//从userdict中批量导入，有词性
+                int k = NLPIR_ImportUserDict(userDictPath);
+                Console.WriteLine("Import " + k + " user dict items");
 
-                //情感分析所用词
-                NLPIR_AddUserWord("较大");
-                NLPIR_AddUserWord("较小");
-                NLPIR_AddUserWord("企稳");
-                NLPIR_AddUserWord("可期");
-                NLPIR_AddUserWord("看好");
-                NLPIR_AddUserWord("极速");
-                NLPIR_AddUserWord("爆发性");
-                NLPIR_AddUserWord("走弱");
-                NLPIR_AddUserWord("折让");
-                NLPIR_AddUserWord("负债率");
-                NLPIR_AddUserWord("完不成");
-                NLPIR_AddUserWord("扣非");
-                NLPIR_AddUserWord("高景气");
-                NLPIR_AddUserWord("中高端");
-                NLPIR_AddUserWord("爆发期");
-                NLPIR_AddUserWord("将好于");
-                NLPIR_AddUserWord("超预期");
-                NLPIR_AddUserWord("稳中有增");
-                NLPIR_AddUserWord("新增收入");
-                NLPIR_AddUserWord("新增利润");
-                NLPIR_AddUserWord("新增市场");
+                string userWordPath = @".\NLPIR\userword.txt";//从userword中逐个导入，无词性
+                string[] userWords = FileHandler.LoadStringArray(userWordPath);
+                if (userWords == null)
+                {
+                    System.Console.WriteLine("user dictionary import failed!");
+                }
+                else
+                {
+                    int count = 0;
+                    foreach(var word in userWords)
+                    {
+                        NLPIR_AddUserWord(word);
+                        count++;
+                    }
+                    Console.WriteLine("Import " + count + " user word items");
+                }
 
-                //前瞻性判断所用词
-                NLPIR_AddUserWord("每股收益");
-                NLPIR_AddUserWord("盈利预测");
-                NLPIR_AddUserWord("盈余预测");
+                ////情感分析所用词
+                //NLPIR_AddUserWord("较大");
+                //NLPIR_AddUserWord("较小");
+                //NLPIR_AddUserWord("企稳");
+                //NLPIR_AddUserWord("可期");
+                //NLPIR_AddUserWord("看好");
+                //NLPIR_AddUserWord("极速");
+                //NLPIR_AddUserWord("爆发性");
+                //NLPIR_AddUserWord("走弱");
+                //NLPIR_AddUserWord("折让");
+                //NLPIR_AddUserWord("负债率");
+                //NLPIR_AddUserWord("完不成");
+                //NLPIR_AddUserWord("扣非");
+                //NLPIR_AddUserWord("高景气");
+                //NLPIR_AddUserWord("中高端");
+                //NLPIR_AddUserWord("爆发期");
+                //NLPIR_AddUserWord("将好于");
+                //NLPIR_AddUserWord("超预期");
+                //NLPIR_AddUserWord("稳中有增");
+                //NLPIR_AddUserWord("新增收入");
+                //NLPIR_AddUserWord("新增利润");
+                //NLPIR_AddUserWord("新增市场");
 
-                Console.WriteLine("Import " + 5 + " user dict items");
+                ////前瞻性判断所用词
+                //NLPIR_AddUserWord("每股收益");
+                //NLPIR_AddUserWord("盈利预测");
+                //NLPIR_AddUserWord("盈余预测");
 
                 isValid = true; 
             }
@@ -195,19 +212,26 @@ namespace Text.Handler
 
         public bool ExecutePartition(string text)
         {
-            partitionResult.Clear();
-            IntPtr intPtr = NLPIR_ParagraphProcess(text);//切分结果保存为IntPtr类型
-            String str = Marshal.PtrToStringAnsi(intPtr);//将切分结果转换为string
-
-            string[] parArray = str.Split(' ');
-            foreach (string curPar in parArray)
+            try
             {
-                string[] wordC = curPar.Split('/');
-                if (wordC.Length != 2) { continue; }
-                partitionResult.Add(new KeyValuePair<string, string>(wordC[1], wordC[0]));
-            }
+                partitionResult.Clear();
+                IntPtr intPtr = NLPIR_ParagraphProcess(text);//切分结果保存为IntPtr类型
+                String str = Marshal.PtrToStringAnsi(intPtr);//将切分结果转换为string
 
-            return true;
+                string[] parArray = str.Split(' ');
+                foreach (string curPar in parArray)
+                {
+                    string[] wordC = curPar.Split('/');
+                    if (wordC.Length != 2) { continue; }
+                    partitionResult.Add(new KeyValuePair<string, string>(wordC[1], wordC[0]));
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("Text.Handler.WordSegHandler.ExecutePartition(string text): " + e.Message);
+                return false;
+            }
         }
 
         public string[] GetNoStopWords()

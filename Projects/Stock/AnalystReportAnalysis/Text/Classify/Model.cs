@@ -117,19 +117,49 @@ namespace Text.Classify
             return predictResult;
         }
 
+        /// <summary>
+        /// 在libsvm的基础上加入了一些规则来做出更好的前瞻性预测
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="sentence"></param>
+        /// <returns></returns>
         public double AdvancedPredict(string type, string sentence)
         {
             if(type.Equals("FLI"))
             {
-                if(isNotFLI(sentence))
-                { return -1; }
+                if (isNotFLI(sentence))
+                    return -1;
+            }
+            else if(type.Equals("FLIIND"))
+            {
+                //if (isNotFLIIND(sentence))
+                //    return 0;
+                //if (isFLIIND(sentence))
+                //    return 1;
             }
 
-            double[] featVector = Feature.GetFeatureVec(sentence, ref wsH, ref features);
-            double predictResult = Predict(featVector);
+            double predictResult = Predict(sentence);
 
             return predictResult;
         }
+
+        private bool isFLIIND(string sentence)//是否是行业层面的信息
+        {
+            if (sentence.Contains("行业"))
+                return true;
+            return false;
+        }
+
+        private bool isNotFLIIND(string sentence)//是否是公司层面的信息
+        {
+            if (sentence.Contains("公司"))
+                return true;
+            return false;
+        }
+
+        //private bool isFLI(string sentence)
+        //{
+        //}
 
         private bool isNotFLI(string sentence)
         {
@@ -221,27 +251,11 @@ namespace Text.Classify
         {
             string rootForChi;
 
-            if (type.Equals("FLI"))
+            if (type.Equals("FLI")||type.Equals("FLIEMO")||type.Equals("FLIIND"))
             {
                 rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
             }
-            else if (type.Equals("FLIEMO"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
-            }
-            else if (type.Equals("INNOVTYPE"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-            }
-            else if (type.Equals("INNOVSTAGE"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-            }
-            else if (type.Equals("INNOVEMO"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-            }
-            else if (type.Equals("NONINNOVTYPE"))
+            else if (type.Equals("INNOVTYPE")||type.Equals("INNOVSTAGE")||type.Equals("INNOVEMO")||type.Equals("NONINNOVTYPE"))
             {
                 rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
             }

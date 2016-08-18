@@ -156,6 +156,11 @@ namespace Text.Classify
                 rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
                 dataFilePath = "./FLIEMO/chi_feature.txt";
             }
+            else if (type.Equals("FLIIND"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+                dataFilePath = "./FLIIND/chi_feature.txt";
+            }
             else if (type.Equals("INNOVTYPE"))
             {
                 rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
@@ -199,6 +204,11 @@ namespace Text.Classify
                 rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
                 dataFilePath = "./FLIEMO/user_feature.txt";
             }
+            else if (type.Equals("FLIIND"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+                dataFilePath = "./FLIIND/chi_feature.txt";
+            }
             else if (type.Equals("INNOVTYPE"))
             {
                 rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
@@ -239,7 +249,7 @@ namespace Text.Classify
             string rootForChi;// = ConfigurationManager.AppSettings["feature_relate_root_dictionary"];
             string dataFilePath;
 
-            if (type.Equals("FLI")||type.Equals("FLIEMO"))
+            if (type.Equals("FLI")||type.Equals("FLIEMO")||type.Equals("FLIIND"))
             {
                 rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
                 dataFilePath = ConfigurationManager.AppSettings["excel_foresight_filename"];//"FLI-信息提取-样本（20160720）.xlsx";
