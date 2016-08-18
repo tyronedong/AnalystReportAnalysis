@@ -22,6 +22,9 @@ namespace Output
     {
         static void Main(string[] args)
         {
+            Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
+            Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
+
             FLIProcess();
             Console.WriteLine("Process finished");
             Console.ReadLine();
@@ -73,6 +76,7 @@ namespace Output
                 bool isError; string curId, nextCurId;
                 string reportRelativeRootPath = @"{0}\{1}-{2}-{3}";
                 List<AnalystReport> reports = new List<AnalystReport>();
+                HashSet<string> idSet = new HashSet<string>();
 
                 try
                 {
@@ -105,6 +109,7 @@ namespace Output
                             break;
                         }
 
+                        idSet.Clear();
                         reports.Clear();
                         foreach (DataRow curRow in curReportsTable.Rows)
                         {
@@ -127,6 +132,14 @@ namespace Output
                                 //update nextCurId
                                 nextCurId = id;
 
+                                //judge if duplicate
+                                if (idSet.Contains(id))
+                                {
+                                    Trace.TraceWarning("Skip duplicate analyst report whose id is: " + id);
+                                    continue;
+                                }
+                                else
+                                    idSet.Add(id);
                                 //judge if current document is handlable
                                 if (language.Equals("EN"))
                                 {
@@ -144,6 +157,7 @@ namespace Output
                                     continue;
                                 }
 
+                                Console.WriteLine("start handle " + securitiesName + " : " + id);
                                 //get pdf file parser by securities
                                 ReportParser reportParser = null;
                                 //StockData stockData = null, stockParser = null;
@@ -310,7 +324,7 @@ namespace Output
                             }
                             catch (Exception e)
                             {
-                                Trace.TraceError("Program.Execute() for loop when handle " + curSecur + " :" + e.Message);
+                                Trace.TraceError("Program.Execute() for loop when handle " + curSecur + " :" + e.ToString());
                                 continue;
                             }
                         }//for
@@ -373,7 +387,13 @@ namespace Output
             if (!string.IsNullOrEmpty(anaReport.Content))//正文不空，表示该报告有效
             {
                 fliInfo.isvalid = true;
-                fliInfo.typecd = anaReport.ReportType;
+                if (anaReport.ReportType.Equals("特殊事项点评"))
+                    fliInfo.typecd = "1";
+                else if (anaReport.ReportType.Equals("常规报告"))
+                    fliInfo.typecd = "2";
+                else
+                    fliInfo.typecd = "3";
+                //fliInfo.typecd = anaReport.ReportType;
                 fliInfo.graph = anaReport.tableCount + anaReport.picCount;
 
                 //判断标题是否是前瞻性语句
@@ -383,10 +403,15 @@ namespace Output
                     fliInfo.flt = false;
 
                 //判断标题是否积极语气前瞻性
-                if (fliInfo.flt && (sensor.CalSentiValue(anaReport.ReportTitle) > 0))
-                    fliInfo.flt_tone = true;
-                else
-                    fliInfo.flt_tone = false;
+                if (fliInfo.flt)
+                {
+                    if (sensor.CalSentiValue(anaReport.ReportTitle) > 0)
+                        fliInfo.flt_tone = true;
+                    else
+                        fliInfo.flt_tone = false;
+                }
+                //else
+                //    fliInfo.flt_tone = false;
 
                 string[] sentences = anaReport.Content.Replace("\n", "").Split('。');
                 //计算研报正文句子总数
@@ -431,7 +456,7 @@ namespace Output
                 }
                 fliInfo.poss = poss;
                 fliInfo.negs = negs;
-                fliInfo.totfls = totnfls;
+                fliInfo.totfls = totfls;
                 fliInfo.posfls = posfls;
                 fliInfo.negfls = negfls;
                 fliInfo.totfls_ind = totfls_ind;

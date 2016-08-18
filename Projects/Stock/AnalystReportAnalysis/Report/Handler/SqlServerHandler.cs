@@ -28,6 +28,8 @@ namespace Report.Handler
         private DataTable dataTable;
         private SqlParameter param_num_once_select_cmd = new SqlParameter("@num_once_select", SqlDbType.Int);
         private SqlParameter param_id_min_cmd = new SqlParameter("@id_min", SqlDbType.Char);
+        private SqlParameter param_num_once_select_cmd_assist = new SqlParameter("@num_once_select", SqlDbType.Int);
+        private SqlParameter param_id_min_cmd_assist = new SqlParameter("@id_min", SqlDbType.Char);
         private SqlParameter param_id_cmd2 = new SqlParameter("@GUID", SqlDbType.Char);
 
         private Dictionary<string, Analyst> personTable;
@@ -42,7 +44,7 @@ namespace Report.Handler
         private static string storedProcName_Report2 = "[dbo].[selectByGUID]";
         private static string numOnceSelect = "100";
 
-        private static string storedProcName_assistReport = "[dbo].[selectTopN_assist] ";
+        private static string storedProcName_assistReport = "[dbo].[selectTopN_assist]";
 
         public SqlServerHandler()
         {
@@ -66,8 +68,8 @@ namespace Report.Handler
                 
                 sqlReportCmd_assist = new SqlCommand(storedProcName_assistReport, sqlCnn);
                 sqlReportCmd_assist.CommandType = CommandType.StoredProcedure;
-                sqlReportCmd_assist.Parameters.Add(param_num_once_select_cmd);
-                sqlReportCmd_assist.Parameters.Add(param_id_min_cmd);
+                sqlReportCmd_assist.Parameters.Add(param_num_once_select_cmd_assist);
+                sqlReportCmd_assist.Parameters.Add(param_id_min_cmd_assist);
                 sqlReportCmd_assist.CommandTimeout = 60;
 
                 sqlReportCmd2 = new SqlCommand(storedProcName_Report2, sqlCnn);
@@ -154,11 +156,26 @@ namespace Report.Handler
             return dataTable;
         }
 
+        public bool ModifyAssistCMDById(string curId)
+        {
+            try
+            {
+                param_num_once_select_cmd_assist.Value = Int32.Parse(numOnceSelect);
+                param_id_min_cmd_assist.Value = curId;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("SqlServerHandler.ModifyAssistCMDById(string curId): " + e.Message);
+                return false;
+            }
+            return true;
+        }
+
         public DataTable GetAssistTableById(string curId)
         {
             dataTable.Clear();
 
-            if (ModifyCMDById(curId))
+            if (ModifyAssistCMDById(curId))
             {
                 try
                 {
@@ -166,7 +183,7 @@ namespace Report.Handler
                 }
                 catch (Exception e)
                 {
-                    Trace.TraceError("SqlServerHandler.GetAssistTableById(string curId): " + e.Message);
+                    Trace.TraceError("SqlServerHandler.GetAssistTableById(string curId): " + e.ToString());
                     return null;
                 }
             }
@@ -272,7 +289,10 @@ namespace Report.Handler
             row["TYPECD"] = fliInfo.typecd;
             row["GRAPH"] = fliInfo.graph;
             row["FLT"] = fliInfo.flt;
-            row["FLT_TONE"] = fliInfo.flt_tone;
+            if (!fliInfo.flt)
+                row["FLT_TONE"] = DBNull.Value;
+            else
+                row["FLT_TONE"] = fliInfo.flt_tone;
             row["TOTS"] = fliInfo.tots;
             row["POSS"] = fliInfo.poss;
             row["NEGS"] = fliInfo.negs;
@@ -284,6 +304,7 @@ namespace Report.Handler
             row["TOTNFLS"] = fliInfo.totnfls;
             row["POSNFLS"] = fliInfo.posnfls;
             row["NEGNFLS"] = fliInfo.negnfls;
+            row["ISVALID"] = fliInfo.isvalid;
 
             insertTable.Rows.Add(row);
 
