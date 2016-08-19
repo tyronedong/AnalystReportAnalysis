@@ -183,6 +183,40 @@ namespace Text.Classify
                     break;
                 }
             }
+            else if(type.Equals("INNOV"))
+            {
+                Regex zhengliWordsYanfa = new Regex(@"研究|开发|研发|探索|引进|启动|(建立|新设|设立)技术中心|研发中心|开发中心|技术研发");
+                Regex zhengliWordsRencai = new Regex(@"引进(技术|专业)人才|博士后|高新人才");
+                Regex zhengliWordsTouru = new Regex(@"新(技术|工艺|技艺|功能)|优质品率|优化|改进");
+                Regex zhengliWordsXinchanpin = new Regex(@"新(产品|产品线|一代|系统|系列|版|推出|应用|性能|工艺|设计|包装)|更新|升级|换代|产品开发|在研产品");
+                Regex zhengliWordsZhuanli = new Regex(@"专利|发明");
+
+                Regex notZhengliWords = new Regex(@"创新战略|商业模式创新|营销(组合)?创新|新领域拓展|颠覆|革新|转型|差异化|多样化");
+
+                string[] sentences = TextPreProcess.SeparateParagraph(content);
+
+                int counter = 0;
+                while (true)//每次循环都尝试随机从content中提取一句话，然后判断这句话符不符合要求
+                {
+                    counter++;
+                    if (counter >= 10)
+                    { break; }//一个content最多尝试10次
+
+                    int whichOne = RandomNumber(0, sentences.Length - 1);
+                    sent = sentences[whichOne];
+
+                    if (string.IsNullOrEmpty(sent)) { continue; }
+                    //if (likeButNotZhengli1.IsMatch(sent)) { return sent; }//像正例的负例
+                    //if (likeButNotZhengli2.IsMatch(sent)) { return sent; }//像正例的负例
+                    if (zhengliWordsYanfa.IsMatch(sent)) continue;
+                    if (zhengliWordsRencai.IsMatch(sent)) continue;
+                    if (zhengliWordsTouru.IsMatch(sent)) continue;
+                    if (zhengliWordsXinchanpin.IsMatch(sent)) continue;
+                    if (zhengliWordsZhuanli.IsMatch(sent)) continue;
+                    
+                    break;
+                }
+            }
             else
             {
                 string[] sentences = TextPreProcess.SeparateParagraph(content);

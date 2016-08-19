@@ -20,13 +20,19 @@ namespace Text
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
+            //ExcelHandler exH = new ExcelHandler(@"F:\things\running\分析师报告\数据标注\7-22\INNOV-文本标注输出结果示例20160721.xlsx");
+            //string[] rows2 = exH.GetColoum("工作表1", 2);
+            //exH.Destroy();
+
+
+
             //Process0();
-            //Process1("FLIIND");
+            Process1("INNOV");
             //WordSegHandler wsH = new WordSegHandler();
             //var l = wsH.GetSegmentation("考虑到发电量预测调整以及其他非经常性项目，我们将2009-11年盈利预测分别上调6%、22%和16%。");
             //CalFLIPrecision();
             //CalPrecision();
-            CalFLIINDPrecision();
+            //CalFLIINDPrecision();
             //TestWordSeg("预计下半年养殖饲料高景气不变，公司产品量价齐升相信广告业务的毛利率回归正常水平是完全可期的，年底广告资源到期后重新的谈判签约值得关注。小米公司和超预期稳中有增爆炸性的极速折让不景气的负债率和资产负债率的微信公众平台和锂电池需求将于明后年进入高速增长期，进而拉动六氟磷酸锂的需求出现爆发性增长，如符合预期，未来几年需求复合增长率在35%左右。");
 
             Console.WriteLine("finished");
@@ -241,15 +247,15 @@ namespace Text
 
         static bool SetAppConfigName(ref string appSetRoot, ref string appSetFile, string type)
         {
-            if (type.Equals("FLI") || type.Equals("FLIEMO") || type.Equals("FLIIND"))
-            {
-                appSetRoot = "excel_foresight_root_dictionary";
-                appSetFile = "excel_foresight_filename";
-            }
-            else if (type.Equals("INNOVTYPE") || type.Equals("INNOVSTAGE") || type.Equals("INNOVEMO") || type.Equals("NONINNOVTYPE"))
+            if (type.Contains("INNOV"))
             {
                 appSetRoot = "excel_innovation_root_dictionary";
                 appSetFile = "excel_innovation_filename";
+            }
+            else if (type.Contains("FLI"))
+            {
+                appSetRoot = "excel_foresight_root_dictionary";
+                appSetFile = "excel_foresight_filename";
             }
             else
             {

@@ -10,14 +10,25 @@ namespace Text.Handler
 {
     class ExcelHandler
     {
+        public bool isValid = false;
+        
         Excel.Application exlApp;
         Excel.Workbook exlWorkBook;
-        
+
 
         public ExcelHandler(string exlPath)
         {
-            exlApp = new Excel.Application();
-            exlWorkBook = exlApp.Workbooks.Open(exlPath, 0, true, 5, "", "", true, Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+            try
+            {
+                exlApp = new Excel.Application();
+                exlWorkBook = exlApp.Workbooks.Open(exlPath, 0, true, 5, "", "", true, Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+                isValid = true;
+            }
+            catch(Exception e)
+            {
+                Trace.TraceError("ExcelHandler.ExcelHandler(): " + e.ToString());
+                isValid = false;
+            }
         }
 
         /// <summary>
@@ -49,9 +60,13 @@ namespace Text.Handler
             return colStrs.ToArray();
         }
 
+        /// <summary>
+        /// This operation does not save any changes which are operated to excel file
+        /// Please make sure you have call save function before call this function
+        /// </summary>
         public void Destroy()
         {
-            exlWorkBook.Close(true, null, null);
+            exlWorkBook.Close(false, null, null);//Close(Object SaveChanges, Object Filename, Object RouteWorkbook)
             //exlWorkBook.Close();
             exlApp.Quit();
 
