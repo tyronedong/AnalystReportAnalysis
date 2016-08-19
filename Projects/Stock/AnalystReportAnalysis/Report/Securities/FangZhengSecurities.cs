@@ -27,7 +27,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("FangZhengSecurities.FangZhengSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("FangZhengSecurities.FangZhengSecurities(string pdReportPath): " + e.ToString());
                 }
             }
         }

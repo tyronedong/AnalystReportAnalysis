@@ -30,7 +30,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("ZhongJinSecurities.ZhongJinSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("ZhongJinSecurities.ZhongJinSecurities(string pdReportPath): " + e.ToString());
                 }
             }
         }

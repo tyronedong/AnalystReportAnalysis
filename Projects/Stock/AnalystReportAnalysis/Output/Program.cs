@@ -301,7 +301,7 @@ namespace Output
                                     {
                                         //isError = true;
                                         //break;
-                                        Trace.TraceError(securitiesName + " is unvalid");
+                                        Trace.TraceError(securitiesName + " : " + id + " is unvalid (init instance failed)");
                                         nextCurId = id;
                                         continue;
                                     }

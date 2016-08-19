@@ -28,7 +28,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("ZhongGuoSecurities.CommonSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("ZhongGuoSecurities.CommonSecurities(string pdReportPath): " + e.ToString());
                 }
             }
         }

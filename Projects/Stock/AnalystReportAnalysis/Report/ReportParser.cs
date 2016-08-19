@@ -57,7 +57,7 @@ namespace Report
             }
             catch (Exception e)
             {
-                Trace.TraceError("ReportParser.ReportParser(string pdfPath): " + e.Message);
+                Trace.TraceError("ReportParser.ReportParser(string pdfPath): " + e.ToString());//这个error表示在加载文件的时候就出现错误
                 isValid = false;
             }
         }
@@ -956,7 +956,11 @@ namespace Report
                 string text = pdfStripper.getText(pdfReport).Replace("\r\n", "\n");
                 return text;
             }
-            catch (Exception e) { return null; }
+            catch (Exception e) 
+            {
+                Trace.TraceError("ReportParser.loadPDFText(): " + e.ToString());
+                return null; 
+            }
         }
 
         public virtual string[] mergeToParagraph(string[] lines)

@@ -28,7 +28,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("PingAnSecurities.PingAnSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("PingAnSecurities.PingAnSecurities(string pdReportPath): " + e.ToString());
                 }
             }
         }

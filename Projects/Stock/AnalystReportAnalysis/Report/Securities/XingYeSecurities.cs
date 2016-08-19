@@ -28,7 +28,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("XingYeSecurities.XingYeSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("XingYeSecurities.XingYeSecurities(string pdReportPath): " + e.ToString());
                 }
             }
         }
