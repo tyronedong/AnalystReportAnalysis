@@ -146,46 +146,17 @@ namespace Text.Classify
         {
             string rootForChi, dataFilePath;
 
-            if (type.Equals("FLI") )
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
-                dataFilePath = "./FLI/chi_feature.txt";
-            }
-            else if (type.Equals("FLIEMO"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
-                dataFilePath = "./FLIEMO/chi_feature.txt";
-            }
-            else if (type.Equals("FLIIND"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
-                dataFilePath = "./FLIIND/chi_feature.txt";
-            }
-            else if (type.Equals("INNOVTYPE"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-                dataFilePath = "./INNOVTYPE/chi_feature.txt";
-            }
-            else if (type.Equals("INNOVSTAGE"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-                dataFilePath = "./INNOVSTAGE/chi_feature.txt";
-            }
-            else if (type.Equals("INNOVEMO"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-                dataFilePath = "./INNOVEMO/chi_feature.txt";
-            }
-            else if (type.Equals("NONINNOVTYPE"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-                dataFilePath = "./NONINNOVTYPE/chi_feature.txt";
-            }
+            if (type.Contains("INNOV"))
+            { rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"]; }
+            else if(type.Contains("FLI"))
+            { rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"]; }
             else
             {
                 Trace.TraceError("Feature.GetChiFeatureStorePath():type error");
                 return null;
             }
+
+            dataFilePath = Path.Combine(type, "chi_feature.txt");
 
             return Path.Combine(rootForChi, dataFilePath);
         }
@@ -194,46 +165,18 @@ namespace Text.Classify
         {
             string rootForChi, dataFilePath;
 
-            if (type.Equals("FLI"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
-                dataFilePath = "./FLI/user_feature.txt";
-            }
-            else if (type.Equals("FLIEMO"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
-                dataFilePath = "./FLIEMO/user_feature.txt";
-            }
-            else if (type.Equals("FLIIND"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
-                dataFilePath = "./FLIIND/chi_feature.txt";
-            }
-            else if (type.Equals("INNOVTYPE"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-                dataFilePath = "./INNOVTYPE/user_feature.txt";
-            }
-            else if (type.Equals("INNOVSTAGE"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-                dataFilePath = "./INNOVSTAGE/user_feature.txt";
-            }
-            else if (type.Equals("INNOVEMO"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-                dataFilePath = "./INNOVEMO/user_feature.txt";
-            }
-            else if (type.Equals("NONINNOVTYPE"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
-                dataFilePath = "./NONINNOVTYPE/user_feature.txt";
-            }
+            if (type.Contains("INNOV"))
+            { rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"]; }
+            else if (type.Contains("FLI"))
+            { rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"]; }
             else
             {
                 Trace.TraceError("Feature.GetUserFeaturePath():type error");
                 return null;
             }
+
+            dataFilePath = Path.Combine(type, "user_feature.txt");
+            
 
             return Path.Combine(rootForChi, dataFilePath);
         }
@@ -249,15 +192,15 @@ namespace Text.Classify
             string rootForChi;// = ConfigurationManager.AppSettings["feature_relate_root_dictionary"];
             string dataFilePath;
 
-            if (type.Equals("FLI")||type.Equals("FLIEMO")||type.Equals("FLIIND"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
-                dataFilePath = ConfigurationManager.AppSettings["excel_foresight_filename"];//"FLI-信息提取-样本（20160720）.xlsx";
-            }
-            else if(type.Equals("INNOVTYPE")||type.Equals("INNOVSTAGE")||type.Equals("INNOVEMO")||type.Equals("NONINNOVTYPE"))
+            if(type.Contains("INNOV"))
             {
                 rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
                 dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];// "INNOV-信息提取.xlsx";
+            }
+            else if (type.Contains("FLI"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+                dataFilePath = ConfigurationManager.AppSettings["excel_foresight_filename"];//"FLI-信息提取-样本（20160720）.xlsx";
             }
             else
             {
@@ -398,6 +341,81 @@ namespace Text.Classify
             return wordChiValueDic;
         }
 
+        //if (type.Equals("FLI"))
+        //{
+        //    rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+        //    dataFilePath = "./FLI/user_feature.txt";
+        //}
+        //else if (type.Equals("FLIEMO"))
+        //{
+        //    rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+        //    dataFilePath = "./FLIEMO/user_feature.txt";
+        //}
+        //else if (type.Equals("FLIIND"))
+        //{
+        //    rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+        //    dataFilePath = "./FLIIND/chi_feature.txt";
+        //}
+        //else if (type.Equals("INNOVTYPE"))
+        //{
+        //    rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+        //    dataFilePath = "./INNOVTYPE/user_feature.txt";
+        //}
+        //else if (type.Equals("INNOVSTAGE"))
+        //{
+        //    rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+        //    dataFilePath = "./INNOVSTAGE/user_feature.txt";
+        //}
+        //else if (type.Equals("INNOVEMO"))
+        //{
+        //    rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+        //    dataFilePath = "./INNOVEMO/user_feature.txt";
+        //}
+        //else if (type.Equals("NONINNOVTYPE"))
+        //{
+        //    rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+        //    dataFilePath = "./NONINNOVTYPE/user_feature.txt";
+        //}
+        //else
+        //{
+        //    Trace.TraceError("Feature.GetUserFeaturePath():type error");
+        //    return null;
+        //}
+        //if (type.Equals("FLI") )
+        //    {
+        //        rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+        //        dataFilePath = "./FLI/chi_feature.txt";
+        //    }
+        //    else if (type.Equals("FLIEMO"))
+        //    {
+        //        rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+        //        dataFilePath = "./FLIEMO/chi_feature.txt";
+        //    }
+        //    else if (type.Equals("FLIIND"))
+        //    {
+        //        rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
+        //        dataFilePath = "./FLIIND/chi_feature.txt";
+        //    }
+        //    else if (type.Equals("INNOVTYPE"))
+        //    {
+        //        rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+        //        dataFilePath = "./INNOVTYPE/chi_feature.txt";
+        //    }
+        //    else if (type.Equals("INNOVSTAGE"))
+        //    {
+        //        rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+        //        dataFilePath = "./INNOVSTAGE/chi_feature.txt";
+        //    }
+        //    else if (type.Equals("INNOVEMO"))
+        //    {
+        //        rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+        //        dataFilePath = "./INNOVEMO/chi_feature.txt";
+        //    }
+        //    else if (type.Equals("NONINNOVTYPE"))
+        //    {
+        //        rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+        //        dataFilePath = "./NONINNOVTYPE/chi_feature.txt";
+        //    }
         ///// <summary>
         ///// </summary>
         ///// <param name="featRatio">define how much percent of words will be remained as chi-feature</param>

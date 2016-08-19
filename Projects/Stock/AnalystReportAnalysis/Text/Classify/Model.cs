@@ -251,13 +251,13 @@ namespace Text.Classify
         {
             string rootForChi;
 
-            if (type.Equals("FLI")||type.Equals("FLIEMO")||type.Equals("FLIIND"))
-            {
-                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
-            }
-            else if (type.Equals("INNOVTYPE")||type.Equals("INNOVSTAGE")||type.Equals("INNOVEMO")||type.Equals("NONINNOVTYPE"))
+            if (type.Contains("INNOV"))
             {
                 rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            }
+            else if (type.Contains("FLI"))
+            {
+                rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"];
             }
             else
             {

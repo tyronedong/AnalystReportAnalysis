@@ -36,3 +36,4 @@ D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.Legacy.pd
 D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.Legacy.xml
 D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.Core.pdb
 D:\workingwc\Stock\AnalystReportAnalysis\Text\bin\Debug\MongoDB.Driver.Core.xml
+D:\workingwc\Stock\AnalystReportAnalysis\Text\obj\Debug\Text.csprojResolveAssemblyReference.cache

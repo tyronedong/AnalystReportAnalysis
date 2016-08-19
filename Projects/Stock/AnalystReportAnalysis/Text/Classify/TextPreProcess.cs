@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Configuration;
@@ -82,114 +83,212 @@ namespace Text.Classify
 
         public Dictionary<int, List<string>> GetTrainData(string type, string dataFilePath)
         {
-            Dictionary<int, List<string>> trainData = new Dictionary<int, List<string>>();
-
-            ExcelHandler exlH = new ExcelHandler(Path.Combine(rootSourcePath, dataFilePath));
-            if (type.Equals("FLI"))
+            ExcelHandler exlH = null;
+            try
             {
-                string[] zhengliCol, fuliCol;
+                Dictionary<int, List<string>> trainData = new Dictionary<int, List<string>>();
 
-                string[] zhengliExl = null, zhengliTxt = null;
-                string[] fuliExl = null, fuliTxt = null;
+                exlH = new ExcelHandler(Path.Combine(rootSourcePath, dataFilePath));
+                if(!exlH.isValid)
+                { return null; }
 
-                //read
-                if(isZhengliXls)
-                { zhengliExl = exlH.GetColoum("sheet1", 3); }
-                if(isZhengliTxt)
+                if (type.Equals("FLI"))
                 {
-                    string txtPath = Path.Combine(rootSourcePath, "./FLI/random_select_zhengli.txt");
-                    zhengliTxt = FileHandler.LoadStringArray(txtPath);
-                }
+                    string[] zhengliCol, fuliCol;
 
-                if(isFuliXls)
-                { fuliExl = exlH.GetColoum("sheet1", 6); }
-                if (isFuliTxt)
+                    string[] zhengliExl = null, zhengliTxt = null;
+                    string[] fuliExl = null, fuliTxt = null;
+
+                    //read
+                    if (isZhengliXls)
+                    { zhengliExl = exlH.GetColoum("sheet1", 3); }
+                    if (isZhengliTxt)
+                    {
+                        string txtPath = Path.Combine(rootSourcePath, "./FLI/random_select_zhengli.txt");
+                        zhengliTxt = FileHandler.LoadStringArray(txtPath);
+                    }
+
+                    if (isFuliXls)
+                    { fuliExl = exlH.GetColoum("sheet1", 6); }
+                    if (isFuliTxt)
+                    {
+                        string txtPath = Path.Combine(rootSourcePath, "./FLI/random_select_fuli.txt");
+                        fuliTxt = FileHandler.LoadStringArray(txtPath);
+                    }
+
+                    //merge
+                    if (zhengliExl == null && zhengliTxt == null)
+                    { Trace.TraceError("Text.Classify.TextPreProcess.GetTrainDataOfZhengli(): no zhengli found"); return null; }
+                    else if (zhengliExl != null && zhengliTxt == null)
+                    { zhengliCol = zhengliExl; }
+                    else if (zhengliTxt != null && zhengliExl == null)
+                    { zhengliCol = zhengliTxt; }
+                    else
+                    { zhengliCol = zhengliExl.Concat(zhengliTxt).ToArray(); }
+
+                    if (fuliExl == null && fuliTxt == null)
+                    { Trace.TraceError("Text.Classify.TextPreProcess.GetTrainDataOfZhengli(): no zhengli found"); return null; }
+                    else if (fuliExl != null && fuliTxt == null)
+                    { fuliCol = fuliExl; }
+                    else if (fuliTxt != null && fuliExl == null)
+                    { fuliCol = fuliTxt; }
+                    else
+                    { fuliCol = fuliExl.Concat(fuliTxt).ToArray(); }
+
+                    //normalize
+                    zhengliCol = NormalizeTrainData(zhengliCol);
+                    fuliCol = NormalizeTrainData(fuliCol);
+                    //exlH.Destroy();
+                    trainData.Add(1, new List<string>(zhengliCol));
+                    trainData.Add(-1, new List<string>(fuliCol));
+                }
+                else if (type.Equals("FLIEMO"))
                 {
-                    string txtPath = Path.Combine(rootSourcePath, "./FLI/random_select_fuli.txt");
-                    fuliTxt = FileHandler.LoadStringArray(txtPath);
+                    string[] textExl = exlH.GetColoum("sheet1", 3);//文本
+                    string[] toneExl = exlH.GetColoum("sheet1", 4);//对应文本的情感标注
+
+                    if (!ConvertToDic(ref trainData, ref textExl, ref toneExl))//转化数据成trainData
+                    { return null; }
                 }
+                else if (type.Equals("FLIIND"))
+                {
+                    string[] textExl = exlH.GetColoum("sheet1", 3);//文本
+                    string[] indExl = exlH.GetColoum("sheet1", 5);//对应文本的情感标注
 
-                //merge
-                if (zhengliExl == null && zhengliTxt == null)
-                { Trace.TraceError("Text.Classify.TextPreProcess.GetTrainDataOfZhengli(): no zhengli found"); return null; }
-                else if (zhengliExl != null && zhengliTxt == null)
-                { zhengliCol = zhengliExl; }
-                else if (zhengliTxt != null && zhengliExl == null)
-                { zhengliCol = zhengliTxt; }
+                    if (!ConvertToDic(ref trainData, ref textExl, ref indExl))//转化数据成trainData
+                    { return null; }
+
+                    //trainData[0].RemoveRange(trainData[1].Count, (trainData[0].Count - trainData[1].Count));
+                }
+                else if(type.Equals("INNOV"))
+                {
+                    string[] textExl = exlH.GetColoum("sheet1", 2);
+                    string[] noninnovExl = exlH.GetColoum("sheet1", 6);
+
+                    if (!NormalizeLabels(ref noninnovExl, type))//标注label中有误标的2-4的label
+                        return null;
+
+                    if(!ConvertToDic(ref trainData, ref textExl, ref noninnovExl))
+                        return null;
+
+                    if (!ReverseDic(ref trainData))
+                        return null;
+                }
+                else if (type.Equals("INNOVTYPE"))
+                {
+                    string[] textExl = exlH.GetColoum("sheet1", 2);//文本
+                    string[] typeExl = exlH.GetColoum("sheet1", 3);//对应文本的情感标注
+
+                    if (!ConvertToDic(ref trainData, ref textExl, ref typeExl))//转化数据成trainData
+                    { return null; }
+                }
+                else if (type.Equals("INNOVSTAGE"))
+                {
+                    string[] textExl = exlH.GetColoum("sheet1", 2);//文本
+                    string[] stageExl = exlH.GetColoum("sheet1", 4);//对应文本的情感标注
+
+                    if (!ConvertToDic(ref trainData, ref textExl, ref stageExl))//转化数据成trainData
+                    { return null; }
+                }
+                else if (type.Equals("INNOVEMO"))
+                {
+                    string[] textExl = exlH.GetColoum("sheet1", 2);//文本
+                    string[] typeExl = exlH.GetColoum("sheet1", 5);//对应文本的情感标注
+
+                    if (!ConvertToDic(ref trainData, ref textExl, ref typeExl))//转化数据成trainData
+                    { return null; }
+                }
+                else if (type.Equals("NONINNOVTYPE"))
+                {
+                    string[] textExl = exlH.GetColoum("sheet1", 2);//文本
+                    string[] typeExl = exlH.GetColoum("sheet1", 7);//对应文本的情感标注
+
+                    if (!ConvertToDic(ref trainData, ref textExl, ref typeExl))//转化数据成trainData
+                    { return null; }
+                }
                 else
-                { zhengliCol = zhengliExl.Concat(zhengliTxt).ToArray(); }
-                
-                if (fuliExl == null && fuliTxt == null) 
-                { Trace.TraceError("Text.Classify.TextPreProcess.GetTrainDataOfZhengli(): no zhengli found"); return null; }
-                else if (fuliExl != null && fuliTxt == null)
-                { fuliCol = fuliExl; }
-                else if (fuliTxt != null && fuliExl == null)
-                { fuliCol = fuliTxt; }
-                else
-                { fuliCol = fuliExl.Concat(fuliTxt).ToArray(); }
-
-                //normalize
-                zhengliCol = NormalizeTrainData(zhengliCol);
-                fuliCol = NormalizeTrainData(fuliCol);
-                //exlH.Destroy();
-                trainData.Add(1, new List<string>(zhengliCol));
-                trainData.Add(-1, new List<string>(fuliCol));
+                {
+                    return null;
+                }
+                return trainData;
             }
-            else if (type.Equals("FLIEMO"))
+            catch(Exception e)
             {
-                string[] textExl = exlH.GetColoum("sheet1", 3);//文本
-                string[] toneExl = exlH.GetColoum("sheet1", 4);//对应文本的情感标注
-
-                if (!ConvertToDic(ref trainData, ref textExl, ref toneExl))//转化数据成trainData
-                { return null; }
-            }
-            else if(type.Equals("FLIIND"))
-            {
-                string[] textExl = exlH.GetColoum("sheet1", 3);//文本
-                string[] indExl = exlH.GetColoum("sheet1", 5);//对应文本的情感标注
-
-                if (!ConvertToDic(ref trainData, ref textExl, ref indExl))//转化数据成trainData
-                { return null; }
-
-                //trainData[0].RemoveRange(trainData[1].Count, (trainData[0].Count - trainData[1].Count));
-            }
-            else if(type.Equals("INNOVTYPE"))
-            {
-                string[] textExl = exlH.GetColoum("sheet1", 2);//文本
-                string[] typeExl = exlH.GetColoum("sheet1", 3);//对应文本的情感标注
-
-                if (!ConvertToDic(ref trainData, ref textExl, ref typeExl))//转化数据成trainData
-                { return null; }
-            }
-            else if (type.Equals("INNOVSTAGE"))
-            {
-                string[] textExl = exlH.GetColoum("sheet1", 2);//文本
-                string[] typeExl = exlH.GetColoum("sheet1", 4);//对应文本的情感标注
-
-                if (!ConvertToDic(ref trainData, ref textExl, ref typeExl))//转化数据成trainData
-                { return null; }
-            }
-            else if(type.Equals("INNOVEMO"))
-            {
-                string[] textExl = exlH.GetColoum("sheet1", 2);//文本
-                string[] typeExl = exlH.GetColoum("sheet1", 5);//对应文本的情感标注
-
-                if (!ConvertToDic(ref trainData, ref textExl, ref typeExl))//转化数据成trainData
-                { return null; }
-            }
-            else if (type.Equals("NONINNOVTYPE"))
-            {
-                string[] textExl = exlH.GetColoum("sheet1", 2);//文本
-                string[] typeExl = exlH.GetColoum("sheet1", 7);//对应文本的情感标注
-
-                if (!ConvertToDic(ref trainData, ref textExl, ref typeExl))//转化数据成trainData
-                { return null; }
-            }
-            else
-            {
+                Trace.TraceError("TextPreProcess.GetTrainData(): " + e.ToString());
                 return null;
             }
-            return trainData;
+            finally
+            {
+                if (exlH != null && exlH.isValid)
+                    exlH.Destroy();
+            }
+        }
+
+        /// <summary>
+        /// 正对label的不一致性，作一个正规化
+        /// </summary>
+        /// <param name="labels"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private bool NormalizeLabels(ref string[] labels, string type)
+        {
+            try
+            {
+                Regex isLabel = new Regex(@"\d+");
+
+                if (type.Equals("INNOV"))
+                {
+                    int index = -1;
+                    foreach (var label in labels)
+                    {
+                        index++;
+                        if (label == null)
+                            continue;
+                        if (label.Equals("0") || label.Equals("1"))
+                            continue;
+                        if(isLabel.IsMatch(label))
+                            labels[index] = "1"; 
+                    }
+                }
+
+                return true;
+            }
+            catch(Exception e)
+            {
+                Trace.TraceError("TextPreProcess.NormalizeLabels(): " + e.ToString());
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 将两个pair对应的键值交换
+        /// </summary>
+        /// <param name="trainDataDic"></param>
+        /// <returns></returns>
+        private bool ReverseDic(ref Dictionary<int, List<string>> trainDataDic)
+        {
+            try
+            {
+                if (trainDataDic.Keys.Count != 2)
+                    return false;
+
+                int key0 = trainDataDic.Keys.ElementAt(0);
+                int key1 = trainDataDic.Keys.ElementAt(1);
+
+                var value0 = trainDataDic[key0];
+                var value1 = trainDataDic[key1];
+
+                trainDataDic.Clear();
+                trainDataDic.Add(key0, value1);
+                trainDataDic.Add(key1, value0);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("TextPreProcess.ReverseDic(): " + e.ToString());
+                return false;
+            }
         }
 
         /// <summary>
@@ -213,7 +312,7 @@ namespace Text.Classify
                     continue;
 
                 int resultLabel;//将label从string转化为int
-                if (!Int32.TryParse(labelColumn[i], out resultLabel))
+                if (!Int32.TryParse(labelColumn[i], out resultLabel))//如果label不是int型数，说明改行有误，跳过
                 { Trace.TraceWarning("TextPreProcess.ConvertToDic():label is not a int value"); continue; }
 
                 if(trainDataDic.ContainsKey(resultLabel))//按照label是否出现做出不同的操作
@@ -389,17 +488,14 @@ namespace Text.Classify
 
         //    foreach(var fuli in fuliTxt)
         //    { nonInnov.Add(fuli); }
-
         //    //end work
         //    trainData.Add(0, nonInnov);
         //    trainData.Add(1, class1);
         //    trainData.Add(2, class2);
         //    trainData.Add(3, class3);
         //    trainData.Add(4, class4);
-
         //    return trainData;
         //}
-
         ///// <summary>
         ///// Return all zhenglis in the form of a string array
         ///// </summary>
@@ -450,7 +546,6 @@ namespace Text.Classify
         //    //exlH.Destroy();
         //    return zhengli;
         //}
-
         ///// <summary>
         ///// Return all fulis in the form of a string array
         ///// </summary>
@@ -501,9 +596,6 @@ namespace Text.Classify
         //    //exlH.Destroy();
         //    return fuli;
         //}
-
-        
-
         ///// <summary>
         ///// Given a sentence, calculate its word count dictionary
         ///// </summary>
