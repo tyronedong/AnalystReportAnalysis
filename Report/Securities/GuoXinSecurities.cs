@@ -28,7 +28,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("GuoXinSecurities.GuoXinSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("GuoXinSecurities.GuoXinSecurities(string pdReportPath): " + e.ToString());
                 }
             }
         }

@@ -29,7 +29,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("GuangFaSecurities.GuangFaSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("GuangFaSecurities.GuangFaSecurities(string pdReportPath): " + e.ToString());
                 }
             }
         }

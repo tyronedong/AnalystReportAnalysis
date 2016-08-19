@@ -29,11 +29,11 @@ namespace Report
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            Execute();
+            //Execute();
 
             //System.Console.ReadLine();
 
-            //Some();
+            Some();
 
             System.Console.ReadLine();
         }
@@ -43,10 +43,11 @@ namespace Report
             string path = @"D:\人民大学\分析师报告\2010\2010-6-8\01E0192C-12D7-4035-A0E4-85B1F73A3AB7.PDF";
             string path2 = @"F:\things\running\分析师报告\分析师研报\分析师报告\000513\20130826-银河证券-丽珠集团-000513-业绩基本符合预期，新品贡献度有望提升.pdf";
             string path3 = @"F:\things\running\分析师报告\分析师研报\分析师报告\002317\20091211-大通证券-众生药业-002317-上市定价报告.pdf";
-            string path4 = @"D:\人民大学\分析师报告\2012\2012-1-13\AFC4A9CD-AFB9-42B2-8C0D-0985892BF915.PDF";
+            string path4 = @"D:\人民大学\分析师报告\2011\2011-8-16\28406CC8-29EB-4C62-B1E5-B3CD7DBC1622.PDF";
             string imgSavePath = @"F:\things\running\分析师报告\";
 
-            PDDocument document = PDDocument.load(path4);
+            //PDDocument document = PDDocument.load(path4);
+            
             //PDDocumentInformation info = document.getDocumentInformation();
 
             //var title = info.getTitle();
@@ -55,45 +56,45 @@ namespace Report
             //var key = info.getKeywords();
             //var t = info.getTrapped();
 
-            /** 文档页面信息 **/
-            PDDocumentCatalog cata = document.getDocumentCatalog();
-            java.util.List pages = cata.getAllPages();
-            int count = 1;
-            for (int i = 0; i < pages.size(); i++)
-            {
-                PDPage page = (PDPage)pages.get(i);
-                if (page != null)
-                {
-                    //PDResources res = page.findResources();
-                    PDResources res = page.getResources();
-                    //获取页面图片信息  
-                    java.util.Map imgs = res.getImages();
-                    if (imgs != null)
-                    {
-                        var keySet = imgs.keySet();
-                        var it = keySet.iterator();
-                        while (it.hasNext())
-                        {
-                            string key = it.next().ToString();
-                            PDXObjectImage img = (PDXObjectImage)imgs.get(key);
-                            try
-                            {
-                                img.write2file(imgSavePath + count);
-                            }
-                            catch (Exception e)
-                            {
-                                count++;
-                                continue;
-                            }
-                            count++;
-                        }
-                    }
-                }
-            }  
+            ///** 文档页面信息 **/
+            //PDDocumentCatalog cata = document.getDocumentCatalog();
+            //java.util.List pages = cata.getAllPages();
+            //int count = 1;
+            //for (int i = 0; i < pages.size(); i++)
+            //{
+            //    PDPage page = (PDPage)pages.get(i);
+            //    if (page != null)
+            //    {
+            //        //PDResources res = page.findResources();
+            //        PDResources res = page.getResources();
+            //        //获取页面图片信息  
+            //        java.util.Map imgs = res.getImages();
+            //        if (imgs != null)
+            //        {
+            //            var keySet = imgs.keySet();
+            //            var it = keySet.iterator();
+            //            while (it.hasNext())
+            //            {
+            //                string key = it.next().ToString();
+            //                PDXObjectImage img = (PDXObjectImage)imgs.get(key);
+            //                try
+            //                {
+            //                    img.write2file(imgSavePath + count);
+            //                }
+            //                catch (Exception e)
+            //                {
+            //                    count++;
+            //                    continue;
+            //                }
+            //                count++;
+            //            }
+            //        }
+            //    }
+            //}  
 
             //Console.WriteLine(info.toString());
 
-            //string t = ReportParser.loadPDFText(path);
+            string t = ReportParser.loadPDFText(path4);
             //ReportParser rp = new ZhongJinSecurities(path);
             //WordSegHandler wsH = new WordSegHandler();
             //var r = rp.executeExtract_nodb(ref wsH);

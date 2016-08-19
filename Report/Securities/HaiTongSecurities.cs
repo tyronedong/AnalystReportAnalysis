@@ -28,7 +28,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("HaiTongSecurities.HaiTongSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("HaiTongSecurities.HaiTongSecurities(string pdReportPath): " + e.ToString());
                 }
             }
         }

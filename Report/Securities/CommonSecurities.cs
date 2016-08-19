@@ -26,7 +26,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("CommonSecurities.CommonSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("CommonSecurities.CommonSecurities(string pdReportPath): " + e.ToString());
                 }
             }
         }

@@ -29,7 +29,7 @@ namespace Report.Securities
                 catch (Exception e)
                 {
                     this.isValid = false;
-                    Trace.TraceError("AnXinSecurities.AnXinSecurities(string pdReportPath): " + e.Message);
+                    Trace.TraceError("AnXinSecurities.AnXinSecurities(string pdReportPath): " + e.ToString());
                 }
             }
         }
