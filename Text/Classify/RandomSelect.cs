@@ -190,8 +190,9 @@ namespace Text.Classify
                 Regex zhengliWordsTouru = new Regex(@"新(技术|工艺|技艺|功能)|优质品率|优化|改进");
                 Regex zhengliWordsXinchanpin = new Regex(@"新(产品|产品线|一代|系统|系列|版|推出|应用|性能|工艺|设计|包装)|更新|升级|换代|产品开发|在研产品");
                 Regex zhengliWordsZhuanli = new Regex(@"专利|发明");
+                Regex zhengliWordsFeijishu = new Regex(@"创新战略|战略创新|商业模式创新|营销(组合)?创新|新领域拓展|颠覆|革新|转型|差异化|多样化");
 
-                Regex notZhengliWords = new Regex(@"创新战略|商业模式创新|营销(组合)?创新|新领域拓展|颠覆|革新|转型|差异化|多样化");
+                Regex notZhengliWords = new Regex(@"行业创新");
 
                 string[] sentences = TextPreProcess.SeparateParagraph(content);
 
@@ -205,14 +206,14 @@ namespace Text.Classify
                     int whichOne = RandomNumber(0, sentences.Length - 1);
                     sent = sentences[whichOne];
 
-                    if (string.IsNullOrEmpty(sent)) { continue; }
-                    //if (likeButNotZhengli1.IsMatch(sent)) { return sent; }//像正例的负例
-                    //if (likeButNotZhengli2.IsMatch(sent)) { return sent; }//像正例的负例
+                    if (string.IsNullOrEmpty(sent)) continue; 
+                    if (notZhengliWords.IsMatch(sent)) return sent; //像正例的负例,为了突现这种负例的重要性，当它出现后直接认定负例，不管有没有正例出现
                     if (zhengliWordsYanfa.IsMatch(sent)) continue;
                     if (zhengliWordsRencai.IsMatch(sent)) continue;
                     if (zhengliWordsTouru.IsMatch(sent)) continue;
                     if (zhengliWordsXinchanpin.IsMatch(sent)) continue;
                     if (zhengliWordsZhuanli.IsMatch(sent)) continue;
+                    if (zhengliWordsFeijishu.IsMatch(sent)) continue;
                     
                     break;
                 }

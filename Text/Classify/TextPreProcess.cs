@@ -160,7 +160,7 @@ namespace Text.Classify
 
                     //trainData[0].RemoveRange(trainData[1].Count, (trainData[0].Count - trainData[1].Count));
                 }
-                else if(type.Equals("INNOV"))
+                else if (type.Equals("INNOV"))
                 {
                     string[] textExl = exlH.GetColoum("sheet1", 2);
                     string[] noninnovExl = exlH.GetColoum("sheet1", 6);
@@ -168,11 +168,18 @@ namespace Text.Classify
                     if (!NormalizeLabels(ref noninnovExl, type))//标注label中有误标的2-4的label
                         return null;
 
-                    if(!ConvertToDic(ref trainData, ref textExl, ref noninnovExl))
+                    if (!ConvertToDic(ref trainData, ref textExl, ref noninnovExl))
                         return null;
 
                     if (!ReverseDic(ref trainData))
                         return null;
+
+                    if (isFuliTxt)
+                    {
+                        string txtPath = Path.Combine(rootSourcePath, "./INNOV/random_select_fuli.txt");
+                        string[] fuliTxt = FileHandler.LoadStringArray(txtPath);
+                        trainData[0].AddRange(fuliTxt);
+                    }
                 }
                 else if (type.Equals("INNOVTYPE"))
                 {
@@ -306,7 +313,7 @@ namespace Text.Classify
             int len = textColumn.Length;
             for (int i = 1; i < len; i++)
             {
-                if (string.IsNullOrEmpty(textColumn[i]) || string.IsNullOrEmpty(labelColumn[i]))//skip invalid row
+                if (string.IsNullOrEmpty(textColumn[i]) || string.IsNullOrEmpty(labelColumn[i]))//skip invalid row, null 行会被pass掉
                     continue;
                 if (string.IsNullOrWhiteSpace(textColumn[i]) || string.IsNullOrWhiteSpace(labelColumn[i]))//skip invalid row
                     continue;
