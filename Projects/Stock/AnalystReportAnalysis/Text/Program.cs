@@ -25,9 +25,10 @@ namespace Text
             //exH.Destroy();
 
 
-
+            GenerateLibSVMVector("INNOV", "于11月15日成功并购了海南金大丰矿业开发有限公司（抱伦金矿）63％的股权");
             //Process0();
-            Process1("INNOV");
+            //Process2("INNOV");
+            //CalINNOVPrecision();
             //WordSegHandler wsH = new WordSegHandler();
             //var l = wsH.GetSegmentation("考虑到发电量预测调整以及其他非经常性项目，我们将2009-11年盈利预测分别上调6%、22%和16%。");
             //CalFLIPrecision();
@@ -162,6 +163,42 @@ namespace Text
             Console.WriteLine("Model train finished");
         }
 
+        static void GenerateLibSVMVector(string type, string sentence)
+        {
+            string appSetRoot = null, appSetFile = null;
+            if (!SetAppConfigName(ref appSetRoot, ref appSetFile, type))
+            { return; }
+
+            string rootDic = ConfigurationManager.AppSettings[appSetRoot];
+
+            string tempF = Path.Combine(type, "chi_feature.txt");
+            string featureFile = Path.Combine(rootDic, tempF);
+
+            List<FeatureItem> fItems = Feature.LoadChiFeature(featureFile);
+
+            StringBuilder sb = new StringBuilder();
+            //sb.Append((lItem.label == 0) ? 0 : 1);
+            var lItem = new LabeledItem(1, sentence);
+            sb.Append(lItem.label);
+            sb.Append(' ');
+            int idx = 1;
+            foreach (var fItem in fItems)
+            {
+                if (lItem.wordCountDic.ContainsKey(fItem.featureWord))
+                {
+                    sb.Append(idx);
+                    sb.Append(':');
+                    double tfidf = lItem.wordCountDic[fItem.featureWord] * fItem.globalWeight;
+                    sb.Append(tfidf.ToString("0.000000"));
+                    sb.Append(' ');
+                }
+                else { }//do nothing//sb.Append(0.0); }
+                idx++;
+            }
+            var str = sb.ToString();
+            Console.WriteLine("");
+        }
+
         static void GenerateLibSVMInputFile(string type)
         {
             string appSetRoot = null, appSetFile = null;
@@ -245,6 +282,16 @@ namespace Text
             Console.WriteLine("Process3 finished");
         }
 
+        /// <summary>
+        /// 为创新性文本选择负例
+        /// </summary>
+        /// <param name="type"></param>
+        static void Process4(string type)
+        {
+            //string rootDic = ConfigurationManager.AppSettings[""]
+            RandomSelect.ExecuteSelectFuli("INNOV", 968, @"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\innovation\INNOV", "random_select_fuli.txt");
+        }
+
         static bool SetAppConfigName(ref string appSetRoot, ref string appSetFile, string type)
         {
             if (type.Contains("INNOV"))
@@ -263,6 +310,42 @@ namespace Text
                 return false;
             }
             return true;
+        }
+
+        static void CalINNOVPrecision()
+        {
+            Model model = new Model("INNOV");
+
+            string rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            string dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];//
+
+            TextPreProcess tPP = new TextPreProcess("INNOV", rootForChi, true, false, true, true);
+            var data = tPP.GetTrainData("INNOV", dataFilePath);
+
+            List<string> wrong = new List<string>();
+            double[] totalCount = new double[2];
+            double[] accCount = new double[2];
+            foreach (var dataItem in data)
+            {
+                totalCount[dataItem.Key <= 0 ? 0 : dataItem.Key] += dataItem.Value.Count();//key equals -1 or 1
+                foreach (var sentence in dataItem.Value)
+                {
+                    double val = model.AdvancedPredict("INNOV", sentence);
+
+                    if (val == 1 && dataItem.Key == 1)
+                        accCount[1]++;
+                    else if (val == 0 && dataItem.Key == 0)
+                        accCount[0]++;
+                    else if (dataItem.Key == 0)
+                        wrong.Add(sentence);
+                }
+            }
+
+            FileHandler.SaveStringArray(@"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\innovation\INNOV\class0_wrong.txt", wrong.ToArray());
+
+            Console.WriteLine("class 0 accuracy is " + (accCount[0] / totalCount[0]));
+            Console.WriteLine("class 1 accuracy is " + (accCount[1] / totalCount[1]));
+            Console.WriteLine("total accuracy is " + ((accCount[0] + accCount[1]) / (totalCount[0] + totalCount[1])));
         }
 
         static void CalFLIEMOPrecision()

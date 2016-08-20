@@ -49,7 +49,7 @@ namespace Text.Classify
                     double tfidf = wordCountDic[fItem.featureWord] * fItem.globalWeight;
                     featVec.Add(tfidf);
                 }
-                else { featVec.Add(0); }
+                else featVec.Add(0);
             }
 
             return featVec.ToArray();
@@ -86,17 +86,24 @@ namespace Text.Classify
 
         public static bool ModifyAndSaveChiFeature(string type)
         {
-            string userFeaturePath = GetUserFeaturePath(type);
-            string chiFeaturePath = GetChiFeatureStorePath(type);
-            if (userFeaturePath == null || chiFeaturePath == null)
+            string userFeaturePath = GetFeaturePath(type, "user_feature.txt");//add to chi_feature.txt
+            string userNotFeaturePath = GetFeaturePath(type, "user_not_feature.txt");//delete from chi_feature.txt
+
+            string chiFeaturePath = GetFeaturePath(type, "chi_feature.txt");
+
+            if (userFeaturePath == null || userNotFeaturePath == null || chiFeaturePath == null)
+            {
+                Console.WriteLine("wrong!");
                 return false;
+            }
 
             List<FeatureItem> newFeatures = new List<FeatureItem>();
             List<FeatureItem> oldFeatures = FileHandler.LoadFeatures(chiFeaturePath);
 
             int id = 1;
             string[] userFeature = FileHandler.LoadStringArray(userFeaturePath);
-            foreach (var userf in userFeature)
+            string[] userNotFeature = FileHandler.LoadStringArray(userNotFeaturePath);
+            foreach (var userf in userFeature)//对与userFeature中的每个词，若在oldFeatures中没有发现，则加入
             {
                 bool isContained = false;
                 foreach (var f in oldFeatures)
@@ -111,9 +118,25 @@ namespace Text.Classify
                 if(!isContained)
                     newFeatures.Add(new FeatureItem(id++, userf, 1.0));
             }
+            foreach(var usernf in userNotFeature)//删除userNotFeature中的词
+            {
+                FeatureItem fItem  = null;
+                foreach (var f in oldFeatures)
+                {
+                    if (f.featureWord.Equals(usernf))
+                    {
+                        fItem  = new FeatureItem(f.id, f.featureWord, f.globalWeight);
+                        break;
+                    }
+                }
+                if (fItem != null)
+                    oldFeatures.Remove(fItem);
+            }
 
             foreach (var of in oldFeatures)
             {
+                if (type.Equals("INNOV"))
+                    if (of.featureWord.Length == 1 && !of.featureWord.Equals("新")) continue;
                 newFeatures.Add(new FeatureItem(id++, of.featureWord, of.globalWeight));
             }
 
@@ -128,9 +151,9 @@ namespace Text.Classify
         /// <param name="minChiValue">define the min value of chi-value by which to decide weather is chi-feature</param>
         /// <param name="globalWeightType">define the type of 'global weight', default as 'tf-idf'</param>
         /// <returns></returns>
-        public static bool ExtractAndStoreChiFeature(string type, double featRatio = 0.20, double minChiValue = 10, string globalWeightType = "idf")
+        public static bool ExtractAndStoreChiFeature(string type, double featRatio = 0.10, double minChiValue = 5, string globalWeightType = "idf")
         {
-            string saveFilePath = GetChiFeatureStorePath(type);
+            string saveFilePath = GetFeaturePath(type, "chi_feature.txt");
             if (saveFilePath == null)
                 return false;
 
@@ -142,26 +165,7 @@ namespace Text.Classify
             return false;
         }
 
-        private static string GetChiFeatureStorePath(string type)
-        {
-            string rootForChi, dataFilePath;
-
-            if (type.Contains("INNOV"))
-            { rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"]; }
-            else if(type.Contains("FLI"))
-            { rootForChi = ConfigurationManager.AppSettings["excel_foresight_root_dictionary"]; }
-            else
-            {
-                Trace.TraceError("Feature.GetChiFeatureStorePath():type error");
-                return null;
-            }
-
-            dataFilePath = Path.Combine(type, "chi_feature.txt");
-
-            return Path.Combine(rootForChi, dataFilePath);
-        }
-
-        private static string GetUserFeaturePath(string type)
+        private static string GetFeaturePath(string type, string featureFileName)
         {
             string rootForChi, dataFilePath;
 
@@ -175,8 +179,7 @@ namespace Text.Classify
                 return null;
             }
 
-            dataFilePath = Path.Combine(type, "user_feature.txt");
-            
+            dataFilePath = Path.Combine(type, featureFileName);
 
             return Path.Combine(rootForChi, dataFilePath);
         }
