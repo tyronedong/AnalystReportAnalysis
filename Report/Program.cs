@@ -29,11 +29,11 @@ namespace Report
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            //Execute();
+            Execute();
 
             //System.Console.ReadLine();
 
-            Some();
+            //Some();
 
             System.Console.ReadLine();
         }
@@ -210,6 +210,7 @@ namespace Report
                                     continue;
                                 }
 
+                                Console.WriteLine("start handle " + securitiesName + " : " + id);
                                 //get pdf file parser by securities
                                 ReportParser reportParser = null;
                                 //StockData stockData = null, stockParser = null;

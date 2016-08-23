@@ -28,8 +28,8 @@ namespace Report
 
         public int picCount { get; set; }//added
         public int tableCount { get; set; }//added
-        public int valueCountInContent { get; set; }//added
-        public int valueCountOutContent { get; set; }//added
+        public int valCountInContent { get; set; }//added
+        public int valCountOutContent { get; set; }//added
 
         public List<Analyst> Analysts { get; set; }
 
@@ -44,8 +44,8 @@ namespace Report
             StockPrice = 0.0;
             picCount = 0;
             tableCount = 0;
-            valueCountInContent = 0;
-            valueCountOutContent = 0;
+            valCountInContent = 0;
+            valCountOutContent = 0;
             Analysts = new List<Analyst>();
             //dic = new List<string>();
         }
@@ -68,6 +68,7 @@ namespace Report
             this.Email = Email;
         }
 
+        public string _id { get; set; }
         public string Name { get; set; }
         public string CertificateNumber { get; set; }
         public string PhoneNumber { get; set; }

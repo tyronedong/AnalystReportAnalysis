@@ -294,9 +294,12 @@ namespace Report
             return;
         }
 
+        /// <summary>
+        /// 执行逻辑：先统计全文的数值数，然后统计正文的数值数，两者相减得到表格（非正文）的数值数
+        /// </summary>
         public virtual void extractValueCount()
         {
-            Regex value = new Regex(@"\d+(\.\d+)?");
+            Regex value = new Regex(@"\d[\d,]*(\.\d+)?");
 
             //if(noABCLines == null)
             //{ Trace.TraceError("noABCLine is null"); }
@@ -304,7 +307,7 @@ namespace Report
             foreach (var nLine in noABCLines)
             {
                 if (value.IsMatch(nLine))
-                { anaReport.valueCountOutContent += value.Matches(nLine).Count; }
+                { anaReport.valCountOutContent += value.Matches(nLine).Count; }
             }
 
             //get value count in content
@@ -315,11 +318,11 @@ namespace Report
             else
             {
                 if (value.IsMatch(anaReport.Content))
-                { anaReport.valueCountInContent += value.Matches(anaReport.Content).Count; }
+                { anaReport.valCountInContent += value.Matches(anaReport.Content).Count; }
             }
 
             //get value count out content
-            anaReport.valueCountOutContent -= anaReport.valueCountInContent;
+            anaReport.valCountOutContent -= anaReport.valCountInContent;
             
             return;
         }
@@ -402,10 +405,18 @@ namespace Report
             string content = "", normaledPara; 
             MatchCollection matchCol;
             Regex isContent = new Regex("[\u4e00-\u9fa5a][，。；]");
+            Regex isMightContent = new Regex("[\u4e00-\u9fa5a]+");
             Regex normalizedText = new Regex("[，,。.．；;：:“”'\"《<》>？?{}\\[\\]【】()（）*&^$￥#…@！!~～·`|+＋\\-－×_—=/、%％ 0-9a-zA-Z\u4e00-\u9fa5a]+");
+
+            int nextIdx = 0;
+            bool isPrePara = false, isNextPara = false;
             foreach (var para in finalParas)
             {
-                if (isContent.IsMatch(para))
+                nextIdx++;
+
+                if (string.IsNullOrEmpty(para) || string.IsNullOrWhiteSpace(para))
+                    continue;
+                if (isNextPara || isContent.IsMatch(para))
                 {
                     normaledPara = "";
                     matchCol = normalizedText.Matches(para);
@@ -415,11 +426,52 @@ namespace Report
                     }
                     normaledPara = normaledPara.Remove(normaledPara.Length - 2).Trim();
                     content += normaledPara + '\n';
+                    isPrePara = true;
+                    isNextPara = false;
+                }
+                else if (isMightContent.IsMatch(para))
+                {
+                    //int nextIdx = nextIdx + 1;
+                    if (nextIdx >= finalParas.Length)
+                        continue;
+                    isNextPara = isContent.IsMatch(finalParas[nextIdx]);
+                    if (isPrePara && isNextPara)
+                    {
+                        normaledPara = "";
+                        matchCol = normalizedText.Matches(para);
+                        foreach (Match match in matchCol)
+                        {
+                            normaledPara += match.Value + "&&";
+                        }
+                        normaledPara = normaledPara.Remove(normaledPara.Length - 2).Trim();
+                        content += normaledPara + "\n";
+                    }
+                    isPrePara = false;
+                }
+                else
+                {
+                    isPrePara = false;
+                    isNextPara = false;
                 }
             }
             anaReport.Content = content;
             return true;
         }
+
+        //foreach (var para in finalParas)
+        //    {
+        //        if (isContent.IsMatch(para))
+        //        {
+        //            normaledPara = "";
+        //            matchCol = normalizedText.Matches(para);
+        //            foreach (Match match in matchCol)
+        //            {
+        //                normaledPara += match.Value + "&&";
+        //            }
+        //            normaledPara = normaledPara.Remove(normaledPara.Length - 2).Trim();
+        //            content += normaledPara + '\n';
+        //        }
+        //    }
 
         /// <summary>
         /// This method has been abandoned cause Jobber info already exists in database.

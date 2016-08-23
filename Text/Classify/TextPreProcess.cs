@@ -659,7 +659,7 @@ namespace Text.Classify
         {
             char[] separator = { '。', '；', '？', '！' };
             paragraph = paragraph.Replace("\n", "。");//替换成‘。'有问题吧
-
+                                                      //替换成‘。’没有问题
             return paragraph.Split(separator);
         }
     }
