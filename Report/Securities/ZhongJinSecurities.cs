@@ -154,11 +154,10 @@ namespace Report.Securities
                     }
                 }
             }
-            if (hasPriceMatched && hasRRCMatched)
-            {
-                return true;
-            }
-            return false;
+            if (!hasRRCMatched)//如果没有匹配成功，则调用基类的方法
+                hasRRCMatched = base.extractStockOtherInfo();
+
+            return hasRRCMatched && hasPriceMatched;
         }
 
         //public override bool extractContent()

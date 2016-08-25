@@ -70,7 +70,10 @@ namespace Report.Securities
                     }
                 }
             }
-            return hasPriceMatched && hasRRCMatched;
+            if (!hasRRCMatched)//如果没有匹配成功，则调用基类的方法
+                hasRRCMatched = base.extractStockOtherInfo();
+
+            return hasRRCMatched && hasPriceMatched;
         }
 
         public override string[] removeAnyButContentInParas(string[] paras)
@@ -88,38 +91,29 @@ namespace Report.Securities
             Regex indexEntry = new Regex(@"\.{9,} *\d{1,3}$");
 
             Regex picOrTabHead = new Regex(@"^(图|表|图表) *\d{1,2}");
-            Regex extra = new Regex("^(请通过合法途径获取本公司研究报告，如经由未经|本报告的信息均来自已公开信息，关于信息的准确性与完|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监)");//added
+            Regex extra = new Regex("^(独立性申明：|请通过合法途径获取本公司研究报告，如经由未经|本报告中?的?信息均来(自|源)于?已?公开的?(信息|资料)|本公司具备证券投资咨询业务资格，请务必阅读最后一页免责声明|证监会审核华创证券投资咨询业务资格批文号：证监|请务必阅读|每位主要负责编写本|市场有风险，投资需谨慎|此份報告由群益證券)");//added
 
-            Regex refReport = new Regex(@"^\d{1,2} *[.、]?.*\.\d{1,2}$");//added
+            Regex refReport1 = new Regex(@"^\d{1,2} *[.、]?.*\.\d{1,2}$");//added
+            Regex refReport2 = new Regex(@"^\d{1,2}[.、].*《.*\d{6}$");
 
             List<string> newParas = new List<string>();
             foreach (var para in paras)
             {
                 string trimedPara = para.Trim();
                 if (refReportHead.IsMatch(trimedPara) && refReportTail.IsMatch(trimedPara))
-                {
                     continue;
-                }
                 if (refReportHT.IsMatch(trimedPara))
-                {
                     continue;
-                }
                 if (indexEntry.IsMatch(trimedPara))
-                {
                     continue;
-                }
-                if (refReport.IsMatch(trimedPara))//added
-                {
+                if (refReport1.IsMatch(trimedPara))//added
                     continue;
-                }
+                if (refReport2.IsMatch(trimedPara))
+                    continue;
                 if (extra.IsMatch(trimedPara))//added
-                {
                     continue;
-                }
                 if (picOrTabHead.IsMatch(trimedPara))
-                {
                     continue;
-                }
                 if (trimedPara.Contains("数据来源："))
                 {
                     if (trimedPara.StartsWith("数据来源：")) { continue; }

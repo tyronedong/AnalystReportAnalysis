@@ -156,9 +156,8 @@ namespace Report
 
         public virtual AnalystReport executeExtract_withdb()
         {
-
-            extractStockInfo();
             extractContent();
+            extractStockInfo();
 
             extractCountInfo();//added
             extractReportInfo();//added;
@@ -170,8 +169,8 @@ namespace Report
         {
             this.wsH = wsH;
 
-            extractStockInfo();
             extractContent();
+            extractStockInfo();
 
             extractDate();
             extractAnalysts();
@@ -331,14 +330,8 @@ namespace Report
         {
             bool f1 = extractStockBasicInfo();
             bool f2 = extractStockOtherInfo();
-            if (f1 && f2)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+
+            return f1 && f2;
         }
 
         public virtual bool extractStockBasicInfo()
@@ -371,28 +364,75 @@ namespace Report
         public virtual bool extractStockOtherInfo()
         {
             //extract stock price, stock rating and stock rating change
-            Regex stockRRC = new Regex(@"(看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|推荐|回避) *(([\(（][\u4e00-\u9fa5]{2,4}[\)）])|(/ *[\u4e00-\u9fa5]{2,4}))");//推荐(维持)||推荐/维持
-            Regex stockR = new Regex(@"看好|看淡|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|谨慎推荐|推荐|回避");
+            Regex stockRP1 = new Regex(@"评级[:：]");
 
-            bool hasRRCMatched = false;
+            Regex stockRRC = new Regex(@"(看好|看淡|谨慎买入|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|谨慎推荐|推荐|回避)(-[A-Z])? *(([\(（][\u4e00-\u9fa5]{2,4}[\)）])|(/ *[\u4e00-\u9fa5]{2,4}))");//推荐(维持)||推荐/维持
+            Regex stockR = new Regex(@"看好|看淡|谨慎买入|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|谨慎推荐|推荐|回避");
+
+            Regex stockRRC2 = new Regex(@"(维持|上调|下调|给予).*(看好|看淡|谨慎买入|买入|增持|持有|减持|卖出|强于大市|中性|弱于大市|强烈推荐|审慎推荐|谨慎推荐|推荐|回避)");
+            Regex stockRC = new Regex("维持|上调|下调");
+
+            Regex chinese = new Regex(@"[\u4e00-\u9fa5a]+");
+
+            bool hasRMatched = false, hasRCMatched = false;
             foreach (var line in lines)
             {
-                string trimedLine = line.Trim();
-                if (stockRRC.IsMatch(line))
+                string trimedLine = line.Replace(" ", "").Trim();
+                if (stockRRC.IsMatch(line))//匹配“‘推荐(维持)’或‘强烈推荐-A （维持）’”
                 {
                     string srrc = stockRRC.Match(line).Value;
                     anaReport.StockRating = stockR.Match(srrc).Value;
-                    anaReport.RatingChanges = srrc.Replace(anaReport.StockRating, "").Replace("(", "").Replace("（", "").Replace("）", "").Replace(")", "").Replace("/","").Trim();
+                    anaReport.RatingChanges = chinese.Match(srrc.Replace(anaReport.StockRating, "")).Value;
 
-                    hasRRCMatched = true;
+                    hasRMatched = true;
+                    hasRCMatched = true;
                     break;
                 }
+                if (stockRP1.IsMatch(line))//匹配“评级：推荐”
+                    if (stockR.IsMatch(line))
+                    {
+                        anaReport.StockRating = stockR.Match(line).Value;
+                        hasRMatched = true;
+                        break;
+                    }
             }
-            if (hasRRCMatched)
-            {
+
+            if (hasRMatched && hasRCMatched)//评级和改变都匹配到则返回
                 return true;
+            else if (string.IsNullOrEmpty(anaReport.Content) || string.IsNullOrWhiteSpace(anaReport.Content))//content内容为空
+                return false;
+            else
+            {
+                string[] paragraphs = anaReport.Content.Split('\n').Reverse().ToArray();//将段落反转，从后至前扫描
+
+                int counter = 0;
+                foreach (string para in paragraphs)
+                {
+                    if (string.IsNullOrEmpty(para))
+                        continue;
+                    if (counter++ >= 5)
+                        break;
+                    //string[] sentences = SeparateParagraph(para).Reverse().ToArray();//这么reverse()是为了提高匹配的效率
+                    string[] groups = SeparateToGroups(para).Reverse().ToArray();
+                    foreach (string group in groups)
+                    {
+                        if (stockRRC2.IsMatch(group))
+                        {
+                            string rrc = stockRRC2.Match(group).Value;
+                            anaReport.StockRating = stockR.Match(rrc).Value;
+                            anaReport.RatingChanges = stockRC.Match(rrc).Value;
+
+                            hasRMatched = true;
+                            hasRCMatched = string.IsNullOrEmpty(anaReport.RatingChanges) ? false : true;
+                            break;
+                        }
+                    }
+
+
+                }
             }
-            return false;
+
+            return hasRMatched && hasRCMatched;
         }         
 
         /// <summary>
@@ -807,7 +847,7 @@ namespace Report
             Regex InvestRatingStatement = new Regex("(^投资评级(的)?(说明|定义))|(投资评级(的)?(说明|定义)?[:：]?$)|(评级(标准|说明|定义)[:：]?$)");
             Regex Statements = new Regex("^(((证券)?分析师(申明|声明|承诺))|((重要|特别)(声|申)明)|(免责(条款|声明|申明))|(法律(声|申)明)|(独立性(声|申)明)|(披露(声|申)明)|(信息披露)|(要求披露))[:：]?$");
             Regex FirmIntro = new Regex("公司简介[:：]?$");
-            Regex AnalystIntro = new Regex("^(分析师|分析师与联系人|分析师与行业专家|研究员|作者|研究团队)(简介|介绍)[\u4e00-\u9fa5a]*?[:：]?$");
+            Regex AnalystIntro = new Regex("^(分析师|研究员|作者|研究团队|建筑建材小组)((与|及)(联系人|研究助理|行业专家))?(简介|介绍)[\u4e00-\u9fa5a]*?[:：]?$");
 
             Regex extra = new Regex(@"^银河证券行业评级体系");//added
 
@@ -864,8 +904,11 @@ namespace Report
             Regex mightBeContent = new Regex("[\u4e00-\u9fa5a][，。；]");
 
             Regex refReportHead = new Regex(@"^(\d{1,2} *[.、]? *)?《");
-            Regex refReportTail = new Regex(@"\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?$");
-            Regex refReportHT = new Regex(@"^《.*》$");
+            Regex refReportTail = new Regex(@"((\d{4}[-\./]\d{1,2}([-\./]\d{1,2})?)|(20\d{4}))$");
+            Regex refReportHT1 = new Regex(@"^《.*》.*20\d{6}$");
+            Regex refReportHT2 = new Regex(@"^《.*》$");
+            Regex refReportHT3 = new Regex(@"《.*》");
+            
 
             Regex noteShuju = new Regex("数据来源：.*$");
             Regex noteZiliao = new Regex("资料来源：.*$");
@@ -881,27 +924,22 @@ namespace Report
             {
                 string trimedPara = para.Trim();
                 if (refReportHead.IsMatch(trimedPara) && refReportTail.IsMatch(trimedPara))
-                {
                     continue;
-                }
-                if (refReportHT.IsMatch(trimedPara))
-                {
+                if (refReportHT1.IsMatch(trimedPara))
                     continue;
-                }
+                if (refReportHT2.IsMatch(trimedPara))
+                    continue;
+                if (refReportHT3.IsMatch(trimedPara))
+                    if (trimedPara.Length - refReportHT3.Match(trimedPara).Value.Length < 4)//非《》内的字符数小于等于3
+                        continue;
                 if (indexEntry.IsMatch(trimedPara))
-                {
                     continue;
-                }
                 if (extra.IsMatch(trimedPara))//added
-                {
                     continue;
-                }
                 if (picOrTabHead.IsMatch(trimedPara))
-                {
                     continue;
-                }
                 if (trimedPara.StartsWith("本人") && trimedPara.Contains("在此申明"))
-                { continue; }
+                    continue;
                 if (trimedPara.Contains("数据来源："))
                 {
                     if (trimedPara.StartsWith("数据来源：")) { continue; }
@@ -934,9 +972,7 @@ namespace Report
                 }
 
                 if (isTableDigits(trimedPara))
-                {
                     continue;
-                }
 
                 newParas.Add(para);
             }
@@ -1053,6 +1089,27 @@ namespace Report
         public void CloseAll()
         {
             pdfReport.close();
+        }
+
+        /// <summary>
+        /// this function is from Text.TextPreProcess()s
+        /// </summary>
+        /// <param name="paragraph"></param>
+        /// <returns></returns>
+        public static string[] SeparateParagraph(string paragraph)
+        {
+            char[] separator = { '。', '；', '？', '！' };
+            paragraph = paragraph.Replace("\n", "。");//替换成‘。'有问题吧
+            //替换成‘。’没有问题
+            return paragraph.Split(separator);
+        }
+
+        public static string[] SeparateToGroups(string paragraph)
+        {
+            char[] separator = { '。', '；', '？', '！', '，' };
+            paragraph = paragraph.Replace("\n", "。");//替换成‘。'有问题吧
+            //替换成‘。’没有问题
+            return paragraph.Split(separator);
         }
 
     }

@@ -41,7 +41,7 @@ namespace Report.Securities
             Regex stockPricePattern = new Regex("^股价.*元$");
             Regex stockPrice = new Regex(@"\d+\.\d+");
 
-            bool hasPriceMatched = false;
+            bool hasPriceMatched = false, hasRRCMatched = false;
             foreach (var line in lines)
             {
                 string trimedLine = line.Trim();
@@ -64,11 +64,11 @@ namespace Report.Securities
                     }
                 }
             }
-            if (hasPriceMatched)
-            {
-                return true;
-            }
-            return false;
+
+            if (!hasRRCMatched)//如果没有匹配成功，则调用基类的方法
+                hasRRCMatched = base.extractStockOtherInfo();
+
+            return hasRRCMatched && hasPriceMatched;
         }
 
         public override string[] removeAnyButContentInParas(string[] paras)

@@ -112,7 +112,7 @@ namespace Report.Handler
                 var s3 = curRow[3].ToString(); //TELEPHONE
                 var s4 = curRow[4].ToString(); //MOBILE
                 var s5 = curRow[5].ToString(); //EMAIL
-                personTable.Add(s0, new Analyst(s1, s2, string.IsNullOrEmpty(s3) ? s3 : s4, s5));
+                personTable.Add(s0, new Analyst(s0, s1, s2, string.IsNullOrEmpty(s3) ? s3 : s4, s5));
             }
             return true ;
         }

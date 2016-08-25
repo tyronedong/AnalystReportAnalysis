@@ -74,15 +74,17 @@ namespace Report.Securities
                 }
                 index++;
             }
-            if (hasRRCMatched && hasPriceMatched)
-            {
-                return true;
-            }
-            return false;
+            if (!hasRRCMatched)//如果没有匹配成功，则调用基类的方法
+                hasRRCMatched = base.extractStockOtherInfo();
+
+            return hasRRCMatched && hasPriceMatched;
         }
 
         public override string[] removeAnyButContentInLines(string[] lines)
         {
+            double perCounter = 0;
+            double perPerLine = 1.0 / lines.Length;
+
             Regex InvestRatingStatement = new Regex("(^投资评级(的)?说明)|(投资评级(的)?(说明)?[:：]?$)|(评级(标准|说明)[:：]?$)");
             Regex Statements = new Regex("^(((证券)?分析师(申明|声明|承诺))|((重要|特别)(声|申)明)|(免责(条款|声明|申明))|(法律(声|申)明)|(披露(声|申)明)|(信息披露)|(要求披露))[:：]?$");
             Regex FirmIntro = new Regex("公司简介[:：]?$");
@@ -90,6 +92,14 @@ namespace Report.Securities
             List<string> newLines = new List<string>();
             foreach (var line in lines)
             {
+                //add this regulation to aviod the loss of main content
+                if (perCounter <= 0.30)
+                {
+                    newLines.Add(line);
+                    perCounter += perPerLine;
+                    continue;
+                }
+
                 string trimedLine = line.Trim();
                 if (trimedLine.StartsWith("报告原因："))//added(提高报告原因的优先级使其不被break掉)
                 {
@@ -113,6 +123,7 @@ namespace Report.Securities
                     break;
                 }
                 newLines.Add(line);
+                perCounter += perPerLine;
             }
             return newLines.ToArray();
         }

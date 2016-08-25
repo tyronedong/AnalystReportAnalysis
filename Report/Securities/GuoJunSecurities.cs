@@ -147,14 +147,11 @@ namespace Report.Securities
                     }
                 }
             }
-            if (isPriceDone && isRatingDone)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+
+            if (!isRatingDone)//如果没有匹配成功，则调用基类的方法
+                isRatingDone = base.extractStockOtherInfo();//有问题
+
+            return isRatingDone && isPriceDone;
         }
 
         public override bool extractContent()

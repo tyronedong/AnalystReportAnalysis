@@ -38,7 +38,7 @@ namespace Report.Securities
             Regex stockPrice = new Regex(@"\d+\.\d+");
 
             bool hasCmpMatched = false, hasCodeMatched = false;
-            bool hasRMatched = false, hasRCMatched = false, hasPriceMatched = false;
+            bool hasRMatched = false, hasRCMatched = false, hasRRCMatched = false, hasPriceMatched = false;
             bool lastRC = false;
             bool lastCmp = false, lastCode = false;
 
@@ -91,7 +91,12 @@ namespace Report.Securities
                 }
             }
 
-            return hasRCMatched && hasRMatched && hasPriceMatched && hasCodeMatched && hasCmpMatched;
+            hasRRCMatched = hasRMatched && hasRCMatched;
+
+            if (!hasRRCMatched)//如果没有匹配成功，则调用基类的方法
+                hasRRCMatched = base.extractStockOtherInfo();
+
+            return hasRRCMatched && hasPriceMatched && hasCodeMatched && hasCmpMatched;
         }
     }
 }

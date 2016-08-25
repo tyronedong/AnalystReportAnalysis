@@ -37,7 +37,7 @@ namespace Report.Securities
         {
             Regex stockCode = new Regex(@"\d{6}\.[a-zA-Z]{1,4}");
             Regex stockPrice = new Regex(@"\d+\.\d+");
-            bool hasCodeMatched = false, hasPriceMatched = false;
+            bool hasCodeMatched = false, hasPriceMatched = false, hasRRCMatched = false;
 
             base.extractStockBasicInfo();
             if (string.IsNullOrEmpty(anaReport.StockName) || anaReport.StockName.Equals("中国银行大厦四楼"))
@@ -80,7 +80,9 @@ namespace Report.Securities
                 }
             }
 
-            return hasCodeMatched && hasPriceMatched;
+            hasRRCMatched = base.extractStockOtherInfo();
+
+            return hasRRCMatched && hasCodeMatched && hasPriceMatched;
         } 
 
         public override string[] removeAnyButContentInParas(string[] paras)
