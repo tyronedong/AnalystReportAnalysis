@@ -49,7 +49,7 @@ namespace Report.Securities
             Regex stockRC = new Regex("[（(][\u4e00-\u9fa5]+评级[）)]");
 
             int index = 0;
-            bool hasRMatched = false, hasRCMatched = false;
+            bool hasRMatched = false, hasRCMatched = false, hasRRCMatched = false;
             foreach (var line in lines)
             {
                 string trimedLine = line.Trim();
@@ -69,10 +69,12 @@ namespace Report.Securities
                 }
                 index++;
             }
-            if (hasRMatched && hasRCMatched)
-            {
-                return true;
-            }
+
+            hasRRCMatched = hasRMatched && hasRCMatched;
+
+            if (!hasRRCMatched)//如果没有匹配成功，则调用基类的方法
+                hasRRCMatched = base.extractStockOtherInfo();
+
             return false;
         }
 

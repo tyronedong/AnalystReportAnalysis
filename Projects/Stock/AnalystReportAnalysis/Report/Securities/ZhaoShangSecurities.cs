@@ -23,8 +23,8 @@ namespace Report.Securities
                     pdfText = loadPDFText();
                     lines = pdfText.Split('\n');
                     noABCLines = removeAnyButContentInLines(lines);
-                    noOtherLines = removeOtherInLines(lines);
-                    mergedParas = mergeToParagraph(noOtherLines);
+                    //noOtherLines = removeOtherInLines(lines);
+                    mergedParas = mergeToParagraph(noABCLines);
                     advancedMergedParas = removeOtherInParas(mergedParas);
                     noABCParas = removeAnyButContentInParas(advancedMergedParas);
                     finalParas = noABCParas;
@@ -104,30 +104,29 @@ namespace Report.Securities
                         }
                     }
                 }
+            }
+            if (!isRandRCDone)//如果没有匹配成功，则调用基类的方法
+                isRandRCDone = base.extractStockOtherInfo();
 
-            }
-            if (isNameCodeDone && isRandRCDone && isPriceDone)
-            {
-                return true;
-            }
-            return false;
+            return isNameCodeDone && isRandRCDone && isPriceDone;
         }
 
-        public override bool extractContent()
-        {
-            string content = "";
-            Regex isContent = new Regex("[\u4e00-\u9fa5a][，。；]");
-            foreach (var para in finalParas)
-            {
-                string normaledPara = para.Replace(" ", "").Trim();
-                if (isContent.IsMatch(para))
-                {
-                    content += normaledPara + '\n';
-                }
-            }
-            anaReport.Content = content;
-            return true;
-        }
+        //public override bool extractcontent()
+        //{
+        //    string content = "";
+        //    regex iscontent = new regex("[\u4e00-\u9fa5a][，。；]");
+        //    foreach (var para in finalparas)
+        //    {
+        //        string normaledpara = para.replace(" ", "").trim();
+        //        if (iscontent.ismatch(para))
+        //        {
+        //            content += normaledpara + '\n';
+        //        }
+        //    }
+        //    anareport.content = content;
+        //    return true;
+        //}
+
         //public override bool extractContent()
         //{      
         //    string content = "";

@@ -234,14 +234,29 @@ namespace Text.Handler
             }
         }
 
+        public string[] GetNoPunctuation()
+        {
+            List<string> noPunc = new List<string>();
+
+            foreach (var kvp in partitionResult)
+            {
+                if (kvp.Key.StartsWith("w"))
+                { continue; }
+
+                //Console.ReadLine();
+                noPunc.Add(kvp.Value);
+            }
+            return noPunc.ToArray();
+        }
+
         public string[] GetNoStopWords()
         {
             List<string> noStopWords = new List<string>();
             foreach (var kvp in partitionResult)
             {
-                if (kvp.Key.StartsWith("w")) 
+                if (kvp.Key.StartsWith("w")) //标点
                 { continue; }
-                if(kvp.Key.StartsWith("u"))
+                if (kvp.Key.StartsWith("u"))//助词
                 { continue; }
                 if(kvp.Key.Equals("m"))//“一些”是数量词mq
                 { continue; }

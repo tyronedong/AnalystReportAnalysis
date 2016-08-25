@@ -78,7 +78,10 @@ namespace Report.Securities
                 lastLine = line;
             }
 
-            return hasPriceMatched && hasRRCMatched;
+            if (!hasRRCMatched)//如果没有匹配成功，则调用基类的方法
+                hasRRCMatched = base.extractStockOtherInfo();
+
+            return hasRRCMatched && hasPriceMatched;
         }
 
         public string RatingChange(string curRating, string lastRating)

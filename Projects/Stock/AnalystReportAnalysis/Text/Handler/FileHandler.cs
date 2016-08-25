@@ -95,6 +95,7 @@ namespace Text.Handler
                 FileStream fs = new FileStream(fileName, FileMode.Open);
                 BinaryFormatter bf = new BinaryFormatter();
                 List<LabeledItem> labeledItems = bf.Deserialize(fs) as List<LabeledItem>;
+                fs.Close();
                 return labeledItems;
             }
             catch (Exception e) { Trace.TraceError("Text.Handler.FileHandler.LoadLabeledItems(string fileName): " + e.ToString()); return null; }

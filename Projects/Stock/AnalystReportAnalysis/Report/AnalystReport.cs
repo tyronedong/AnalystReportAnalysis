@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Report
 {
+    [Serializable]
     public class AnalystReport
     {
         public string _id { get; set; }
@@ -51,6 +52,7 @@ namespace Report
         }
     }
 
+    [Serializable]
     public class Analyst
     {
         public Analyst() { }
@@ -60,8 +62,9 @@ namespace Report
             this.Name = Name;
         }
 
-        public Analyst(string Name, string CertificateNumber, string PhoneNumber, string Email)
+        public Analyst(string _id, string Name, string CertificateNumber, string PhoneNumber, string Email)
         {
+            this._id = _id;
             this.Name = Name;
             this.CertificateNumber = CertificateNumber;
             this.PhoneNumber = PhoneNumber;
@@ -96,6 +99,26 @@ namespace Report
         public int posnfls { get; set; }
         public int negnfls { get; set; }
         public bool isvalid { get; set; }
+    }
+
+    public class INNOVInfo
+    {
+        public string guid { get; set; }
+        public string stock_code { get; set; }
+        public DateTime rpt_date { get; set; }
+        public string rpt_type { get; set; }
+        public string title { get; set; }
+        public string title_type { get; set; }
+        public int text_sent_count { get; set; }//正文句子数
+        public int text_char_count { get; set; }//正文字符数
+        public int table_value_count { get; set; }
+        public int text_value_count { get; set; }
+        public string firstauthor { get; set; }
+        public string firstauthor_id { get; set; }
+        public bool innov { get; set; }
+        public int innov_sent_count { get; set; }
+        public int innov_char_count { get; set; }
+        //public 
     }
     //class Linkman
     //{
