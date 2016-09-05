@@ -11,6 +11,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Runtime.Serialization.Formatters.Binary;
 using Report.Handler;
 using Report.Securities;
 using Report.Outsider;
@@ -33,7 +34,7 @@ namespace Report
 
             //List<AnalystReport> reports = FileHandler.LoadClassInstances<AnalystReport>(reportInstancesPath);
 
-            Execute2();
+            Execute3();
 
             //System.Console.ReadLine();
 
@@ -120,6 +121,58 @@ namespace Report
             //DateTime d = DateTime.ParseExact(dateStr1, format3, System.Globalization.CultureInfo.CurrentCulture);
            
             return false;
+        }
+
+        /// <summary>
+        /// from hard disk to MongoDB
+        /// </summary>
+        /// <returns></returns>
+        static bool Execute3()
+        {
+            try
+            {
+                string filePath = @"E:\data\report_instance.dat";
+
+                MongoDBHandler mgDBH = new MongoDBHandler("InsertOnly");
+                if (!mgDBH.Init())
+                {
+                    System.Console.WriteLine("mgDBH.Init() failed");
+                    Trace.TraceError("mgDBH.Init() failed");
+                    return false;
+                }
+
+                FileStream fs = new FileStream(filePath, FileMode.Open);
+                BinaryFormatter bf = new BinaryFormatter();
+                List<AnalystReport> instances = new List<AnalystReport>();
+                int counter = 0;
+                while (true)
+                {
+                    instances.Clear();
+
+                    if (fs.Position == fs.Length)
+                        break;
+
+                    instances.AddRange(bf.Deserialize(fs) as List<AnalystReport>);
+
+                    counter += instances.Count;
+
+                    if (!mgDBH.InsertMany(instances))
+                    {
+                        Console.WriteLine("failed");
+                        return false;
+                    }
+                    Console.WriteLine(counter + " inserted");
+                        //Console.WriteLine("a");
+                }
+                Console.WriteLine("Process finished");
+                fs.Close();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("Text.Handler.FileHandler.LoadClassInstances<T>(): " + e.ToString());
+                return false;
+            }
         }
 
         /// <summary>
