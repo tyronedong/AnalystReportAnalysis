@@ -137,6 +137,15 @@ namespace Text.Classify
                 //if (isFLIIND(sentence))
                 //    return 1;
             }
+            //else if(type.Equals("NONINNOV"))
+            //{
+
+            //}
+            //else if (type.Equals("INNOVEMO"))
+            //{
+            //    if (isPosINNOVEMO(sentence))
+            //        return 1;
+            //}
 
             double predictResult = Predict(sentence);
 
@@ -160,6 +169,16 @@ namespace Text.Classify
         //private bool isFLI(string sentence)
         //{
         //}
+
+        private bool isPosINNOVEMO(string sentence)
+        {
+            Regex posWords = new Regex(@"看好|高效|推进|有望|坚挺|显著");
+            Regex posWords2 = new Regex(@"如虎添翼|有条不紊|稳中有升");
+            if (posWords.IsMatch(sentence) || posWords2.IsMatch(sentence))
+                return true; 
+
+            return false;
+        }
 
         private bool isNotFLI(string sentence)
         {

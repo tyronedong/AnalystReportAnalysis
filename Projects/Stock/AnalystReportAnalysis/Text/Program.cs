@@ -25,9 +25,15 @@ namespace Text
             //exH.Destroy();
 
 
-            GenerateLibSVMVector("INNOV", "于11月15日成功并购了海南金大丰矿业开发有限公司（抱伦金矿）63％的股权");
+            //GenerateLibSVMVector("INNOV", "于11月15日成功并购了海南金大丰矿业开发有限公司（抱伦金矿）63％的股权");
             //Process0();
-            //Process2("INNOV");
+            //Process1("NONINNOV");
+            CalNONINNOVPrecision();
+            //CalNONINNOVPrecision();
+            //CalINNOVTYPEPrecision();
+            //CalINNOVPrecision();
+            //CalFLIEMOPrecision();
+            //CalINNOVEMOPrecision();
             //CalINNOVPrecision();
             //WordSegHandler wsH = new WordSegHandler();
             //var l = wsH.GetSegmentation("考虑到发电量预测调整以及其他非经常性项目，我们将2009-11年盈利预测分别上调6%、22%和16%。");
@@ -39,77 +45,6 @@ namespace Text
             Console.WriteLine("finished");
             Console.ReadLine();
         }
-
-        //Bootstrap.ExecuteBootstrap(3000);
-        //Feature.ExtractAndStoreChiFeature(featurePath);
-        //List<FeatureItem> fItems = Feature.LoadChiFeature(fileName);
-        //Test2();
-        //Feature.ModifyChiFeature(featurePath);
-        //SelectAndSaveFulis();
-        //ExtractAndSaveChiFeatures();
-        //GenerateLibSVMInputFile();
-        //ExecuteTrain();
-        //ExecutePredict();
-        //string rootDicForModelRelate = ConfigurationManager.AppSettings["model_relate_root_dictionary"];
-        //Model.GenerateTrainSet(rootDicForModelRelate);
-
-        //GenerateLibSVMInputFile();
-        //ExecuteTrain();
-
-        //RandomSelect.ExecuteSelectFuli("INNOV", featureRootPath, 300);
-        //GenerateChiFeatureWord("FLIEMO");
-        //GenerateLibSVMInputFile("FLIEMO");
-        //ExecuteTrain();
-        //Feature.ExtractAndStoreChiFeature("FLIEMO", featureRootPath);
-
-        //Feature.ExtractAndStoreChiFeature("FLIEMO");
-        //GenerateLibSVMInputFile("FLIEMO");
-        //ExecuteTrain("FLIEMO");
-        //static void Test()
-        //{
-        //    Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
-        //    Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
-
-        //    string path = @"F:\事们\进行中\分析师报告\数据标注\FLI信息提取-样本.xlsx";
-        //    ExcelHandler exlH = new ExcelHandler(path);
-        //    string[] zhenglis = exlH.GetColoum("sheet1", 2);
-
-        //    Dictionary<string, int> dic = new Dictionary<string, int>();
-        //    WordSegHandler wsH = new WordSegHandler();
-        //    if (!wsH.isValid) { Console.WriteLine("init failed"); }
-        //    else
-        //    {
-        //        foreach (var zhengli in zhenglis)
-        //        {
-        //            if (zhengli == null || string.IsNullOrEmpty(zhengli.Trim())) { continue; }
-        //            wsH.ExecutePartition(zhengli);
-        //            string[] result = wsH.GetAll();
-        //            //string[] noStopWords = wsH.GetNoStopWords();
-        //            //List<string> words = new List<string>(noStopWords);
-        //            foreach (var word in result)
-        //            {
-        //                if (dic.ContainsKey(word))
-        //                {
-        //                    dic[word]++;
-        //                }
-        //                else
-        //                {
-        //                    dic.Add(word, 1);
-        //                }
-        //            }
-        //        }
-        //    }
-        //    var dicSort = from objDic in dic orderby objDic.Value descending select objDic;
-
-        //    foreach (var line in dicSort)
-        //    {
-        //        Trace.TraceInformation(line.Key + ":" + line.Value);
-        //    }
-
-        //    //SVM.Train.ExecuteTrain();
-
-        //    Console.ReadLine();
-        //}
 
         static void ExecutePredict(string type)
         {
@@ -319,7 +254,7 @@ namespace Text
             string rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
             string dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];//
 
-            TextPreProcess tPP = new TextPreProcess("INNOV", rootForChi, true, false, true, true);
+            TextPreProcess tPP = new TextPreProcess("INNOV", rootForChi, true, false, false, true);
             var data = tPP.GetTrainData("INNOV", dataFilePath);
 
             List<string> wrong = new List<string>();
@@ -348,6 +283,208 @@ namespace Text
             Console.WriteLine("total accuracy is " + ((accCount[0] + accCount[1]) / (totalCount[0] + totalCount[1])));
         }
 
+        static void CalINNOVTYPEPrecision()
+        {
+            Model model = new Model("INNOVTYPE");
+
+            string rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            string dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];//
+
+            TextPreProcess tPP = new TextPreProcess("INNOVTYPE", rootForChi, true, false, false, false);
+            var data = tPP.GetTrainData("INNOVTYPE", dataFilePath);
+
+            List<string> wrong = new List<string>();
+            double[] totalCount = new double[3];
+            double[] accCount = new double[3];
+            foreach (var dataItem in data)
+            {
+                totalCount[dataItem.Key - 1] += dataItem.Value.Count();//key equals 1, 2, 3
+                foreach (var sentence in dataItem.Value)
+                {
+                    double val = model.AdvancedPredict("INNOVTYPE", sentence);
+
+                    if (val == 1 && dataItem.Key == 1)
+                        accCount[0]++;
+                    else if (val == 2 && dataItem.Key == 2)
+                        accCount[1]++;
+                    else if (val == 3 && dataItem.Key == 3)
+                        accCount[2]++;
+                    else if (dataItem.Key == 1)
+                        wrong.Add(sentence);
+                }
+            }
+
+            FileHandler.SaveStringArray(@"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\innovation\INNOVTYPE\class1_wrong.txt", wrong.ToArray());
+
+            Console.WriteLine("class 1 accuracy is " + (accCount[0] / totalCount[0]));
+            Console.WriteLine("class 2 accuracy is " + (accCount[1] / totalCount[1]));
+            Console.WriteLine("class 3 accuracy is " + (accCount[2] / totalCount[2]));
+            Console.WriteLine("total accuracy is " + ((accCount[0] + accCount[1] + accCount[2]) / (totalCount[0] + totalCount[1] + totalCount[2])));
+        }
+
+        static void CalNONINNOVPrecision()
+        {
+            Model model = new Model("NONINNOV");
+
+            string rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            string dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];//
+
+            TextPreProcess tPP = new TextPreProcess("NONINNOV", rootForChi, true, false, false, true);
+            var data = tPP.GetTrainData("NONINNOV", dataFilePath);
+
+            List<string> wrong = new List<string>();
+            double[] totalCount = new double[2];
+            double[] accCount = new double[2];
+            foreach (var dataItem in data)
+            {
+                totalCount[dataItem.Key <= 0 ? 0 : dataItem.Key] += dataItem.Value.Count();//key equals -1,1
+                foreach (var sentence in dataItem.Value)
+                {
+                    double val = model.AdvancedPredict("NONINNOV", sentence);
+
+                    if (val == 1 && dataItem.Key == 1)
+                        accCount[1]++;
+                    else if (val == -1 && dataItem.Key == -1)
+                        accCount[0]++;
+                    else if (dataItem.Key == 1)
+                        wrong.Add(sentence);
+                }
+            }
+
+            FileHandler.SaveStringArray(@"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\innovation\NONINNOV\class1_wrong.txt", wrong.ToArray());
+
+            Console.WriteLine("class -1 accuracy is " + (accCount[0] / totalCount[0]));
+            Console.WriteLine("class 1 accuracy is " + (accCount[1] / totalCount[1]));
+            Console.WriteLine("total accuracy is " + ((accCount[0] + accCount[1]) / (totalCount[0] + totalCount[1])));
+        }
+
+        static void CalNONINNOVTYPEPrecision()
+        {
+            Model model = new Model("NONINNOVTYPE");
+
+            string rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            string dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];//
+
+            TextPreProcess tPP = new TextPreProcess("NONINNOVTYPE", rootForChi, true, false, false, false);
+            var data = tPP.GetTrainData("NONINNOVTYPE", dataFilePath);
+
+            List<string> wrong = new List<string>();
+            double[] totalCount = new double[5];
+            double[] accCount = new double[5];
+            foreach (var dataItem in data)
+            {
+                totalCount[dataItem.Key - 1] += dataItem.Value.Count();//key equals 1, 2, 3
+                foreach (var sentence in dataItem.Value)
+                {
+                    double val = model.AdvancedPredict("NONINNOVTYPE", sentence);
+
+                    if (val == 1 && dataItem.Key == 1)
+                        accCount[0]++;
+                    else if (val == 2 && dataItem.Key == 2)
+                        accCount[1]++;
+                    else if (val == 3 && dataItem.Key == 3)
+                        accCount[2]++;
+                    else if (val == 4 && dataItem.Key == 4)
+                        accCount[3]++;
+                    else if (val == 5 && dataItem.Key == 5)
+                        accCount[4]++;
+                    else if (dataItem.Key == 1)
+                        wrong.Add(sentence);
+                }
+            }
+
+            FileHandler.SaveStringArray(@"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\innovation\NONINNOVTYPE\class1_wrong.txt", wrong.ToArray());
+
+            Console.WriteLine("class 1 accuracy is " + (accCount[0] / totalCount[0]));
+            Console.WriteLine("class 2 accuracy is " + (accCount[1] / totalCount[1]));
+            Console.WriteLine("class 3 accuracy is " + (accCount[2] / totalCount[2]));
+            Console.WriteLine("class 4 accuracy is " + (accCount[3] / totalCount[3]));
+            Console.WriteLine("class 5 accuracy is " + (accCount[4] / totalCount[4]));
+            Console.WriteLine("total accuracy is " + ((accCount[0] + accCount[1] + accCount[2] + accCount[3] + accCount[4]) / (totalCount[0] + totalCount[1] + totalCount[2] + totalCount[3] + totalCount[4])));
+        }
+
+        static void CalINNOVEMOPrecision()
+        {
+            Model model = new Model("INNOVEMO");
+
+            string rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            string dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];//
+
+            TextPreProcess tPP = new TextPreProcess("INNOVEMO", rootForChi, true, false, false, false);
+            var data = tPP.GetTrainData("INNOVEMO", dataFilePath);
+
+            List<string> wrong = new List<string>();
+            double[] totalCount = new double[3];
+            double[] accCount = new double[3];
+            foreach (var dataItem in data)
+            {
+                totalCount[dataItem.Key - 1] += dataItem.Value.Count();//key equals 1,2,3
+                foreach (var sentence in dataItem.Value)
+                {
+                    double val = model.AdvancedPredict("INNOVEMO", sentence);
+
+                    if (val == 1 && dataItem.Key == 1)
+                        accCount[0]++;
+                    else if (val == 2 && dataItem.Key == 2)
+                        accCount[1]++;
+                    else if (val == 3 && dataItem.Key == 3)
+                        accCount[2]++;
+                    else if (dataItem.Key == 3)
+                        wrong.Add(sentence);
+                }
+            }
+
+            FileHandler.SaveStringArray(@"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\innovation\INNOVEMO\class3_wrong_adv.txt", wrong.ToArray());
+
+            Console.WriteLine("class 1 accuracy is " + (accCount[0] / totalCount[0]));
+            Console.WriteLine("class 2 accuracy is " + (accCount[1] / totalCount[1]));
+            Console.WriteLine("class 3 accuracy is " + (accCount[2] / totalCount[2]));
+            Console.WriteLine("total accuracy is " + ((accCount[0] + accCount[1] + accCount[2]) / (totalCount[0] + totalCount[1] + totalCount[2])));
+        }
+
+        static void CalINNOVEMOPrecision_nosvm()
+        {
+            SentiAnalysis sa = new SentiAnalysis();
+            if (!sa.isValid)
+            {
+                Console.WriteLine("Program.CalPrecision(): error");
+                return;
+            }
+
+            string rootForChi = ConfigurationManager.AppSettings["excel_innovation_root_dictionary"];
+            string dataFilePath = ConfigurationManager.AppSettings["excel_innovation_filename"];//
+
+            TextPreProcess tPP = new TextPreProcess("INNOVEMO", rootForChi, true, false, false, false);
+            var data = tPP.GetTrainData("INNOVEMO", dataFilePath);
+
+            List<string> wrong = new List<string>();
+            double[] totalCount = new double[3];
+            double[] accCount = new double[3];
+            foreach (var dataItem in data)
+            {
+                totalCount[dataItem.Key - 1] += dataItem.Value.Count();//key equals 1,2,3
+                foreach (var sentence in dataItem.Value)
+                {
+                    double val = sa.CalSentiValue(sentence);
+
+                    if (val > 0 && dataItem.Key == 1)
+                        accCount[dataItem.Key - 1]++;
+                    else if (val == 0 && dataItem.Key == 3)
+                        accCount[dataItem.Key - 1]++;
+                    else if (val < 0 && dataItem.Key == 2)
+                        accCount[dataItem.Key - 1]++;
+                    else if (dataItem.Key == 1)
+                        wrong.Add(sentence);
+                }
+            }
+
+            FileHandler.SaveStringArray(@"D:\workingwc\Stock\AnalystReportAnalysis\Text\result\innovation\INNOVEMO\class1_wrong_nosvm.txt", wrong.ToArray());
+
+            Console.WriteLine("class 1 accuracy is " + (accCount[0] / totalCount[0]));
+            Console.WriteLine("class 2 accuracy is " + (accCount[1] / totalCount[1]));
+            Console.WriteLine("class 3 accuracy is " + (accCount[2] / totalCount[2]));
+            Console.WriteLine("total accuracy is " + ((accCount[0] + accCount[1] + accCount[2]) / (totalCount[0] + totalCount[1] + totalCount[2])));
+        }
         static void CalFLIEMOPrecision()
         {
             SentiAnalysis sa = new SentiAnalysis();

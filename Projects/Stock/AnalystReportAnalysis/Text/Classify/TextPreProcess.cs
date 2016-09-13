@@ -205,13 +205,39 @@ namespace Text.Classify
                     if (!ConvertToDic(ref trainData, ref textExl, ref typeExl))//转化数据成trainData
                     { return null; }
                 }
+                else if(type.Equals("NONINNOV"))
+                {
+                    //read excel file for zhengli
+                    string[] textExl = exlH.GetColoum("sheet1", 2);
+                    string[] labelExl = exlH.GetColoum("sheet1", 7);
+
+                    if (textExl.Length != labelExl.Length)
+                        return null;
+                    int len = textExl.Length;
+                    List<string> zhengli = new List<string>();
+                    for (int i = 1; i < len; i++)
+                    {
+                        if (string.IsNullOrEmpty(textExl[i]) || string.IsNullOrEmpty(labelExl[i]))//skip invalid row, null 行会被pass掉
+                            continue;
+                        if (string.IsNullOrWhiteSpace(textExl[i]) || string.IsNullOrWhiteSpace(labelExl[i]))//skip invalid row
+                            continue;
+
+                        zhengli.Add(textExl[i]);
+                    }
+                    trainData.Add(1, zhengli);
+
+                    //read excel file for fuli
+                    string txtPath = Path.Combine(rootSourcePath, "./NONINNOV/random_select_fuli.txt");
+                    string[] fuliTxt = FileHandler.LoadStringArray(txtPath);
+                    trainData.Add(-1, new List<string>(fuliTxt));
+                }
                 else if (type.Equals("NONINNOVTYPE"))
                 {
                     string[] textExl = exlH.GetColoum("sheet1", 2);//文本
                     string[] typeExl = exlH.GetColoum("sheet1", 7);//对应文本的情感标注
 
                     if (!ConvertToDic(ref trainData, ref textExl, ref typeExl))//转化数据成trainData
-                    { return null; }
+                        return null;
                 }
                 else
                 {

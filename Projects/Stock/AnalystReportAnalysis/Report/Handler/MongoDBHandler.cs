@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace Report.Handler
 {
-    class MongoDBHandler
+    public class MongoDBHandler
     {
         private string authority;
         //variables for insert into mongoDB
@@ -25,7 +25,6 @@ namespace Report.Handler
         MongoClient ins_mgclient;
         IMongoDatabase ins_mgdatabase;
         IMongoCollection<AnalystReport> ins_mgcollection;
-
 
         //variables for query from mongoDB
         string query_mongoDBHost;
@@ -129,6 +128,49 @@ namespace Report.Handler
             IMongoQuery query = Query.Empty;
             var count = query_mgcollection.Count(query);
             return (int)count;
+        }
+
+        public List<AnalystReport> FindMany(string startQuid)
+        {
+            List<AnalystReport> tempList = new List<AnalystReport>();
+
+            IMongoQuery query = Query.GT("_id", startQuid);
+            MongoCursor<AnalystReport> cursor = query_mgcollection
+                .FindAs<AnalystReport>(query)
+                .SetSortOrder(SortBy.Ascending("_id"))
+                .SetLimit(100);
+
+            if (cursor == null)
+            {
+                Trace.TraceWarning("Report.Handler.MongoDBHandler.FindMany(string startQuid) goes wrong");
+                return null;
+            }
+
+            //try
+            //{
+            //    if (cursor.Size() == 0)
+            //    {
+            //        Trace.TraceWarning("Report.Handler.MongoDBHandler.FindMany goes wrong");
+            //        return null;
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    Trace.TraceWarning("Report.Handler.MongoDBHandler.FindMany: " + e.ToString());
+            //    return null;
+            //}
+
+            try
+            {
+                foreach (var report in cursor)
+                    tempList.Add(report);
+            }
+            catch (Exception e)
+            {
+                Trace.TraceWarning("Report.Handler.MongoDBHandler.FindMany(string startQuid): " + e.ToString());
+                return null;
+            }
+            return tempList;
         }
 
         public MongoCursor<AnalystReport> FormulateCursor(int quidRank)
