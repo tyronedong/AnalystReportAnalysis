@@ -80,4 +80,3 @@ D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Bson.xml
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.xml
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Legacy.xml
 D:\workingwc\Stock\AnalystReportAnalysis\Report\bin\Debug\MongoDB.Driver.Core.xml
-D:\workingwc\Stock\AnalystReportAnalysis\Report\obj\Debug\Report.csprojResolveAssemblyReference.cache

@@ -146,6 +146,8 @@ namespace Report
         public int noninnov3_char_count { get; set; }
         public int noninnov4_sent_count { get; set; }
         public int noninnov4_char_count { get; set; }
+        public int noninnov5_sent_count { get; set; }
+        public int noninnov5_char_count { get; set; }
 
         public string rpt_tone { get; set; }
 
@@ -157,6 +159,8 @@ namespace Report
         public int rpt_innov_pos_char_count { get; set; }
         public int rpt_innov_neg_sent_count { get; set; }
         public int rpt_innov_neg_char_count { get; set; }
+
+        public bool isvalid { get; set; }
     }
     //class Linkman
     //{
