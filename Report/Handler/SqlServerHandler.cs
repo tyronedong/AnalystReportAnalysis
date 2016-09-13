@@ -17,7 +17,7 @@ namespace Report.Handler
 
         private SqlConnection sqlCnn;
 
-        private DataTable insertTable;
+        private DataTable insertTable, insertTable_INNOV;
 
         private SqlDataAdapter sqlAdapter_assist;
         private SqlDataAdapter sqlAdapter;
@@ -50,6 +50,26 @@ namespace Report.Handler
         {
             //sqlCnn = new SqlConnection(sqlConnectionString);
             personTable = new Dictionary<string, Analyst>();
+        }
+
+        public bool Init_INNOV()
+        {
+            try
+            {
+                //set connection
+                sqlCnn = new SqlConnection(sqlConnectionString);
+
+                sqlCnn.Open();
+
+                isValid = true;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("SqlServerHandler.Init_INNOV(): " + e.Message);
+                isValid = false;
+                return false;
+            }
+            return true;
         }
 
         public bool Init()
@@ -260,6 +280,25 @@ namespace Report.Handler
             return analysts;
         }
 
+        public bool ExecuteInsertTable_INNOV()
+        {
+            bool isSuccuss;
+            try
+            {
+                //SqlConnection SqlConnectionObj = GetSQLConnection();
+                SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlCnn, SqlBulkCopyOptions.TableLock | SqlBulkCopyOptions.FireTriggers | SqlBulkCopyOptions.UseInternalTransaction, null);
+                bulkCopy.DestinationTableName = "[JRTZ_ANA].[dbo].[INNOV]";
+                bulkCopy.WriteToServer(insertTable_INNOV);
+                isSuccuss = true;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError(ex.ToString());
+                isSuccuss = false;
+            }
+            return isSuccuss;
+        }
+
         public bool ExecuteInsertTable()
         {
             bool isSuccuss;
@@ -277,6 +316,66 @@ namespace Report.Handler
                 isSuccuss = false;
             }
             return isSuccuss;
+        }
+
+        public void AddRowToInsertTable_INNOV(INNOVInfo inoInfo)
+        {
+            DataRow row = insertTable_INNOV.NewRow();
+
+            row["GUID"] = inoInfo.guid;
+            row["Code"] = inoInfo.stock_code;
+            row["Rpt_date"] = inoInfo.rpt_date;
+            row["Title"] = inoInfo.title;
+            row["Title_Type"] = inoInfo.title_type;
+            row["Rpt_Type"] = inoInfo.rpt_type;
+            row["Rpt_Length1"] = inoInfo.text_sent_count;
+            row["Rpt_Length2"] = inoInfo.text_char_count;
+            row["Rpt_data_table"] = inoInfo.table_value_count;
+            row["Rpt_data_content"] = inoInfo.text_value_count;
+            row["FirstAuthor"] = inoInfo.firstauthor;
+            row["FirstAuthor_ID"] = inoInfo.firstauthor_id;
+            row["Innov"] = inoInfo.has_innov;
+            row["Innov_Num1"] = inoInfo.innov_sent_count;
+            row["Innov_Num2"] = inoInfo.innov_char_count;
+            row["Innov1_Num1"] = inoInfo.innov1_sent_count;
+            row["Innov1_Num2"] = inoInfo.innov1_char_count;
+            row["Innov2_Num1"] = inoInfo.innov2_sent_count;
+            row["Innov2_Num2"] = inoInfo.innov2_char_count;
+            row["Innov3_Num1"] = inoInfo.innov3_sent_count;
+            row["Innov3_Num2"] = inoInfo.innov3_char_count;
+            row["InnovStage1_Num1"] = inoInfo.innov_stage1_sent_count;
+            row["InnovStage1_Num2"] = inoInfo.innov_stage1_char_count;
+            row["InnovStage2_Num1"] = inoInfo.innov_stage2_sent_count;
+            row["InnovStage2_Num2"] = inoInfo.innov_stage2_char_count;
+            row["InnovStage3_Num1"] = inoInfo.innov_stage3_sent_count;
+            row["InnovStage3_Num2"] = inoInfo.innov_stage3_char_count;
+            row["InnovStage4_Num1"] = inoInfo.innov_stage4_sent_count;
+            row["InnovStage4_Num2"] = inoInfo.innov_stage4_char_count;
+            row["Rpt_Tone"] = inoInfo.rpt_tone;
+            row["Rpt_Positive1"] = inoInfo.rpt_pos_sent_count;
+            row["Rpt_Positive2"] = inoInfo.rpt_pos_char_count;
+            row["Rpt_Negative1"] = inoInfo.rpt_neg_sent_count;
+            row["Rpt_Negative2"] = inoInfo.rpt_neg_char_count;
+            row["Rpt_Innov_Positive1"] = inoInfo.rpt_innov_pos_sent_count;
+            row["Rpt_Innov_Positive2"] = inoInfo.rpt_innov_pos_char_count;
+            row["Rpt_Innov_Negative1"] = inoInfo.rpt_innov_neg_sent_count;
+            row["Rpt_Innov_Negative2"] = inoInfo.rpt_innov_neg_char_count;
+            row["NOINNOV"] = inoInfo.has_noninnov;
+            row["NOINNOV1_Num1"] = inoInfo.noninnov1_sent_count;
+            row["NOINNOV1_Num2"] = inoInfo.noninnov1_char_count;
+            row["NOINNOV2_Num1"] = inoInfo.noninnov2_sent_count;
+            row["NOINNOV2_Num2"] = inoInfo.noninnov2_char_count;
+            row["NOINNOV3_Num1"] = inoInfo.noninnov3_sent_count;
+            row["NOINNOV3_Num2"] = inoInfo.noninnov3_char_count;
+            row["NOINNOV4_Num1"] = inoInfo.noninnov4_sent_count;
+            row["NOINNOV4_Num2"] = inoInfo.noninnov4_char_count;
+            row["NOINNOV5_Num1"] = inoInfo.noninnov5_sent_count;
+            row["NOINNOV5_Num2"] = inoInfo.noninnov5_char_count;
+            row["ISVALID"] = inoInfo.isvalid;
+
+            insertTable_INNOV.Rows.Add(row);
+
+            return;
         }
 
         public void AddRowToInsertTable(FLIInfo fliInfo)
@@ -311,9 +410,283 @@ namespace Report.Handler
             return;
         }
 
+        public void ClearInsertTable_INNOV()
+        {
+            insertTable_INNOV.Rows.Clear();
+        }
+
         public void ClearInsertTable()
         {
             insertTable.Rows.Clear();
+        }
+
+        public bool InitInsertTable_INNOV()
+        {
+            insertTable_INNOV = new DataTable();
+
+            DataColumn column;
+
+            try
+            {
+                // Create new DataColumn, set DataType, ColumnName and add to DataTable.    
+                column = new DataColumn();
+                column.DataType = System.Type.GetType("System.String");
+                column.ColumnName = "GUID";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = System.Type.GetType("System.String");
+                column.ColumnName = "Code";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.DateTime");
+                column.ColumnName = "Rpt_date";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = System.Type.GetType("System.String");
+                column.ColumnName = "Title";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = System.Type.GetType("System.String");
+                column.ColumnName = "Title_Type";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = System.Type.GetType("System.String");
+                column.ColumnName = "Rpt_Type";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_Length1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_Length2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_data_table";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_data_content";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = System.Type.GetType("System.String");
+                column.ColumnName = "FirstAuthor";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = System.Type.GetType("System.String");
+                column.ColumnName = "FirstAuthor_ID";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Boolean");
+                column.ColumnName = "Innov";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Innov_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Innov_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Innov1_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Innov1_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Innov2_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Innov2_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Innov3_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Innov3_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "InnovStage1_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "InnovStage1_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "InnovStage2_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "InnovStage2_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "InnovStage3_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "InnovStage3_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "InnovStage4_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "InnovStage4_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.String");
+                column.ColumnName = "Rpt_Tone";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_Positive1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_Positive2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_Negative1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_Negative2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_Innov_Positive1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_Innov_Positive2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_Innov_Negative1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "Rpt_Innov_Negative2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Boolean");
+                column.ColumnName = "NOINNOV";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NOINNOV1_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NOINNOV1_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NOINNOV2_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NOINNOV2_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NOINNOV3_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NOINNOV3_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NOINNOV4_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NOINNOV4_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NOINNOV5_Num1";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Int32");
+                column.ColumnName = "NOINNOV5_Num2";
+                insertTable_INNOV.Columns.Add(column);
+
+                column = new DataColumn();
+                column.DataType = Type.GetType("System.Boolean");
+                column.ColumnName = "ISVALID";
+                insertTable_INNOV.Columns.Add(column);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(e.ToString());
+                Console.WriteLine("Insert table innov init error");
+                return false;
+            }
         }
 
         public bool InitInsertTable()

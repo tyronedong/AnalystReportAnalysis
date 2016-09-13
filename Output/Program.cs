@@ -25,7 +25,9 @@ namespace Output
             Trace.Listeners.Clear();  //清除系统监听器 (就是输出到Console的那个)
             Trace.Listeners.Add(new TraceHandler()); //添加MyTraceListener实例
 
-            FLIProcess();
+            //var L = new INNOVInfo();
+            INNOVProcess();
+            //FLIProcess();
             Console.WriteLine("Process finished");
             Console.ReadLine();
         }
@@ -54,17 +56,17 @@ namespace Output
                     Thread.Sleep(10000);
                     continue;
                 }
-                if (!sqlSH.Init())
+                if (!sqlSH.Init_INNOV())
                 {
                     System.Console.WriteLine("sqlSH.Init failed");
                     Trace.TraceError("sqlSH.Init failed");
                     Thread.Sleep(10000);
                     continue;
                 }
-                if (!sqlSH.InitInsertTable())
+                if (!sqlSH.InitInsertTable_INNOV())
                 {
-                    System.Console.WriteLine("sqlSH.InitInsertTable failed");
-                    Trace.TraceError("sqlSH.InitInsertTable failed");
+                    System.Console.WriteLine("sqlSH.InitInsertTable_INNOV failed");
+                    Trace.TraceError("sqlSH.InitInsertTable_INNOV failed");
                     Thread.Sleep(10000);
                     continue;
                 }
@@ -77,7 +79,7 @@ namespace Output
                 }
 
                 bool isError; string curId, nextCurId;
-                string reportRelativeRootPath = @"{0}\{1}-{2}-{3}";
+                //string reportRelativeRootPath = @"{0}\{1}-{2}-{3}";
                 List<AnalystReport> reports = new List<AnalystReport>();
                 //HashSet<string> idSet = new HashSet<string>();
 
@@ -97,21 +99,6 @@ namespace Output
                         Console.WriteLine("Start handle reports whose id are greater than " + curId);
                         Trace.TraceInformation("Start handle reports whose id are greater than " + curId);
 
-                        ////get data by id
-                        //DataTable curReportsTable = sqlSH.GetAssistTableById(curId);
-                        //if (curReportsTable == null)
-                        //{
-                        //    isError = true;
-                        //    break;
-                        //}
-
-                        ////judge if data has all been handled
-                        //if (curReportsTable.Rows.Count == 0)
-                        //{
-                        //    isError = false;
-                        //    break;
-                        //}
-
                         //idSet.Clear();
                         List<AnalystReport> curMReports = mgDBH.FindMany(curId);
                         if(curMReports==null)
@@ -127,16 +114,13 @@ namespace Output
                         }
 
                         reports.Clear();
-                        foreach (AnalystReport curRow in curMReports)
+                        foreach (AnalystReport curReports in curMReports)
                         {
-                            INNOVInfo innovInfo = FLIConvert(ref FLIModel, ref FLIINDModel, ref senti, curAnReport);
-                            sqlSH.AddRowToInsertTable(fliInfo);
-                            //if (flag)
-                            //{
-                            //    System.Console.WriteLine("Hello");
-                            //}
+                            INNOVInfo innovInfo = INNOVConvert(ref INNOVModel, ref INNOVTYPEModel, ref NONINNOVModel, ref NONINNOVTYPEModel, ref senti, curReports);
+                            sqlSH.AddRowToInsertTable_INNOV(innovInfo);
+
                             //update nextCurId
-                            nextCurId = id;
+                            nextCurId = curReports._id;
                         }//for
                         if (isError)
                         {
@@ -153,14 +137,14 @@ namespace Output
                         //    isError = true;
                         //    break;
                         //}
-                        if (!sqlSH.ExecuteInsertTable())
+                        if (!sqlSH.ExecuteInsertTable_INNOV())
                         {
                             isError = true;
                             break;
                         }
 
                         //set curid to id file
-                        sqlSH.ClearInsertTable();
+                        sqlSH.ClearInsertTable_INNOV();
                         curIH.SetCurIdToFile(nextCurId);
                     }//while(true)
                     if (isError)
@@ -179,18 +163,153 @@ namespace Output
                 }
                 catch (Exception e)
                 {
-                    Trace.TraceError("Program.Execute(): " + e.Message);
+                    Trace.TraceError("Program.Execute(): " + e.ToString());
                     Thread.Sleep(10000);
                     continue;
                 }
             }//while(true)
         }
 
-        static INNOVInfo INNOVConvert(ref Model innovModel, ref Model innovtypeModel, )
+        static INNOVInfo INNOVConvert(ref Model innovModel, ref Model innovtypeModel, ref Model noninnovModel, ref Model noninnovtypeModel, ref SentiAnalysis sensor, AnalystReport anaReport)
         {
             INNOVInfo innovInfo = new INNOVInfo();
 
-            return null;
+            innovInfo.guid = anaReport._id;
+            innovInfo.title = anaReport.ReportTitle;
+            innovInfo.rpt_date = anaReport.Date;
+            if (string.IsNullOrEmpty(anaReport.Content))
+                return innovInfo;
+
+            innovInfo.stock_code = anaReport.StockCode;
+            if (anaReport.ReportType.Equals("特殊事项点评"))
+                innovInfo.rpt_type = "1";
+            else if (anaReport.ReportType.Equals("常规报告"))
+                innovInfo.rpt_type = "2";
+            else
+                innovInfo.rpt_type = "3";
+            
+
+            if (innovModel.AdvancedPredict("INNOV", anaReport.ReportTitle) == 0)
+                innovInfo.title_type = "2";//不包含前瞻性信息
+            else
+                innovInfo.title_type = "1";//包含前瞻性信息
+
+            double title_se = sensor.CalSentiValue(anaReport.ReportTitle);
+            if (title_se > 0)
+                innovInfo.rpt_tone = "1";
+            else if (title_se == 0)
+                innovInfo.rpt_tone = "3";
+            else
+                innovInfo.rpt_tone = "2";
+
+            if (!string.IsNullOrEmpty(anaReport.Content))
+            {
+                innovInfo.isvalid = true;
+
+                string[] sentences = GetSegSentences(anaReport.Content);
+                innovInfo.text_sent_count = sentences.Count();
+                innovInfo.text_char_count = anaReport.Content.Length;
+                innovInfo.table_value_count = anaReport.valCountOutContent;
+                innovInfo.text_value_count = anaReport.valCountInContent;
+
+                if (anaReport.Analysts.Count() >= 1)
+                {
+                    innovInfo.firstauthor = anaReport.Analysts[0].Name;
+                    innovInfo.firstauthor_id = anaReport.Analysts[0]._id;
+                }
+
+                foreach (string sent in sentences)
+                {
+                    bool isPos = false, isNeg = false;
+                    double sent_val = sensor.CalSentiValue(sent);
+                    if (sent_val > 0)
+                    {
+                        isPos = true;
+                        innovInfo.rpt_pos_sent_count++;
+                        innovInfo.rpt_pos_char_count += sent.Length;
+                    }
+                    else if (sent_val < 0)
+                    {
+                        isNeg = true;
+                        innovInfo.rpt_neg_sent_count++;
+                        innovInfo.rpt_neg_char_count += sent.Length;
+                    }
+
+                    if (innovModel.AdvancedPredict("INNOV", sent) == 1)//是创新性信息
+                    {
+                        if (isPos)
+                        {
+                            innovInfo.rpt_innov_pos_sent_count++;
+                            innovInfo.rpt_innov_pos_char_count += sent.Length;
+                        }
+                        if (isNeg)
+                        {
+                            innovInfo.rpt_innov_neg_sent_count++;
+                            innovInfo.rpt_innov_neg_char_count += sent.Length;
+                        }
+
+                        innovInfo.innov_sent_count++;
+                        innovInfo.innov_char_count += sent.Length;
+
+                        double innov_type = innovtypeModel.AdvancedPredict("INNOVTYPE", sent);
+                        if (innov_type == 1)
+                        {
+                            innovInfo.innov1_sent_count++;
+                            innovInfo.innov1_char_count += sent.Length;
+                        }
+                        else if (innov_type == 2)
+                        {
+                            innovInfo.innov2_sent_count++;
+                            innovInfo.innov2_char_count += sent.Length;
+                        }
+                        else
+                        {
+                            innovInfo.innov3_sent_count++;
+                            innovInfo.innov3_char_count += sent.Length;
+                        }
+                    }
+                    else//不是创新性信息
+                    {
+                        if (noninnovModel.AdvancedPredict("NONINNOV", sent) == 1)
+                        {
+                            double non_innov_type = noninnovtypeModel.AdvancedPredict("NONINNOVTYPE", sent);
+                            if (non_innov_type == 1)
+                            {
+                                innovInfo.noninnov1_sent_count++;
+                                innovInfo.noninnov1_char_count += sent.Length;
+                            }
+                            else if (non_innov_type == 2)
+                            {
+                                innovInfo.noninnov2_sent_count++;
+                                innovInfo.noninnov2_char_count += sent.Length;
+                            }
+                            else if (non_innov_type == 3)
+                            {
+                                innovInfo.noninnov3_sent_count++;
+                                innovInfo.noninnov3_char_count += sent.Length;
+                            }
+                            else if (non_innov_type == 4)
+                            {
+                                innovInfo.noninnov4_sent_count++;
+                                innovInfo.noninnov4_char_count += sent.Length;
+                            }
+                            else
+                            {
+                                innovInfo.noninnov5_sent_count++;
+                                innovInfo.noninnov5_char_count += sent.Length;
+                            }
+                        }
+                    }
+                }//for loop
+                if (innovInfo.innov_sent_count > 0)
+                    innovInfo.has_innov = true;
+                int count = innovInfo.noninnov1_sent_count + innovInfo.noninnov2_sent_count + innovInfo.noninnov3_sent_count + innovInfo.noninnov4_sent_count + innovInfo.noninnov5_sent_count;
+                if (count > 0)
+                    innovInfo.has_noninnov = true;
+            }//if content is valid
+            else innovInfo.isvalid = false;
+
+            return innovInfo;
         }
 
         static void FLIProcess()
@@ -642,5 +761,27 @@ namespace Output
 
             return narrowSense.IsMatch(sentence);
         }
+
+        /// <summary>
+        /// 获取正规化的句子列表
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        static string[] GetSegSentences(string document)
+        {
+            char[] separator = { '。', '？', '！' };
+            document = document.Replace("\n", "。");//替换成‘。'有问题吧
+            //替换成‘。’没有问题
+            string[] sents = document.Split(separator);
+            List<string> normalized_sent = new List<string>();
+            foreach(string sent in sents)
+            {
+                if (string.IsNullOrEmpty(sent) || string.IsNullOrWhiteSpace(sent))
+                    continue;
+                normalized_sent.Add(sent);
+            }
+            return normalized_sent.ToArray();
+        }
+
     }
 }

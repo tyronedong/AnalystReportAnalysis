@@ -137,10 +137,13 @@ namespace Text.Classify
                 //if (isFLIIND(sentence))
                 //    return 1;
             }
-            //else if(type.Equals("NONINNOV"))
-            //{
-
-            //}
+            else if (type.Equals("NONINNOV"))
+            {
+                if (isNONINNOV(sentence))
+                    return 1;
+                else
+                    return -1;
+            }
             //else if (type.Equals("INNOVEMO"))
             //{
             //    if (isPosINNOVEMO(sentence))
@@ -151,6 +154,34 @@ namespace Text.Classify
 
             return predictResult;
         }
+
+        private bool isNONINNOV(string sentence)
+        {
+            Regex words = new Regex(@"新技术|新工艺|新技艺|新功能|优质品率|优化|改进|技术人才|专业人才|博士后|高新人才|创新|研发|房地产|公司的竞争对手|同行业其他公司|可比企业研究|开发|研发费用|研发投入|探索|技术中心|引进|启动|研发中心|开发中心|技术研发");
+            Regex words2 = new Regex(@"创新战略|商业模式创新|营销创新|新领域拓展|颠覆|革新|转型|差异化|多样化|研发成果|新专利|新发明|专利申请|专利获批|新产品|新产品线|新一代|新系统|新系列|新版|更新|新推出|升级|换代|产品开发|新应用|在研产品|新性能|新工艺|新设计|新包装");
+            if (words.IsMatch(sentence) || words2.IsMatch(sentence))
+                return true;
+            return false;
+        }
+
+        //private bool isNONINNOV(string sentence)
+        //{
+        //    double[] featVector = Feature.GetFeatureVec(sentence, ref wsH, ref features);
+
+        //    int index = 0;
+        //    bool isnoninnov = false;
+        //    foreach (double val in featVector)
+        //    {
+        //        index++;
+        //        if (index == 38)
+        //            continue;
+        //        if (val == 0)
+        //            continue;
+        //        isnoninnov = true;
+        //    }
+
+        //    return isnoninnov;
+        //}
 
         private bool isFLIIND(string sentence)//是否是行业层面的信息
         {

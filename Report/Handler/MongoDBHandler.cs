@@ -146,20 +146,6 @@ namespace Report.Handler
                 return null;
             }
 
-            //try
-            //{
-            //    if (cursor.Size() == 0)
-            //    {
-            //        Trace.TraceWarning("Report.Handler.MongoDBHandler.FindMany goes wrong");
-            //        return null;
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    Trace.TraceWarning("Report.Handler.MongoDBHandler.FindMany: " + e.ToString());
-            //    return null;
-            //}
-
             try
             {
                 foreach (var report in cursor)
