@@ -30,6 +30,169 @@ namespace Output
             Console.ReadLine();
         }
 
+        static void INNOVProcess()
+        {
+            string idFileName = ConfigurationManager.AppSettings["IdFileName"];
+            string dataRootPath = ConfigurationManager.AppSettings["DataRootPath"];
+
+            while (true)
+            {
+                CurIdHandler curIH = new CurIdHandler(idFileName);
+                SqlServerHandler sqlSH = new SqlServerHandler();
+                MongoDBHandler mgDBH = new MongoDBHandler("QueryOnly");
+                //WordSegHandler wsH = new WordSegHandler();
+                Model INNOVModel = new Model("INNOV");
+                Model INNOVTYPEModel = new Model("INNOVTYPE");
+                Model NONINNOVModel = new Model("NONINNOV");
+                Model NONINNOVTYPEModel = new Model("NONINNOVTYPE");
+
+                SentiAnalysis senti = new SentiAnalysis();
+                if (!senti.LoadSentiDic())
+                {
+                    System.Console.WriteLine("sentiment dictionary load failed");
+                    Trace.TraceError("sentiment dictionary load failed");
+                    Thread.Sleep(10000);
+                    continue;
+                }
+                if (!sqlSH.Init())
+                {
+                    System.Console.WriteLine("sqlSH.Init failed");
+                    Trace.TraceError("sqlSH.Init failed");
+                    Thread.Sleep(10000);
+                    continue;
+                }
+                if (!sqlSH.InitInsertTable())
+                {
+                    System.Console.WriteLine("sqlSH.InitInsertTable failed");
+                    Trace.TraceError("sqlSH.InitInsertTable failed");
+                    Thread.Sleep(10000);
+                    continue;
+                }
+                if (!mgDBH.Init())
+                {
+                    System.Console.WriteLine("mgDBH.Init() failed");
+                    Trace.TraceError("mgDBH.Init() failed");
+                    Thread.Sleep(10000);
+                    continue;
+                }
+
+                bool isError; string curId, nextCurId;
+                string reportRelativeRootPath = @"{0}\{1}-{2}-{3}";
+                List<AnalystReport> reports = new List<AnalystReport>();
+                //HashSet<string> idSet = new HashSet<string>();
+
+                try
+                {
+                    while (true)
+                    {
+                        isError = false;
+                        //get current id in the log file
+                        curId = curIH.GetCurIdFromFile();
+                        if (curId == null)
+                        {
+                            isError = true;
+                            break;
+                        }
+                        nextCurId = curId;
+                        Console.WriteLine("Start handle reports whose id are greater than " + curId);
+                        Trace.TraceInformation("Start handle reports whose id are greater than " + curId);
+
+                        ////get data by id
+                        //DataTable curReportsTable = sqlSH.GetAssistTableById(curId);
+                        //if (curReportsTable == null)
+                        //{
+                        //    isError = true;
+                        //    break;
+                        //}
+
+                        ////judge if data has all been handled
+                        //if (curReportsTable.Rows.Count == 0)
+                        //{
+                        //    isError = false;
+                        //    break;
+                        //}
+
+                        //idSet.Clear();
+                        List<AnalystReport> curMReports = mgDBH.FindMany(curId);
+                        if(curMReports==null)
+                        {
+                            isError = true;
+                            break;
+                        }
+                        if(curMReports.Count==0)
+                        {
+                            isError = false;
+                            Console.WriteLine("process finished");
+                            break;
+                        }
+
+                        reports.Clear();
+                        foreach (AnalystReport curRow in curMReports)
+                        {
+                            INNOVInfo innovInfo = FLIConvert(ref FLIModel, ref FLIINDModel, ref senti, curAnReport);
+                            sqlSH.AddRowToInsertTable(fliInfo);
+                            //if (flag)
+                            //{
+                            //    System.Console.WriteLine("Hello");
+                            //}
+                            //update nextCurId
+                            nextCurId = id;
+                        }//for
+                        if (isError)
+                        {
+                            Console.WriteLine("Something wrong within the inner foreach loop!");
+                            Trace.TraceInformation("Something wrong within the inner foreach loop!");
+                            //Thread.Sleep(10000);
+                            isError = true;
+                            break;
+                        }
+                        ////insert reports list to mongoDB
+                        ////debug
+                        //if (!mgDBH.InsertMany(reports))
+                        //{
+                        //    isError = true;
+                        //    break;
+                        //}
+                        if (!sqlSH.ExecuteInsertTable())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        //set curid to id file
+                        sqlSH.ClearInsertTable();
+                        curIH.SetCurIdToFile(nextCurId);
+                    }//while(true)
+                    if (isError)
+                    {
+                        Console.WriteLine("Something wrong within the inner while loop!");
+                        Trace.TraceInformation("Something wrong within the inner while loop!");
+                        Thread.Sleep(10000);
+                        continue;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Process finished!");
+                        Trace.TraceInformation("Program.Execute() process finished!");
+                        break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError("Program.Execute(): " + e.Message);
+                    Thread.Sleep(10000);
+                    continue;
+                }
+            }//while(true)
+        }
+
+        static INNOVInfo INNOVConvert(ref Model innovModel, ref Model innovtypeModel, )
+        {
+            INNOVInfo innovInfo = new INNOVInfo();
+
+            return null;
+        }
+
         static void FLIProcess()
         {
             string idFileName = ConfigurationManager.AppSettings["IdFileName"];

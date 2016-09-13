@@ -115,10 +115,48 @@ namespace Report
         public int text_value_count { get; set; }
         public string firstauthor { get; set; }
         public string firstauthor_id { get; set; }
-        public bool innov { get; set; }
+        
+        public bool has_innov { get; set; }
+        
         public int innov_sent_count { get; set; }
         public int innov_char_count { get; set; }
-        //public 
+        public int innov1_sent_count { get; set; }
+        public int innov1_char_count { get; set; }
+        public int innov2_sent_count { get; set; }
+        public int innov2_char_count { get; set; }
+        public int innov3_sent_count { get; set; }
+        public int innov3_char_count { get; set; }
+        
+        public int innov_stage1_sent_count { get; set; }
+        public int innov_stage1_char_count { get; set; }
+        public int innov_stage2_sent_count { get; set; }
+        public int innov_stage2_char_count { get; set; }
+        public int innov_stage3_sent_count { get; set; }
+        public int innov_stage3_char_count { get; set; }
+        public int innov_stage4_sent_count { get; set; }
+        public int innov_stage4_char_count { get; set; }
+
+        public bool has_noninnov { get; set; }
+
+        public int noninnov1_sent_count { get; set; }
+        public int noninnov1_char_count { get; set; }
+        public int noninnov2_sent_count { get; set; }
+        public int noninnov2_char_count { get; set; }
+        public int noninnov3_sent_count { get; set; }
+        public int noninnov3_char_count { get; set; }
+        public int noninnov4_sent_count { get; set; }
+        public int noninnov4_char_count { get; set; }
+
+        public string rpt_tone { get; set; }
+
+        public int rpt_pos_sent_count { get; set; }
+        public int rpt_pos_char_count { get; set; }
+        public int rpt_neg_sent_count { get; set; }
+        public int rpt_neg_char_count { get; set; }
+        public int rpt_innov_pos_sent_count { get; set; }
+        public int rpt_innov_pos_char_count { get; set; }
+        public int rpt_innov_neg_sent_count { get; set; }
+        public int rpt_innov_neg_char_count { get; set; }
     }
     //class Linkman
     //{
