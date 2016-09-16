@@ -181,26 +181,32 @@ namespace Output
                 return innovInfo;
 
             innovInfo.stock_code = anaReport.StockCode;
-            if (anaReport.ReportType.Equals("特殊事项点评"))
-                innovInfo.rpt_type = "1";
-            else if (anaReport.ReportType.Equals("常规报告"))
-                innovInfo.rpt_type = "2";
-            else
-                innovInfo.rpt_type = "3";
-            
+            if (!string.IsNullOrEmpty(anaReport.ReportType))
+            {
+                if (anaReport.ReportType.Equals("特殊事项点评"))
+                    innovInfo.rpt_type = "1";
+                else if (anaReport.ReportType.Equals("常规报告"))
+                    innovInfo.rpt_type = "2";
+                else
+                    innovInfo.rpt_type = "3";
+            }
 
-            if (innovModel.AdvancedPredict("INNOV", anaReport.ReportTitle) == 0)
-                innovInfo.title_type = "2";//不包含前瞻性信息
-            else
-                innovInfo.title_type = "1";//包含前瞻性信息
 
-            double title_se = sensor.CalSentiValue(anaReport.ReportTitle);
-            if (title_se > 0)
-                innovInfo.rpt_tone = "1";
-            else if (title_se == 0)
-                innovInfo.rpt_tone = "3";
-            else
-                innovInfo.rpt_tone = "2";
+            if (!string.IsNullOrEmpty(anaReport.ReportTitle))
+            {
+                if (innovModel.AdvancedPredict("INNOV", anaReport.ReportTitle) == 0)
+                    innovInfo.title_type = "2";//不包含前瞻性信息
+                else
+                    innovInfo.title_type = "1";//包含前瞻性信息
+
+                double title_se = sensor.CalSentiValue(anaReport.ReportTitle);
+                if (title_se > 0)
+                    innovInfo.rpt_tone = "1";
+                else if (title_se == 0)
+                    innovInfo.rpt_tone = "3";
+                else
+                    innovInfo.rpt_tone = "2";
+            }
 
             if (!string.IsNullOrEmpty(anaReport.Content))
             {
